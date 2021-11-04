@@ -36,6 +36,7 @@
           :empty-text="$t('deal.formNotData')"
           :default-sort = "{prop: 'date', order: 'descending'}" v-loading="loading"
           
+          @row-click="clickRowHandle"
           :row-key="getRowKeys"
           :expand-row-keys="expands"
           @expand-change="exChange"
@@ -281,7 +282,7 @@
                 <el-button class="uploadBtn blue"
                   :class="{'opacity': (tableData[scope.$index].status.toLowerCase() != 'created' && tableData[scope.$index].status.toLowerCase() != 'actionRequired' && tableData[scope.$index].status.toLowerCase() != 'assigned')}"
                   :disabled="(tableData[scope.$index].status.toLowerCase() != 'created' && tableData[scope.$index].status.toLowerCase() != 'actionRequired' && tableData[scope.$index].status.toLowerCase() != 'assigned')" 
-                  @click="payClick(scope.row)">
+                  @click.stop="payClick(scope.row)">
                   PAY
                 </el-button>
                 <el-button 
@@ -427,6 +428,18 @@ export default {
     }
   },
   methods: {
+    clickRowHandle(row, column, event) {
+      if (this.expands.includes(row.uuid)) {
+        // this.expands = this.expands.filter(val => val !== row.uuid);
+        this.expands = []
+      } else {
+        this.expands = []
+        if (row) {
+          this.expands.push(row.uuid)
+        }
+        this.tableTrClick(row)
+      }
+    },
     payClick(row){
       let _this = this
       if(row.status.toLowerCase() == 'created' || row.status.toLowerCase() == 'actionRequired'){
@@ -565,7 +578,6 @@ export default {
                 if(type) _this.walletInfo()
               } 
             });
-            _this.tableDataAll = JSON.parse(JSON.stringify(_this.tableDataChild));
             // console.log(_this.tableDataChild)
           } else {
             // _this.$message.error(response.message);
@@ -758,6 +770,7 @@ export default {
         task_name: _this.searchValue
       };
 
+      _this.tableData = []
       myAjax
         .getTasksList(parma)
         .then((response) => {
@@ -766,9 +779,7 @@ export default {
             _this.expands = []
             // _this.tableData = Array.from(new Set(response.data.task));
             _this.parma.total = response.data.total_items;
-            // _this.parma.total = response.total_items;
-            _this.tableData = response.data.task;
-            _this.tableData.map((item,s) => {
+            response.data.task.map((item,s) => {
               item.conIDvisible = false
               item.cIDvisible = false
               item.namevisible = false
@@ -786,9 +797,11 @@ export default {
                 _this.expands.push(item.uuid)
               }
             });
+
+            _this.tableData = response.data.task;
             _this.tableDataAll = JSON.parse(JSON.stringify(_this.tableData))
-            _this.$refs.singleTable.setCurrentRow(_this.tableData[0]);
             if(_this.tableData[0]){
+              _this.$refs.singleTable.setCurrentRow(_this.tableData[0]);
               _this.tableTrClick(_this.tableData[0])
             }
             _this.loading = false
