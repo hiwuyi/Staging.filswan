@@ -82,7 +82,7 @@
                         </template>                    
                     </el-table-column>
                     <el-table-column prop="network" :label="$t('billing.NETWORK')" min-width="120"></el-table-column>
-                    <el-table-column prop="log_payment_time" :label="$t('billing.PAYMENTDATE')" min-width="140"></el-table-column>
+                    <el-table-column prop="lock_payment_time" :label="$t('billing.PAYMENTDATE')" min-width="140"></el-table-column>
                     <el-table-column prop="deadline" :label="$t('billing.Deadline')" min-width="140"></el-table-column>
                 </el-table>
             </div>
@@ -171,12 +171,12 @@
                             item.txHashVis = false
                             item.payloadVis = false
                             item.walletVis = false
-                            item.log_payment_time =
-                                item.log_payment_time?
-                                    String(item.log_payment_time).length<13?
-                                        moment(new Date(parseInt(item.log_payment_time * 1000))).format("YYYY-MM-DD HH:mm:ss")
+                            item.lock_payment_time =
+                                item.lock_payment_time?
+                                    String(item.lock_payment_time).length<13?
+                                        moment(new Date(parseInt(item.lock_payment_time * 1000))).format("YYYY-MM-DD HH:mm:ss")
                                         :
-                                        moment(new Date(item.log_payment_time)).format("YYYY-MM-DD HH:mm:ss")
+                                        moment(new Date(parseInt(item.lock_payment_time))).format("YYYY-MM-DD HH:mm:ss")
                                     :
                                     '-'
                             item.deadline =
@@ -184,10 +184,9 @@
                                     String(item.deadline).length<13?
                                         moment(new Date(parseInt(item.deadline * 1000))).format("YYYY-MM-DD HH:mm:ss")
                                         :
-                                        moment(new Date(item.deadline)).format("YYYY-MM-DD HH:mm:ss")
+                                        moment(new Date(parseInt(item.deadline))).format("YYYY-MM-DD HH:mm:ss")
                                     :
                                     '-'
-                            
                             // item.locked_fee = web3.utils.fromWei(item.locked_fee, 'ether')
                             item.locked_fee = Number(0.000000000000000001 * item.locked_fee).toFixed(18)
                         })
