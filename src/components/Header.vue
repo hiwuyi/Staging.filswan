@@ -29,6 +29,9 @@
 
                         <img src="@/assets/images/metamask.png" slot="reference" />
                     </el-popover>
+
+                    <span class="text" v-if="addrChild && !network.text" @click="wrongVisible=true">Wrong Network</span>
+                    <span class="text textTrue" v-else-if="addrChild && network.text">{{network.name}}</span>
                 </div>
                 {{$t('navbar.hi')}}
                 <router-link :to="{name: 'Upload_files_create'}">
@@ -57,6 +60,14 @@
             </div>
         </div>    
         
+
+        <el-dialog
+        title="Tips"
+        :visible.sync="wrongVisible" :show-close="false"
+        :width="width" custom-class="wrongNet">
+        <span>Please connect to the appropriate Ethereum network.</span>
+        </el-dialog>
+
         <div class="loadIndexStyle" v-show="loadIndexing" v-loading="loadIndexing"></div>
     </div>
 </template>
@@ -87,9 +98,12 @@ export default {
             priceAccound: 0,
             network: {
                 name: '',
-                unit: ''
+                unit: '',
+                text: false
             },
-            addrChild: ''
+            addrChild: '',
+            wrongVisible: false,
+            width: document.body.clientWidth>600?'400px':'95%',
         };
     },
     computed: {
@@ -288,38 +302,47 @@ export default {
                 case 1:
                     _this.network.name = 'mainnet';
                     _this.network.unit = 'ETH';
+                    _this.network.text = false
                     return;
                 case 3:
                     _this.network.name = 'ropsten';
                     _this.network.unit = 'ETH';
+                    _this.network.text = false
                     break;
                 case 4:
                     _this.network.name = 'rinkeby';
                     _this.network.unit = 'ETH';
+                    _this.network.text = false
                     return;
                 case 5:
                     _this.network.name = 'goerli';
                     _this.network.unit = 'ETH';
+                    _this.network.text = false
                     return;
                 case 42:
                     _this.network.name = 'kovan';
                     _this.network.unit = 'ETH';
+                    _this.network.text = false
                     return;
                 case 97:
                     _this.network.name = 'BSC Network';
                     _this.network.unit = 'BNB';
+                    _this.network.text = false
                     return;
                 case 999:
                     _this.network.name = 'NBAI';
                     _this.network.unit = 'NBAI';
+                    _this.network.text = false
                     return;
                 case 80001:
                     _this.network.name = 'polygon';
                     _this.network.unit = 'MATIC';
+                    _this.network.text = true
                     return;
                 default:
                     _this.network.name = '';
                     _this.network.unit = '';
+                    _this.network.text = false
                     return;
                 }
             });
@@ -409,6 +432,39 @@ export default {
 };
 </script>
 <style  lang="scss" scoped>
+.el-dialog__wrapper /deep/{
+    display: flex;
+    align-items: center;
+    .wrongNet{
+        margin: auto !important;
+        border-radius: 4px;
+        background: #fff url(../assets/images/tip_bg.png) no-repeat;
+        background-size: 1.45rem;
+        background-position: -0.2rem -0.3rem;
+        .el-dialog__header{
+            display: flex;
+            color: #000;
+            font-size: 18px;
+            padding: 0.15rem 0.15rem 0.1rem;
+            .el-dialog__headerbtn{
+                i{
+                    color: #000;
+                    font-weight: 600;
+                }
+            }
+        }
+        .el-dialog__body {
+            padding: 0.2rem 0.2rem 0.3rem;
+            span{
+              word-break: break-word;
+              line-height: 1.5;    
+              color: #606266;
+              font-size: 14px;
+            }
+        }
+    }
+
+}
 .addressInfo{
   padding: 0.2rem;
   h6{
@@ -709,27 +765,38 @@ export default {
     font-size: 0.1372rem;
     color: #959595;
     .feh-metamask{
+        display: flex;
+        align-items: center;
         position: relative;
-        width: 25px;
-        height: 25px;
-        margin: 0 0.1rem 0 0;
+        width: auto;
+        height: 30px;
+        margin: 0 10px 0 0;
         cursor: pointer;
         img{
             display: block;
-            width: 100%;
-            height: auto;
-            margin: auto;
+            width: 30px;
             cursor: pointer;
+            margin: 0 5px 0 0;
         }
         &:before{
             position: absolute;
-            right: 0;
+            left: 30px;
             top: -4px;
             content: "";
             width: 5px;
             height: 5px;
             border-radius: 100%;
             background: #d7d6d6;
+        }
+        .text{
+            padding: 0.05rem 0.1rem;
+            font-size: 0.12rem;
+            background: #f56c6c;
+            color: #fff;
+            border-radius: 0.51rem;
+        }
+        .textTrue{
+            background: #4326ab;
         }
     }
     .online{

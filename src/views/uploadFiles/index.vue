@@ -336,7 +336,7 @@
     </el-dialog>
 
     <el-dialog
-    title="Reminder"
+    title="Tips"
     :visible.sync="wrongVisible" :show-close="false"
     :width="width" custom-class="wrongNet">
     <span>Please wait until the task is assigned to a storage provider.</span>
@@ -2000,10 +2000,10 @@ export default {
 
     .wrongNet{
         margin: auto !important;
-        border-radius: 0.1rem;
         background: #fff url(../../assets/images/tip_bg.png) no-repeat;
         background-size: 1.45rem;
         background-position: -0.2rem -0.3rem;
+        border-radius: 4px;
         .el-dialog__header{
             display: flex;
             color: #000;
