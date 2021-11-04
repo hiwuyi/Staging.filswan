@@ -11,10 +11,11 @@
                 <el-input v-model="ruleForm.cid" placeholder="" @blur="selectFun(2, ruleForm.cid)" @input="selectFun(2, ruleForm.cid)"></el-input>
             </el-form-item>
             <el-form-item label="Recommended Payment Amount" prop="amount" :class="{'err': ruleForm.amount_tip}">
-                <el-input v-model="ruleForm.amount" placeholder="" @blur="selectFun(1, ruleForm.amount)" @input="selectFun(1, ruleForm.amount)" maxlength="30" style="width: calc(100% - 50px);"></el-input> USDC
+                <el-input v-model="ruleForm.amount" placeholder="" @blur="selectFun(1, ruleForm.amount)" @input="selectFun(1, ruleForm.amount)" onkeyup="value=value.replace(/^\D*(\d*(?:\.\d{0,18})?).*$/g, '$1')" style="width: calc(100% - 50px);"></el-input> USDC
+                <p style="font-size:12px">Available: {{usdcAvailable}} USDC</p>
                 <p v-if="ruleForm.amount_tip" style="font-size:12px">Amount should be a number</p>
                 <p v-if="ruleForm.amount_incorrect" style="font-size:12px">Insufficient balance</p>
-                <p v-if="ruleForm.amount_minprice_incorrect" style="font-size:12px">The minimum payment is {{ruleForm.amount_minprice}}</p>
+                <p v-if="ruleForm.amount_minprice_incorrect" style="font-size:12px">The minimum payment amount should be greater than {{ruleForm.amount_minprice}}</p>
             </el-form-item>
             <!-- <el-form-item label="Gas Limit" prop="gaslimit" :class="{'err': ruleForm.gaslimit_tip}">
                 <el-input v-model="ruleForm.gaslimit" @blur="selectFun(4, ruleForm.gaslimit)" @input="selectFun(4, ruleForm.gaslimit)" maxlength="7"></el-input>
@@ -39,6 +40,7 @@
     import first_contract_json from "@/utils/swanPayment.json";
     import erc20_contract_json from "@/utils/ERC20.json";
     import axios from 'axios'
+    let contract_erc20
 
     export default {
         name: "pay_tip",
@@ -63,6 +65,7 @@
                 inputG: /^[1-9]\d*$/,
                 hashload: false,
                 timer: '',
+                usdcAvailable: '',
 
                 gatewayContractAddress: this.$root.SWAN_PAYMENT_CONTRACT_ADDRESS,
                 recipientAddress: this.$root.RECIPIENT,
@@ -91,15 +94,10 @@
                                 //     _this.ruleForm.amount_incorrect = true
                                 //     return false
                                 // }else 
-                                if(Number(_this.ruleForm.amount.trim()) < _this.ruleForm.amount_minprice){
+                                if(Number(_this.ruleForm.amount.trim()) <= _this.ruleForm.amount_minprice){
                                     _this.ruleForm.amount_minprice_incorrect = true
                                     return false
                                 }
-
-
-                                // 授权代币
-                                let contract_erc20 = new web3.eth.Contract( erc20_contract_json );
-                                contract_erc20.options.address = _this.usdcAddress
 
                                 // 查询剩余授权余额为：
                                 contract_erc20.methods.allowance(_this.gatewayContractAddress, _this.metaAddress).call()
@@ -112,11 +110,6 @@
                                         })
                                     }
                                     _this.contractSend()
-                                })
-
-                                contract_erc20.methods.balanceOf(_this.metaAddress).call()
-                                .then(resultUSDC => {
-                                    console.log('查询剩余代币余额为：'+ resultUSDC);
                                 })
 
                             });
@@ -208,16 +201,29 @@
                     this.ruleForm.gasprice_tip = !this.inputG.test(val) ? true : false
                 }
             },
+            init(){
+                // 授权代币
+                let _this = this
+                contract_erc20 = new web3.eth.Contract( erc20_contract_json );
+                contract_erc20.options.address = _this.usdcAddress
+                // 查询剩余代币余额为：
+                contract_erc20.methods.balanceOf(_this.metaAddress).call()
+                .then(resultUSDC => {
+                    _this.usdcAvailable = web3.utils.fromWei(resultUSDC, 'ether');
+                })
+                
+                if(_this.paymentAmount){
+                    let number = Number(_this.paymentAmount).toFixed(18)
+                    _this.ruleForm.amount = String(number)
+                    _this.ruleForm.amount_minprice = String(number)
+                }
+            }
         },
         mounted() {
             // web3.eth.getCode(this.gatewayContractAddress).then(res => {
             //     this.ruleForm.gaslimit = res.toLowerCase() == '0x' ? '21000' : '9999999'
             // })
-            if(this.paymentAmount){
-                let number = Number(this.paymentAmount).toFixed(18)
-                this.ruleForm.amount = String(number)
-                this.ruleForm.amount_minprice = String(number)
-            }
+            this.init()
         },
         watch: {
             'payVisible': function() {

@@ -8,7 +8,8 @@
     "payload_cid": "bafk2bzaceb7cp727fxdrzudlgvsoivdwscydp35eb6wc3bzuflggfdhfa4rfe",
     "address_from": "0xc4fcaAdCb0b00a9501e56215c37B10fAF9e79c0a",
     "network": "bsc",
-    "create_at": ""
+    "create_at": "",
+    "log_payment_time": "1630774404"
   }, {
     "tx_hash": "0xe5eb5415c9288eb5a4619ca9d06f00ca1415bc33e3b6eecb1e3ace3dd948778e",
     "locked_fee": "50000000000000000",

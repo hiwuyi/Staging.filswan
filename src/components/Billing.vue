@@ -43,7 +43,8 @@
                             </div>
                         </template>                    
                     </el-table-column>
-                    <el-table-column prop="locked_fee" :label="$t('billing.AMOUNT')" min-width="120"></el-table-column>
+                    <el-table-column prop="locked_fee" :label="$t('billing.AMOUNT')" min-width="150"></el-table-column>
+                    <el-table-column prop="coin_type" label="COIN" min-width="120"></el-table-column>
                     <el-table-column prop="payload_cid" :label="$t('billing.PAYLOADCID')" min-width="140">
                         <template slot-scope="scope">
                             <div class="hot-cold-box">
@@ -81,9 +82,7 @@
                         </template>                    
                     </el-table-column>
                     <el-table-column prop="network" :label="$t('billing.NETWORK')" min-width="120"></el-table-column>
-                    <el-table-column prop="create_at" :label="$t('billing.PAYMENTDATE')" min-width="140">
-
-                    </el-table-column>
+                    <el-table-column prop="log_payment_time" :label="$t('billing.PAYMENTDATE')" min-width="140"></el-table-column>
                     <el-table-column prop="deadline" :label="$t('billing.Deadline')" min-width="140"></el-table-column>
                 </el-table>
             </div>
@@ -172,12 +171,12 @@
                             item.txHashVis = false
                             item.payloadVis = false
                             item.walletVis = false
-                            item.create_at =
-                                item.create_at?
-                                    String(item.create_at).length<13?
-                                        moment(new Date(parseInt(item.create_at * 1000))).format("YYYY-MM-DD HH:mm:ss")
+                            item.log_payment_time =
+                                item.log_payment_time?
+                                    String(item.log_payment_time).length<13?
+                                        moment(new Date(parseInt(item.log_payment_time * 1000))).format("YYYY-MM-DD HH:mm:ss")
                                         :
-                                        moment(new Date(item.create_at)).format("YYYY-MM-DD HH:mm:ss")
+                                        moment(new Date(item.log_payment_time)).format("YYYY-MM-DD HH:mm:ss")
                                     :
                                     '-'
                             item.deadline =
@@ -190,7 +189,7 @@
                                     '-'
                             
                             // item.locked_fee = web3.utils.fromWei(item.locked_fee, 'ether')
-                            item.locked_fee = 0.000000000000000001 * item.locked_fee
+                            item.locked_fee = Number(0.000000000000000001 * item.locked_fee).toFixed(18)
                         })
                         _this.parma.total = Number(json.data.page_info.total_record_count)
                     }else{
@@ -415,9 +414,9 @@
                 }
                 .el-table /deep/{
                     overflow: visible;
-                    .el-table__body-wrapper,.el-table__header-wrapper{
-                        overflow: visible;
-                    }
+                    // .el-table__body-wrapper,.el-table__header-wrapper{
+                    //     overflow: visible;
+                    // }
                     tr{
                         border-radius: 0.08rem;
                         // cursor: pointer;
@@ -463,6 +462,7 @@
                                         width: 100%;
                                         border: 0;
                                         padding: 0;
+                                        margin: 0;
                                         background-color: transparent;
                                         font-size: 0.1372rem;
                                         word-break: break-word;
