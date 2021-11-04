@@ -45,7 +45,7 @@
         data() {
             return {
                 ruleForm: {
-                    amount: this.paymentAmount ? this.paymentAmount : '',
+                    amount: '',
                     amount_balance: 0,
                     amount_tip: false,
                     amount_incorrect: false,
@@ -213,7 +213,11 @@
             // web3.eth.getCode(this.gatewayContractAddress).then(res => {
             //     this.ruleForm.gaslimit = res.toLowerCase() == '0x' ? '21000' : '9999999'
             // })
-            this.ruleForm.amount_minprice = this.paymentAmount ? this.paymentAmount.toFix(18) : '0'
+            if(this.paymentAmount){
+                let number = Number(this.paymentAmount).toFixed(18)
+                this.ruleForm.amount = String(number)
+                this.ruleForm.amount_minprice = String(number)
+            }
         },
         watch: {
             'payVisible': function() {

@@ -1,7 +1,7 @@
 {
-  "name": "market-place",
+  "name": "Staging",
   "version": "1.0.0",
-  "description": "marketplace",
+  "description": "Staging",
   "author": "yxie <yxie@nbai.io>",
   "private": true,
   "scripts": {

@@ -561,6 +561,10 @@ export default {
                 _this.payFun(item.payload_cid)
                 _this.toAddress = item.contract_id
                 _this.payment.cid = item.payload_cid
+
+                item.storage_cost = 0.00600025
+                _this.payment.biling_price = 0.15421335454
+
                 if(item.storage_cost && _this.payment.biling_price) _this.payment.amount = String(item.storage_cost * _this.payment.biling_price * _this.$root.PAY_WITH_MULTIPLY_FACTOR)
                 if(type) _this.walletInfo()
               } 
