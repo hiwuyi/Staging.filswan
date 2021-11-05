@@ -43,7 +43,9 @@
                             </div>
                         </template>                    
                     </el-table-column>
-                    <el-table-column prop="locked_fee" :label="$t('billing.AMOUNT')" min-width="150"></el-table-column>
+                    <el-table-column prop="locked_fee" :label="$t('billing.AMOUNT')" min-width="150">
+                        <template slot-scope="scope">{{scope.row.locked_fee | balanceFilter}}</template>
+                    </el-table-column>
                     <el-table-column prop="coin_type" label="COIN" min-width="120"></el-table-column>
                     <el-table-column prop="payload_cid" :label="$t('billing.PAYLOADCID')" min-width="140">
                         <template slot-scope="scope">
@@ -188,7 +190,7 @@
                                     :
                                     '-'
                             // item.locked_fee = web3.utils.fromWei(item.locked_fee, 'ether')
-                            item.locked_fee = Number(0.000000000000000001 * item.locked_fee).toFixed(18)
+                            // item.locked_fee = 0.000000000000000001 * item.locked_fee
                         })
                         _this.parma.total = Number(json.data.page_info.total_record_count)
                     }else{
@@ -298,7 +300,25 @@
             NumFormat (value) {
                 if(!value) return '-';
                 return value
-            }
+            },
+            balanceFilter (value) {
+                if (!Number(value)) return 0;
+                if (isNaN(value)) return value;
+                // 18 - 单位换算需要 / 1000000000000000000，浮点运算显示有bug
+                if(String(value).length > 18){
+                    let v1 = String(value).substring(0, String(value).length - 18)
+                    let v2 = String(value).substring(String(value).length - 18)
+                    return v1.replace(/(\d)(?=(?:\d{3})+$)/g, "$1,") + '.' + v2
+                }else if(String(value).length == 18){
+                    return String(value).replace(/(\d)(?=(?:\d{3})+$)/g, "$1,")
+                }else{
+                    let v3 = ''
+                    for(let i = 0; i < 18 - String(value).length; i++){
+                        v3 += '0'
+                    }
+                    return '0.' + v3 + value
+                }
+            },
         },
     };
 </script>

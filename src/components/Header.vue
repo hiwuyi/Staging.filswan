@@ -774,7 +774,8 @@ export default {
         cursor: pointer;
         img{
             display: block;
-            width: 30px;
+            width: auto;
+            height: 30px;
             cursor: pointer;
             margin: 0 5px 0 0;
         }
