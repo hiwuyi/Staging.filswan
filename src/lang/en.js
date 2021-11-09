@@ -9,7 +9,7 @@ export default {
         My_FS3: 'FS3',
         Stats:'Statistics',
         myAccount: 'My Account',
-        Upload_files: 'Upload Files',
+        Upload_files: 'Upload File',
         Search_file: 'Search File'
     },
     navbar: {
@@ -29,7 +29,7 @@ export default {
         My_Profile: 'MY PROFILE',
         Browse_tasks: 'BROWSE TASKS',
         create_tasks: 'CREATE TASK',
-        Upload_files: 'UPLOAD FILES',
+        Upload_files: 'UPLOAD FILE',
         Tools: 'TOOLS',
         Stats:'STATISTICS',
         copy: '© 2021 FilSwan Canada',

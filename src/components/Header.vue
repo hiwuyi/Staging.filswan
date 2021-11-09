@@ -30,8 +30,9 @@
                         <img src="@/assets/images/metamask.png" slot="reference" />
                     </el-popover>
 
-                    <span class="text" v-if="addrChild && !network.text" @click="wrongVisible=true">Wrong Network</span>
-                    <span class="text textTrue" v-else-if="addrChild && network.text">{{network.name}}</span>
+                    <!-- <span class="text" v-if="addrChild && !network.text" @click="wrongVisible=true">Wrong Network</span> -->
+                    <span class="text" v-if="!addrChild">Connect Wallet</span>
+                    <span class="text textTrue" v-else>{{network.name}}</span>
                 </div>
                 {{$t('navbar.hi')}}
                 <router-link :to="{name: 'Upload_files_create'}">

@@ -55,7 +55,7 @@ export default new Router({
                     },
                     meta: {
                         metaInfo: {
-                            title: 'Upload Files',
+                            title: 'Upload File',
                             description: "Swan is a marketplace for Filecoin miners, clients post/bidding deals the online."
                         }
                     }
@@ -79,7 +79,7 @@ export default new Router({
                     },
                     meta: {
                         metaInfo: {
-                            title: 'Upload Files',
+                            title: 'Upload File',
                             description: "Swan is a marketplace for Filecoin miners, clients post/bidding deals the online."
                         }
                     }
@@ -103,7 +103,7 @@ export default new Router({
                     },
                     meta: {
                         metaInfo: {
-                            title: 'Upload Files',
+                            title: 'Upload File',
                             description: "Swan is a marketplace for Filecoin miners, clients post/bidding deals the online."
                         }
                     }
