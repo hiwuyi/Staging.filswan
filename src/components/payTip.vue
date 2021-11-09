@@ -41,6 +41,7 @@
     import erc20_contract_json from "@/utils/ERC20.json";
     import axios from 'axios'
     let contract_erc20
+    const EthereumTx = require('ethereumjs-tx')
 
     export default {
         name: "pay_tip",
@@ -94,10 +95,16 @@
                                 //     _this.ruleForm.amount_incorrect = true
                                 //     return false
                                 // }else 
-                                if(Number(_this.ruleForm.amount.trim()) <= _this.ruleForm.amount_minprice){
+                                console.log(Number(_this.ruleForm.amount.trim()), Number(_this.ruleForm.amount_minprice))
+                                if(Number(_this.ruleForm.amount.trim()) <= Number(_this.ruleForm.amount_minprice)){
                                     _this.ruleForm.amount_minprice_incorrect = true
                                     return false
                                 }
+
+
+                                _this.contractSend()
+                                return false
+
 
                                 // 查询剩余授权余额为：
                                 contract_erc20.methods.allowance(_this.gatewayContractAddress, _this.metaAddress).call()
@@ -107,9 +114,12 @@
                                         contract_erc20.methods.approve(_this.gatewayContractAddress, web3.utils.toWei(_this.ruleForm.amount, 'ether')).send({from:  _this.metaAddress})
                                         .then(receipt => {
                                             // console.log(receipt)
+                                            _this.hashload = true;
+                                            _this.contractSend()
                                         })
+                                    }else{
+                                        _this.contractSend()
                                     }
-                                    _this.contractSend()
                                 })
 
                             });
@@ -128,42 +138,101 @@
                 // console.log( 'contract_instance合约实例：', contract_instance );
                 // console.log(contract_instance.options.jsonInterface)
 
-                let payObject = {
-                    from: _this.metaAddress,
-                    gas: web3.utils.toHex(_this.ruleForm.gaslimit),
-                    // gasPrice: web3.utils.toHex(web3.utils.toWei(_this.ruleForm.gasprice + '', 'gwei')),
-                    // value: web3.utils.toHex(web3.utils.toWei(_this.ruleForm.amount, 'ether')),
-                };
+
                 
                 let lockObj = {
                     id: _this.ruleForm.cid,
-                    minPayment: web3.utils.toWei(_this.ruleForm.amount_minprice, 'ether'),
+                    // minPayment: web3.utils.toWei(_this.ruleForm.amount_minprice, 'ether'),
+                    minPayment: web3.utils.toWei('0.000000000000000001', 'ether'),
                     amount: web3.utils.toWei(_this.ruleForm.amount, 'ether'),
                     lockTime: 86400 * Number(_this.$root.LOCK_TIME), // one day
                     recipient: _this.recipientAddress, //todo:
                 }
-                
-                contract_instance.methods.lockTokenPayment(lockObj)
-                .send(payObject)
-                .on('transactionHash', function(hash){
-                    // console.log('hash console:', hash);
-                    _this.hashload = true
-                })
-                .on('confirmation', function(confirmationNumber, receipt){
-                    // console.log('confirmationNumber console:', confirmationNumber, receipt);
-                })
-                .on('receipt', function(receipt){
-                    // receipt example
-                    // console.log('receipt console:', receipt);
-                    _this.checkTransaction(receipt.transactionHash)
 
-                })
-                .on('error', function(error){
-                    // console.log('error console:', error)
-                    console.error
-                    _this.hashload = false
-                    _this.$message.error('Fail');
-                }); 
+
+                //私钥转换为Buffer
+                const privateKey = Buffer.from(process.env.ownerPk,"hex")
+                //私钥转换为账号
+                const account = web3.eth.accounts.privateKeyToAccount('0x'+process.env.ownerPk);
+                //私钥对应的账号地地址
+                const address = account.address
+                // console.log("account:",account)  0x6f2B76024196e82D81c8bC5eDe7cff0B0276c9C1
+                console.log("address:",address)
+
+                //获取nonce,使用私钥发送交易
+                web3.eth.getTransactionCount(address).then(
+                    nonce => {
+                        const txParams = {
+                            nonce: nonce,
+                            chainId: 80001,
+                            gasLimit: web3.utils.toHex(_this.ruleForm.gaslimit),
+                            // to: '0x4Ce5daA9Fbc934f4676eDfB0eBF4445762006b17',
+                            gasPrice: web3.utils.toHex(web3.utils.toWei('1', 'gwei')),
+                            value: web3.utils.toWei(_this.ruleForm.amount, 'ether'),
+                            to: _this.gatewayContractAddress,
+                            data: contract_instance.methods.lockTokenPayment(lockObj).encodeABI(), //智能合约中lockTokenPayment方法的abi
+                        }
+                        console.log(txParams)
+                        const tx = new EthereumTx(txParams)
+                        tx.sign(privateKey)
+                        const serializedTx = '0x' + tx.serialize().toString('hex');
+                        web3.eth.sendSignedTransaction(serializedTx)
+                        .on('receipt', console.log);
+
+                        return  false
+                        web3.eth.sendSignedTransaction(serializedTx, (error, txHash) => {
+                            if (error) {
+                                console.log('web3.eth.sendSignedTransaction error:', error);
+                                _this.hashload = false;
+                                _this.$message.error('Fail');
+                            }
+                            _this.checkTransaction(txHash);
+                        });
+                    },
+                    e => console.log(e)
+                )
+
+
+
+
+
+                return false
+                // let payObject = {
+                //     from: _this.metaAddress,
+                //     gas: web3.utils.toHex(_this.ruleForm.gaslimit),
+                //     // gasPrice: web3.utils.toHex(web3.utils.toWei(_this.ruleForm.gasprice + '', 'gwei')),
+                //     // value: web3.utils.toHex(web3.utils.toWei(_this.ruleForm.amount, 'ether')),
+                // };
+                
+                // let lockObj = {
+                //     id: _this.ruleForm.cid,
+                //     minPayment: web3.utils.toWei(_this.ruleForm.amount_minprice, 'ether'),
+                //     amount: web3.utils.toWei(_this.ruleForm.amount, 'ether'),
+                //     lockTime: 86400 * Number(_this.$root.LOCK_TIME), // one day
+                //     recipient: _this.recipientAddress, //todo:
+                // }
+                
+                // contract_instance.methods.lockTokenPayment(lockObj)
+                // .send(payObject)
+                // .on('transactionHash', function(hash){
+                //     // console.log('hash console:', hash);
+                //     _this.hashload = true
+                // })
+                // .on('confirmation', function(confirmationNumber, receipt){
+                //     // console.log('confirmationNumber console:', confirmationNumber, receipt);
+                // })
+                // .on('receipt', function(receipt){
+                //     // receipt example
+                //     // console.log('receipt console:', receipt);
+                //     _this.checkTransaction(receipt.transactionHash)
+
+                // })
+                // .on('error', function(error){
+                //     // console.log('error console:', error)
+                //     console.error
+                //     _this.hashload = false
+                //     _this.$message.error('Fail');
+                // }); 
             },
             checkTransaction(txHash) {
                 let _this = this
@@ -213,9 +282,10 @@
                 })
                 
                 if(_this.paymentAmount){
-                    let number = Number(_this.paymentAmount).toFixed(18)
+                    let number = Number(_this.paymentAmount)
                     _this.ruleForm.amount = String(number)
                     _this.ruleForm.amount_minprice = String(number)
+                    console.log(_this.ruleForm.amount)
                 }
             }
         },

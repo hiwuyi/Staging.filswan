@@ -18,6 +18,14 @@ import './assets/css/main.css';
 
 import 'element-ui/lib/theme-chalk/index.css';
 
+
+
+require('dotenv').config({ path: '.env' })
+// console.log(process.env.ownerPk)
+
+
+
+
 Vue.use(Router);
 Vue.use(ElementUI, { locale })
 let langNew = store.getters.language == 'en'?{ locale }:{ localeCN }

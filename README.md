@@ -18,6 +18,11 @@ npm run build
 
 # build for production and view the bundle analyzer report
 npm run build --report
+
+# install ethereumjs-tx
+npm i --save ethereumjs-tx@1.3.7
+# install dotenv
+npm install --save dotenv
 ```
 
 ## Node version

@@ -442,10 +442,10 @@ export default {
     },
     payClick(row){
       let _this = this
-      if(row.status.toLowerCase() == 'created' || row.status.toLowerCase() == 'actionRequired'){
-        _this.wrongVisible = true
-        return false
-      }
+      // if(row.status.toLowerCase() == 'created' || row.status.toLowerCase() == 'actionRequired'){
+      //   _this.wrongVisible = true
+      //   return false
+      // }
       if(!_this.metaAddress){
         _this.centerDialogVisible = true
       }else{

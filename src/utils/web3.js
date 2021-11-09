@@ -6,7 +6,8 @@ var contract=null;
 function Init(callback){
   if (typeof window.ethereum === "undefined") {
     // alert("Looks like you need a Dapp browser to get started.");
-    alert("Consider installing MetaMask!");
+    // alert("Consider installing MetaMask!");
+    window.open('https://metamask.io/download.html')
   } else {
     ethereum.enable()
       .catch(function (reason) {
