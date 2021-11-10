@@ -1,6 +1,7 @@
 <template>
     <div id="Create">
         <div class="upload" v-loading="loading">
+            <div class="upload_title">Please upload a file and set a duration. An estimated storage cost will be calculated for you.</div>
             <div class="upload_form">
                 <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" class="demo-ruleForm">
                     <el-form-item prop="fileList" :label="$t('uploadFile.upload')">
@@ -18,7 +19,14 @@
                             <p v-if="ruleForm.fileList.length>0">{{ruleForm.file_size}}</p>
                         </div>
                     </el-form-item>
-                    <el-form-item prop="duration" label="Duration">
+                    <el-form-item prop="duration">
+                        <template slot="label">
+                            Duration 
+                            
+                            <el-tooltip effect="dark" content="Duration refers to the terms in which you want the file to be stored on the Filecoin network." placement="top">
+                                <img src="@/assets/images/info.png"/>
+                            </el-tooltip>
+                        </template>
                         <el-input v-model="ruleForm.duration" type="number" style="max-width:130px"></el-input> &nbsp; days
                     </el-form-item>
                     <el-form-item prop="storage_cost" label="Estimated Storage Cost">
@@ -26,25 +34,30 @@
                     </el-form-item>
                 </el-form>
                 <div class="upload_plan">
-                    <div class="title" :style="{'color': ruleForm.lock_plan_tip? '#f67e7e' : '#000'}">* Select Lock Funds Plan</div>
+                    <div class="title" :style="{'color': ruleForm.lock_plan_tip? '#f67e7e' : '#000'}">
+                        Select Lock Funds Plan
+                        <el-tooltip effect="dark" content="The more funds locked, the sooner your file will be stored on the Filecoin network. The overpaid funds will be returned automatically after the deal is on chain." placement="top">
+                            <img src="@/assets/images/info.png"/>
+                        </el-tooltip>
+                    </div>
                     <div class="upload_plan_radio">
                         <el-radio-group v-model="ruleForm.lock_plan" @change="agreeChange">
                             <el-radio label="1" border>
                                 <div class="title">Low</div>
                                 <div class="cont">
-                                    {{storage_cost_low}} <br/> USDT
+                                    {{storage_cost_low}} <br/> USDC
                                 </div>
                             </el-radio>
                             <el-radio label="2" border>
                                 <div class="title">Average</div>
                                 <div class="cont">
-                                    {{storage_cost_average}} <br/> USDT
+                                    {{storage_cost_average}} <br/> USDC
                                 </div>
                             </el-radio>
                             <el-radio label="3" border>
                                 <div class="title">High</div>
                                 <div class="cont">
-                                    {{storage_cost_high}} <br/> USDT
+                                    {{storage_cost_high}} <br/> USDC
                                 </div>
                             </el-radio>
                         </el-radio-group>
@@ -58,7 +71,7 @@
             
             <el-row class="upload_result" v-if="resultSuc">
                 <el-col :span="24">
-                    <h5>The following file has been successfully uploaded. You can check it in My Task!</h5>
+                    <h5>The following file has been successfully uploaded. You can check it in My Files!</h5>
                 </el-col>
                 <el-col :span="24">
                     <label for="">File name: </label>
@@ -542,7 +555,7 @@
         padding: 0.3rem 0.2rem;
         font-size: 0.24rem;
         .upload{
-            padding: 0.4rem 0.17rem;
+            padding: 0 0.17rem 0.4rem;
             margin: 0 auto 0.2rem;
             background-color: #fff;
             border-radius: 0.1rem;
@@ -555,6 +568,16 @@
                 color: #000;
                 line-height: 0.42rem;
                 text-indent: 0.08rem;
+            }
+            .upload_title{
+                width: 100%;
+                margin: 0.1rem 0 0.3rem;
+                text-align: left;
+                font-size: 0.12rem;
+                font-weight: 600;
+                color: #000;
+                line-height: 1.5;
+                text-indent: 0;
             }
             .upload_form{
                 // display: flex;
@@ -571,6 +594,9 @@
                         width: auto;
                         margin: 0.15rem auto;
                         .el-form-item__label{
+                            display: flex;
+                            justify-content: flex-end;
+                            align-items: center;
                             width: 47%;
                             padding: 0 3% 0 0;
                             // max-width: 2rem;
@@ -582,6 +608,15 @@
                             font-weight: 500;
                             text-shadow: 0 0 black;
                             text-align: right;
+                            img{
+                                width: 0.16rem;
+                                height: 0.16rem;
+                                margin: 0 0 0 5px;
+                                cursor: pointer;
+                            }
+                            &::before{
+                                display: none;
+                            }
                         }
                         .el-form-item__content{
                             display: flex;
@@ -694,15 +729,24 @@
                 margin: auto; 
                 justify-content: flex-start;
                 .title{
-                    margin: 0.1rem 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 0.3rem 0 0.1rem;
                     line-height: 1.5;
                     text-align: center;
-                    font-size: 0.1372rem;
+                    font-size: 0.15rem;
                     white-space: normal;
                     color: #000;
                     font-weight: 500;
                     text-shadow: 0 0 black;
                     text-indent: 0;
+                    img{
+                        width: 0.16rem;
+                        height: 0.16rem;
+                        margin: 0 0 0 5px;
+                        cursor: pointer;
+                    }
                 }
                 .upload_plan_radio{
                     .el-radio-group /deep/{
@@ -866,6 +910,22 @@
             }
         }
     }
+    @media screen and (max-width: 600px){
+        #Create {
+            .upload{
+                 .upload_plan {
+                     .upload_plan_radio {
+                         .el-radio-group /deep/{
+                             .el-radio{
+                                 width: 32%;
+                                 margin: auto;
+                             }
+                         }
+                     }
+                 }
+            }
+        }
+    }
     @media screen and (max-width: 441px){
         #Create {
             .upload{
@@ -875,14 +935,25 @@
                     line-height: 1.5;
                  }
                  .upload_form {
+                     width: 100%;
                      .el-form /deep/{
                          .el-form-item{
                              flex-wrap: wrap;
+                             .el-form-item__label{
+                                width: 100%;
+                                padding-bottom: 0.05rem;
+                                justify-content: center;
+                             }
                              .el-form-item__content{
-                                 flex-wrap: wrap;
+                                flex-wrap: wrap;
+                                width: 100%;
+                                justify-content: center;
                              }
                          }
                      }
+                 }
+                 .upload_plan {
+                     width: 95%;
                  }
                  .upload_result{
                      width: 90%;

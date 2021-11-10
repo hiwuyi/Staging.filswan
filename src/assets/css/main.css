@@ -143,6 +143,11 @@ border: 0;
   margin-left: 0.1rem;
 }
 
+.el-tooltip__popper{
+  width: 200px;
+  word-break: break-word;
+}
+
 .el-table tr:hover {
   background: #f6faff;
 }

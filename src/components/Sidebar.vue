@@ -52,17 +52,17 @@ export default {
             bodyWidth: document.body.clientWidth<999?true:false,
             items: [
                 {
-                    icon: 'el-icon-s-deal',
-                    index: '1',
-                    title: this.$t('route.Deal'),
-                    name: 'Upload_files',
-                    type: ''
-                },
-                {
                     icon: 'el-icon-s-upload',
                     index: '0',
                     title: this.$t('route.Upload_files'),
                     name: 'Upload_files_create',
+                    type: ''
+                },
+                {
+                    icon: 'el-icon-s-deal',
+                    index: '1',
+                    title: this.$t('route.Deal'),
+                    name: 'Upload_files',
                     type: ''
                 },
                 {

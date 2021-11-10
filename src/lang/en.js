@@ -1,7 +1,7 @@
 export default {
     route: {
         dashboard: "Dashboard",
-        Deal: "My Task",
+        Deal: "My Files",
         Miner: "Storage Provider Management",
         myProfile: 'My Profile',
         browse: 'Browse Tasks',
@@ -23,7 +23,7 @@ export default {
         "logout": "Logout",
         dashboard: 'DASHBOARD',
         minerDetail: 'STORAGE PROVIDER DETAIL',
-        deal: 'MY TASK',
+        deal: 'MY FILES',
         miner: 'STORAGE PROVIDER MANAGEMENT',
         deal_details: 'TASK DETAIL',
         My_Profile: 'MY PROFILE',

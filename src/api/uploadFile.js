@@ -10,6 +10,14 @@ export const getTasksList = (query) => {
     })
 }
 
+export const getPaymentDeals = (query) => {
+    return request({
+        url: '/paymentgateway/deals?'+ QS.stringify(query),
+        method: 'get',
+        data: query
+    })
+}
+
 // task details
 export const getTasksListDetails = (data) => {
     return request({
