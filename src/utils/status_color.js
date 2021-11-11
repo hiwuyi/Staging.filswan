@@ -35,9 +35,42 @@ export function Task_color(type){
         // 需要操作
         case 'ActionRequired':
             return 'color: #ffb822'
+        break;
         // 交易已发送
         case 'DealSent':
             return 'color: #67c23a'
+        break;
+        // 文件已导入
+        case 'FileImporting':
+            return 'color: #ffb822'
+        break;
+        // 导入失败
+        case 'FileImported':
+            return 'color: #ffb822'
+        break;
+        // 下载中
+        case 'ImportFailed':
+            return 'color: #dc3545'
+        break;
+        // 已下载
+        case 'Downloading':
+            return 'color: #ffb822'
+        break;
+        // 下载失败
+        case 'DownloadFailed':
+            return 'color: #dc3545'
+        break;
+        // 有效交易
+        case 'DealActive':
+            return 'color: #28a745'
+        break;
+        // 等待中
+        case 'Waiting':
+            return 'color: #ffb822'
+        break;
+        // 准备导入
+        case 'ReadyForImport':
+            return 'color: #ffb822'
         break;
     }
 }

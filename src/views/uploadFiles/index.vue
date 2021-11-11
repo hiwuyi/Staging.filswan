@@ -84,10 +84,10 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="miner_fid" label="PROVIDER ID" width="120">
+          <el-table-column prop="miner_id" label="PROVIDER ID" width="120">
             <template slot-scope="scope">
               <div class="hot-cold-box">
-                {{ scope.row.miner_fid | NumFormat }}
+                {{ scope.row.miner_id | NumFormat }}
               </div>
             </template>
           </el-table-column>
@@ -160,6 +160,51 @@
                   :style="$status_color.Task_color('DealSent')">
                   {{ language == 'en' ? 'DealSent' : '交易已发送' }}
               </div>
+              <div class="statusStyle"
+                    v-else-if="scope.row.status == 'FileImporting'"
+                    :style="$status_color.Task_color('FileImporting')">
+                  {{ language == 'en' ? 'FileImporting' : '文件导入中' }}
+              </div>
+              <div class="statusStyle"
+                    v-else-if="scope.row.status == 'FileImported'"
+                    :style="$status_color.Task_color('FileImported')">
+                  {{ language == 'en' ? 'FileImported' : '文件已导入' }}
+              </div>
+              <div class="statusStyle"
+                    v-else-if="scope.row.status == 'ImportFailed'"
+                    :style="$status_color.Task_color('ImportFailed')">
+                  {{ language == 'en' ? 'ImportFailed' : '导入失败' }}
+              </div>
+              <div class="statusStyle"
+                    v-else-if="scope.row.status == 'Downloading'"
+                    :style="$status_color.Task_color('Downloading')">
+                  {{ language == 'en' ? 'Downloading' : '下载中' }}
+              </div>
+              <div class="statusStyle"
+                    v-else-if="scope.row.status == 'DownloadFailed'"
+                    :style="$status_color.Task_color('DownloadFailed')">
+                  {{ language == 'en' ? 'DownloadFailed' : '下载失败' }}
+              </div>
+              <div class="statusStyle"
+                    v-else-if="scope.row.status == 'DealActive'"
+                    :style="$status_color.Task_color('DealActive')">
+                  {{ language == 'en' ? 'DealActive' : '有效交易' }}
+              </div>
+              <div class="statusStyle"
+                    v-else-if="scope.row.status == 'Waiting'"
+                    :style="$status_color.Task_color('Waiting')">
+                  {{ language == 'en' ? 'Waiting' : '等待中' }}
+              </div>
+              <div class="statusStyle"
+                    v-else-if="scope.row.status == 'ReadyForImport'"
+                    :style="$status_color.Task_color('ReadyForImport')">
+                  {{ language == 'en' ? 'ReadyForImport' : '准备导入' }}
+              </div>
+              <div
+                  class="statusStyle"
+                  v-else>
+                  {{ scope.row.status }}
+              </div>
               <!-- <div class="scoreStyle" @click="openScore(scope.row)" v-show="scope.row.status == 'Completed'">Score</div> -->
             </template>
           </el-table-column>
@@ -210,7 +255,7 @@
       </el-row>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary"  @click="signFun">{{$t('transfer.connect_wallet')}}</el-button>
-        <p v-if="center_fail">{{$t('transfer.connected_fail')}}</p>
+        <p v-if="center_fail">Please connect your wallet to Mumbai Testnet.</p>
       </span>
     </el-dialog>
 
@@ -228,6 +273,7 @@
 <script>
 import bus from "@/components/bus";
 import axios from 'axios'
+import QS from 'qs';
 import * as myAjax from "@/api/uploadFile";
 import moment from "moment";
 import payTip from "@/components/payTip"
@@ -241,13 +287,13 @@ export default {
       tableDataChild: [],
       tableDataAll: [],
       parma: {
-        limit: 20,
+        limit: 10,
         offset: 0,
         locationValue: "",
         total: 0,
       },
       parmaChild: {
-        limit: 20,
+        limit: 10,
         offset: 0,
         locationValue: "",
         total: 0,
@@ -292,9 +338,9 @@ export default {
   watch: {
     'searchValue': function(){
       let _this = this
-      _this.parma.limit = 20
+      _this.parma.limit = 10
       _this.parma.offset = 0
-      _this.parmaChild.limit = 20
+      _this.parmaChild.limit = 10
       _this.parmaChild.offset = 0
       _this.getData()
     }
@@ -356,6 +402,7 @@ export default {
             return false
         }
         web3.eth.net.getId().then(netId => {
+            _this.$store.dispatch('setMetaNetworkId', netId)
             // console.log('network ID:', netId)
             switch (netId) {
               case 80001:
@@ -589,7 +636,7 @@ export default {
     //查询
     search() {
       let _this = this;
-      _this.parma.limit = 20;
+      _this.parma.limit = 10;
       _this.paginationShow = true;
       _this.parma.offset = 0;
       _this.getData();
@@ -597,7 +644,7 @@ export default {
     clearAll() {
       let _this = this;
       _this.searchValue = "";
-      _this.parma.limit = 20;
+      _this.parma.limit = 10;
       _this.parma.offset = 0;
       _this.getData();
     },
@@ -643,23 +690,27 @@ export default {
       let offset =
         _this.parma.offset > 0 ? _this.parma.offset - 1 : _this.parma.offset;
       let parma = {
-        limit: _this.parma.limit,
-        offset: offset * _this.parma.limit,
+        page_size: _this.parma.limit,
+        page_number: offset * _this.parma.limit,
         file_name: _this.searchValue,
         source_id: 4
       };
 
       _this.tableData = []
 
-      myAjax
-        .getPaymentDeals(parma)
-        .then((response) => {
-          if (response.status == "success") {
-            const data = response.data;
-            _this.expands = []
-            // _this.tableData = Array.from(new Set(response.data.deals));
-            _this.parma.total = response.paging_info.total_items;
-            _this.tableData = response.data.deals;
+      let storage_api = `${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/storage/tasks/deals?${QS.stringify(parma)}`
+      // let storage_api = `./static/pay-status-response.json?${QS.stringify(parma)}`
+
+      axios.get(storage_api, {
+          headers: {
+              'Authorization': "Bearer "+ _this.$store.getters.accessToken
+          },
+      })
+      .then((response) => {
+          if(response.data.status == 'success'){
+            const data = response.data.data;
+            _this.parma.total = Number(response.data.page_info.total_record_count);
+            _this.tableData = response.data.data;
             _this.tableData.map((item,s) => {
               item.payloadAct = false
               item.created_at = item.created_at
@@ -677,11 +728,43 @@ export default {
             _this.$message.error(response.message);
           }
           _this.loading = false
-        })
-        .catch((error) => {
-          console.log(error);
+      }).catch(error => {
+          console.log(error)
           _this.loading = false;
-        });
+      })
+      return false
+
+      // myAjax
+      //   .getPaymentDeals(parma)
+      //   .then((response) => {
+      //     if (response.status == "success") {
+      //       const data = response.data;
+      //       _this.expands = []
+      //       // _this.tableData = Array.from(new Set(response.data.deals));
+      //       _this.parma.total = response.paging_info.total_items;
+      //       _this.tableData = response.data.deals;
+      //       _this.tableData.map((item,s) => {
+      //         item.payloadAct = false
+      //         item.created_at = item.created_at
+      //           ? item.created_at.length < 13
+      //             ? moment(new Date(parseInt(item.created_at * 1000))).format(
+      //                 "YYYY-MM-DD HH:mm:ss"
+      //               )
+      //             : moment(new Date(parseInt(item.created_at))).format(
+      //                 "YYYY-MM-DD HH:mm:ss"
+      //               )
+      //           : "-";
+      //       });
+
+      //     } else {
+      //       _this.$message.error(response.message);
+      //     }
+      //     _this.loading = false
+      //   })
+      //   .catch((error) => {
+      //     console.log(error);
+      //     _this.loading = false;
+      //   });
     },
     unique(arr) {
       const res = new Map();

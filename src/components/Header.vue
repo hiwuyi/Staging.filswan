@@ -31,7 +31,7 @@
                     </el-popover>
 
                     <!-- <span class="text" v-if="addrChild && !network.text" @click="wrongVisible=true">Wrong Network</span> -->
-                    <span class="text" v-if="!addrChild">Connect Wallet</span>
+                    <span class="text" v-if="!addrChild" @click="signFun">Connect Wallet</span>
                     <span class="text textTrue" v-else>{{network.name}}</span>
                 </div>
                 {{$t('navbar.hi')}}
@@ -299,6 +299,7 @@ export default {
             });
             web3.eth.net.getId().then(netId => {
                 // console.log('network ID:', netId)
+                _this.$store.dispatch('setMetaNetworkId', netId)
                 switch (netId) {
                 case 1:
                     _this.network.name = 'mainnet';
@@ -365,6 +366,7 @@ export default {
         signOutFun() {
             this.addrChild = ''
             this.$store.dispatch('setMetaAddress', '')
+            this.$store.dispatch('setMetaNetworkId', 0)
         },
         commonParam(){
             let _this = this

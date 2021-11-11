@@ -23,6 +23,7 @@ const getters = {
   metaInfo: state => state.app.metaInfo,
   avater: state => state.app.avater,
   collapseL: state => state.app.collapseL,
-  metaAddress: state => state.app.metaAddress
+  metaAddress: state => state.app.metaAddress,
+  networkID: state => state.app.networkID
 }
 export default getters

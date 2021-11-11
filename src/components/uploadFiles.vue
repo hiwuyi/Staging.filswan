@@ -1,5 +1,8 @@
 <template>
     <div id="Create">
+        <el-alert type="warning" effect="dark" center show-icon v-if="networkID!=80001">
+            <div slot="title">Your wallet is wrongly connected to {{network.name}} Network. To use our site, please switch to <span style="text-decoration: underline;">Mumbai Testnet</span>.</div>
+        </el-alert>
         <div class="upload" v-loading="loading">
             <div class="upload_title">Please upload a file and set a duration. An estimated storage cost will be calculated for you.</div>
             <div class="upload_form">
@@ -64,7 +67,7 @@
                     </div>
                 </div>
                 <div class="upload_bot">
-                    <el-button type="primary" v-if="!metaAddress||center_fail" @click="centerDialogVisible=true">Connect Wallet</el-button>
+                    <el-button type="primary" v-if="!metaAddress||center_fail||networkID!=80001" @click="centerDialogVisible=true">Connect Wallet</el-button>
                     <el-button type="primary" v-else @click="submitForm('ruleForm')">{{$t('deal.Submit')}}</el-button>
                 </div>
             </div>
@@ -100,8 +103,26 @@
         </el-row>
         <span slot="footer" class="dialog-footer">
             <el-button type="primary"  @click="signFun">{{$t('transfer.connect_wallet')}}</el-button>
-            <p v-if="center_fail">{{$t('transfer.connected_fail')}}</p>
+            <p v-if="center_fail">Please connect your wallet to Mumbai Testnet.</p>
         </span>
+        </el-dialog>
+
+        <el-dialog title="" :visible.sync="finishTransaction" :width="width"
+            custom-class="completeDia">
+            <img src="@/assets/images/alert-icon.png" />
+            <h1>Completed!</h1>
+            <h3>Your transaction has been submitted successfully. Check more detail in your transaction history.</h3>
+            <a :href="'https://mumbai.polygonscan.com/tx/'+txHash" target="_blank">{{txHash}}</a>
+            <a class="a-close" @click="finishClose">Close</a>
+        </el-dialog>
+
+        <el-dialog title="" :visible.sync="failTransaction" :width="width"
+            custom-class="completeDia">
+            <img src="@/assets/images/alert-icon.png" />
+            <h1>Fail!</h1>
+            <h3>Your transaction has failed. Check the transaction history for more details.</h3>
+            <a :href="'https://mumbai.polygonscan.com/tx/'+txHash" target="_blank">{{txHash}}</a>
+            <a class="a-close" @click="failTransaction=false">Close</a>
         </el-dialog>
     </div>
 </template>
@@ -175,6 +196,14 @@
                 hashload: false,
                 timer: '',
                 usdcAvailable: '',
+                network: {
+                    name: '',
+                    unit: '',
+                    text: false
+                },
+                finishTransaction: false,
+                failTransaction: false,
+                txHash: ''
             };
         },
         components: {},
@@ -185,8 +214,8 @@
                     this.calculation()
                 }
             },
-            metaAddress: function(){
-                if(this.metaAddress) this.init()
+            networkID: function(){
+                this.walletInfo()
             }
         },
         methods: {
@@ -223,60 +252,57 @@
                         }
 
                         if(_this.metaAddress){
-                            console.log(_this.ruleForm.amount, _this.usdcAvailable)
-                            if(_this.ruleForm.amount > _this.usdcAvailable ){
-                                _this.$message.error('Insufficient balance')
-                                return false
-                            }
+                            // 授权代币
+                            contract_erc20 = new web3.eth.Contract( erc20_contract_json );
+                            contract_erc20.options.address = _this.usdcAddress
+                            // 查询剩余代币余额为：
+                            contract_erc20.methods.balanceOf(_this.metaAddress).call()
+                            .then(resultUSDC => {
+                                _this.usdcAvailable = web3.utils.fromWei(resultUSDC, 'ether');
+                                console.log('Available:', _this.usdcAvailable)
+                                console.log(_this.ruleForm.amount, _this.usdcAvailable)
 
-                            // 通过 FormData 对象上传文件
-                            var formData = new FormData()
-                            formData.append('file', _this._file)
-                            // formData.append('task_name', _this.ruleForm.task_name)
-                            _this.loading = true
-                            // 发起请求
-                            
-                            axios.post(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/storage/ipfs/upload `, formData,{
-                                headers: {
-                                'Authorization': "Bearer "+_this.$store.getters.accessToken
-                                },
-                            })
-                            .then((res) => {
-                                // console.log('_RequestUploads_', res)
-                                if (res.data.status == "success") {
-                                    // this.$message({
-                                    //     type: 'success',
-                                    //     message: res.data.data
-                                    // })
-                                    
-                                    // _this.tableData = res.data.data
-
-                                    contract_erc20.methods.allowance(_this.gatewayContractAddress, _this.metaAddress).call()
-                                    .then(resultUSDC => {
-                                        console.log('allowance：'+ resultUSDC);
-                                        if(resultUSDC < web3.utils.toWei(_this.ruleForm.amount, 'ether')){
-                                            contract_erc20.methods.approve(_this.gatewayContractAddress, web3.utils.toWei(_this.ruleForm.amount, 'ether')).send({from:  _this.metaAddress})
-                                            .then(receipt => {
-                                                // console.log(receipt)
-                                            })
-                                        }
-                                        _this.contractSend(res.data.data)
-                                    })
-
-
-                                    // _this.$router.push({name: 'Upload_files'})
-
-
-                                } else {
-                                    _this.$message.error(res.data.data)
+                                // 判断支付金额是否大于代币余额
+                                if(_this.ruleForm.amount > _this.usdcAvailable ){
+                                    _this.$message.error('Insufficient balance')
+                                    return false
                                 }
-                            }).catch(error => {
-                                console.log(error)
-                                _this.loading = false
-                            })
 
+                                // 通过 FormData 对象上传文件
+                                var formData = new FormData()
+                                formData.append('file', _this._file)
+                                // formData.append('task_name', _this.ruleForm.task_name)
+                                _this.loading = true
+                                // 发起请求
+                                axios.post(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/storage/ipfs/upload `, formData,{
+                                    headers: {
+                                    'Authorization': "Bearer "+_this.$store.getters.accessToken
+                                    },
+                                })
+                                .then((res) => {
+                                    // console.log('_RequestUploads_', res)
+                                    if (res.data.status == "success") {
+                                        contract_erc20.methods.allowance(_this.gatewayContractAddress, _this.metaAddress).call()
+                                        .then(resultUSDC => {
+                                            console.log('allowance：'+ resultUSDC);
+                                            if(resultUSDC < web3.utils.toWei(_this.ruleForm.amount, 'ether')){
+                                                contract_erc20.methods.approve(_this.gatewayContractAddress, web3.utils.toWei(_this.ruleForm.amount, 'ether')).send({from:  _this.metaAddress})
+                                                .then(receipt => {
+                                                    // console.log(receipt)
+                                                })
+                                            }
+                                            _this.contractSend(res.data.data)
+                                        })
+                                        // _this.$router.push({name: 'Upload_files'})
+                                    } else {
+                                        _this.$message.error(res.data.data)
+                                    }
+                                }).catch(error => {
+                                    console.log(error)
+                                    _this.loading = false
+                                })
+                            })
                         }
-                        
                     } else {
                         console.log('error submit!!');
                         return false;
@@ -310,6 +336,7 @@
                 .send(payObject)
                 .on('transactionHash', function(hash){
                     // console.log('hash console:', hash);
+                    _this.txHash = hash
                 })
                 .on('confirmation', function(confirmationNumber, receipt){
                     // console.log('confirmationNumber console:', confirmationNumber, receipt);
@@ -318,13 +345,13 @@
                     // receipt example
                     // console.log('receipt console:', receipt);
                     _this.checkTransaction(receipt.transactionHash)
-
+                    _this.txHash = receipt.transactionHash
                 })
                 .on('error', function(error){
                     // console.log('error console:', error)
-                    console.error
+                    // console.error
                     _this.loading = false
-                    _this.$message.error('Fail');
+                    _this.failTransaction = true
                 }); 
             },
             checkTransaction(txHash) {
@@ -336,14 +363,15 @@
                         else {
                             _this.loading = false
                             clearTimeout(_this.timer)
-                            _this.$message({
-                                message: 'Success',
-                                type: 'success'
-                            });
+                            _this.finishTransaction = true
                         }
                     },
                     err => { console.error(err); }
                 );
+            },
+            finishClose(){
+                this.finishTransaction = false
+                this.$router.push({name: 'Upload_files'})
             },
             // 文件上传
             uploadFile(params) {
@@ -442,36 +470,70 @@
                 }
                 web3.eth.net.getId().then(netId => {
                     // console.log('network ID:', netId)
+                    _this.$store.dispatch('setMetaNetworkId', netId)
                     switch (netId) {
-                        case 80001:
-                            _this.center_fail = false
-                            _this.centerDialogVisible = false
-                            break;
-                        default:
-                            _this.center_fail = true
-                            _this.centerDialogVisible = true
-                            return;
+                    case 1:
+                        _this.network.name = 'mainnet';
+                        _this.network.unit = 'ETH';
+                        _this.center_fail = true
+                        _this.centerDialogVisible = true
+                        return;
+                    case 3:
+                        _this.network.name = 'ropsten';
+                        _this.network.unit = 'ETH';
+                        _this.center_fail = true
+                        _this.centerDialogVisible = true
+                        break;
+                    case 4:
+                        _this.network.name = 'rinkeby';
+                        _this.network.unit = 'ETH';
+                        _this.center_fail = true
+                        _this.centerDialogVisible = true
+                        return;
+                    case 5:
+                        _this.network.name = 'goerli';
+                        _this.network.unit = 'ETH';
+                        _this.center_fail = true
+                        _this.centerDialogVisible = true
+                        return;
+                    case 42:
+                        _this.network.name = 'kovan';
+                        _this.network.unit = 'ETH';
+                        _this.center_fail = true
+                        _this.centerDialogVisible = true
+                        return;
+                    case 97:
+                        _this.network.name = 'BSC Network';
+                        _this.network.unit = 'BNB';
+                        _this.center_fail = true
+                        _this.centerDialogVisible = true
+                        return;
+                    case 999:
+                        _this.network.name = 'NBAI';
+                        _this.network.unit = 'NBAI';
+                        _this.center_fail = true
+                        _this.centerDialogVisible = true
+                        return;
+                    case 80001:
+                        _this.network.name = 'polygon';
+                        _this.network.unit = 'MATIC';
+                        _this.center_fail = false
+                        _this.centerDialogVisible = false
+                        return;
+                    default:
+                        _this.network.name = '';
+                        _this.network.unit = '';
+                        _this.center_fail = true
+                        _this.centerDialogVisible = true
+                        return;
                     }
                 });
-            },
-            init(){
-                // 授权代币
-                let _this = this
-                contract_erc20 = new web3.eth.Contract( erc20_contract_json );
-                contract_erc20.options.address = _this.usdcAddress
-                // 查询剩余代币余额为：
-                contract_erc20.methods.balanceOf(_this.metaAddress).call()
-                .then(resultUSDC => {
-                    _this.usdcAvailable = web3.utils.fromWei(resultUSDC, 'ether');
-                    console.log('Available:', _this.usdcAvailable)
-                })
             }
         },
         mounted() {
             let _this = this
             that = _this
             _this.stats()
-            if(_this.metaAddress) _this.init()
             _this.$store.dispatch("setRouterMenu", 0);
             _this.$store.dispatch('setHeadertitle', _this.$t('navbar.Upload_files'))
             document.onkeydown = function(e) {
@@ -488,6 +550,9 @@
         computed: {
             metaAddress() {
                 return this.$store.getters.metaAddress
+            },
+            networkID() {
+                return this.$store.getters.networkID
             }
         },
     };
@@ -549,11 +614,62 @@
                 }
             }
         }
+        .completeDia{
+            text-align: center;
+            .el-dialog__header{
+            display: none;
+            }
+            img{
+                display: block;
+                max-width: 100px;
+                margin: auto;
+            }
+            h1{
+                margin: 0.32rem auto 0.1rem;
+                font-size: 0.32rem;
+                font-weight: 500;
+                line-height: 1.2;
+                color: #191919;
+                word-break: break-word;
+            }
+            h3, a{
+                font-size: 0.16rem;
+                font-weight: 500;
+                line-height: 1.2;
+                color: #191919;
+                word-break: break-word;
+            }
+            a{
+                text-decoration: underline;
+                color: #007bff;
+            }
+            a.a-close{
+                padding: 5px 45px;
+                background: #5c3cd3;
+                color: #fff;
+                border-radius: 10px;
+                cursor: pointer;
+                margin: 0.2rem auto 0;
+                display: block;
+                width: max-content;
+                text-decoration: unset;
+            }
+        }
     }
     #Create {
+        position: relative;
         height: calc(100% - 0.6rem);
-        padding: 0.3rem 0.2rem;
+        padding: 0.4rem 0.2rem;
         font-size: 0.24rem;
+        .el-alert /deep/{
+            position: absolute;
+            left: 0;
+            top: 0;
+            .el-alert__content{
+                display: flex;
+                align-items: center;
+            }
+        }
         .upload{
             padding: 0 0.17rem 0.4rem;
             margin: 0 auto 0.2rem;

@@ -14,7 +14,8 @@ const app = {
         avater: localStorage.getItem('oaxLoginAvater') || require('../../assets/images/user_big.png'),
         htmlGo:{},
         collapseL:  localStorage.getItem('collapseL') || false,
-        metaAddress: sessionStorage.getItem('metaAddress') || ''
+        metaAddress: sessionStorage.getItem('metaAddress') || '',
+        networkID: sessionStorage.getItem('networkID') || 0
     },
     mutations: {
         TOGGLE_SIDEBAR: state => {
@@ -61,6 +62,10 @@ const app = {
             state.metaAddress = metaAddress
             sessionStorage.setItem('metaAddress', metaAddress)
         },
+        SET_METANETWORKID: (state, networkID) => {
+            state.networkID = networkID
+            sessionStorage.setItem('networkID', networkID)
+        },
 
     },
     actions: {
@@ -93,6 +98,9 @@ const app = {
         },
         setMetaAddress({commit}, metaAddress) {
             commit('SET_METAADDRESS', metaAddress)
+        },
+        setMetaNetworkId({commit}, networkID) {
+            commit('SET_METANETWORKID', networkID)
         }
     }
 }
