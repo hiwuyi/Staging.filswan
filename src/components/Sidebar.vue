@@ -65,13 +65,13 @@ export default {
                     name: 'Upload_files',
                     type: ''
                 },
-                {
-                    icon: 'el-icon-search',
-                    index: '2',
-                    title: this.$t('route.Search_file'),
-                    name: 'Search_file',
-                    type: ''
-                },
+                // {
+                //     icon: 'el-icon-search',
+                //     index: '2',
+                //     title: this.$t('route.Search_file'),
+                //     name: 'Search_file',
+                //     type: ''
+                // },
                 {
                     icon: 'el-icon-s-myAccount',
                     index: '3',

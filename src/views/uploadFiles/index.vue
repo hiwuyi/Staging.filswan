@@ -84,10 +84,10 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="miner_id" label="PROVIDER ID" width="120">
+          <el-table-column prop="miner_fid" label="PROVIDER ID" width="120">
             <template slot-scope="scope">
               <div class="hot-cold-box">
-                {{ scope.row.miner_id | NumFormat }}
+                {{ scope.row.miner_fid | NumFormat }}
               </div>
             </template>
           </el-table-column>
@@ -288,13 +288,13 @@ export default {
       tableDataAll: [],
       parma: {
         limit: 10,
-        offset: 0,
+        offset: 1,
         locationValue: "",
         total: 0,
       },
       parmaChild: {
         limit: 10,
-        offset: 0,
+        offset: 1,
         locationValue: "",
         total: 0,
       },
@@ -339,9 +339,9 @@ export default {
     'searchValue': function(){
       let _this = this
       _this.parma.limit = 10
-      _this.parma.offset = 0
+      _this.parma.offset = 1
       _this.parmaChild.limit = 10
-      _this.parmaChild.offset = 0
+      _this.parmaChild.offset = 1
       _this.getData()
     }
   },
@@ -638,14 +638,14 @@ export default {
       let _this = this;
       _this.parma.limit = 10;
       _this.paginationShow = true;
-      _this.parma.offset = 0;
+      _this.parma.offset = 1;
       _this.getData();
     },
     clearAll() {
       let _this = this;
       _this.searchValue = "";
       _this.parma.limit = 10;
-      _this.parma.offset = 0;
+      _this.parma.offset = 1;
       _this.getData();
     },
     handleCurrentChange(val) {
@@ -691,7 +691,7 @@ export default {
         _this.parma.offset > 0 ? _this.parma.offset - 1 : _this.parma.offset;
       let parma = {
         page_size: _this.parma.limit,
-        page_number: offset * _this.parma.limit,
+        page_number: _this.parma.offset,
         file_name: _this.searchValue,
         source_id: 4
       };
@@ -795,7 +795,7 @@ export default {
     },
     formatbytes: function (bytes) {
       if (!bytes) return "-";
-      if (bytes === 0) return '0 B';
+      if (bytes == 0) return '0 B';
       var k = 1000, // or 1024
           sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
           i = Math.floor(Math.log(bytes) / Math.log(k));

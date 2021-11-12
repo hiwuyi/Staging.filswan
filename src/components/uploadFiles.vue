@@ -1,6 +1,6 @@
 <template>
     <div id="Create">
-        <el-alert type="warning" effect="dark" center show-icon v-if="networkID!=80001">
+        <el-alert type="warning" effect="dark" center show-icon v-if="metaAddress&&networkID!=80001">
             <div slot="title">Your wallet is wrongly connected to {{network.name}} Network. To use our site, please switch to <span style="text-decoration: underline;">Mumbai Testnet</span>.</div>
         </el-alert>
         <div class="upload" v-loading="loading">
@@ -118,7 +118,7 @@
 
         <el-dialog title="" :visible.sync="failTransaction" :width="width"
             custom-class="completeDia">
-            <img src="@/assets/images/alert-icon.png" />
+            <img src="@/assets/images/error.png" />
             <h1>Fail!</h1>
             <h3>Your transaction has failed. Check the transaction history for more details.</h3>
             <a :href="'https://mumbai.polygonscan.com/tx/'+txHash" target="_blank">{{txHash}}</a>
