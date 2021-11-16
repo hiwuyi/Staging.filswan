@@ -4,25 +4,7 @@
             <div class="upload_form_detail">
                 <el-tabs v-model="activeName">
                     <el-tab-pane :label="$t('miner.tab_left')" name="User_Profile">
-                        <div class="user_menu">
-                            <div class="menu_tab" :class="menuTabShow == 0?'menu_tab_active':''" @click="menuToggle(0)">{{$t('navbar.BillingHistory')}}</div>
-                            <div class="menu_tab" :class="menuTabShow == 1?'menu_tab_active':''" @click="menuToggle(1)">{{$t('my_profile.Change_password')}}</div>
-                        </div>
-                        <div class="user_contRight" v-show="menuTabShow == 0">
-                            <div v-if="metaAddress" style="font-size:12px">
-                                <billing></billing>
-                            </div>
-                            <div v-else>
-                                <el-alert
-                                    title=""
-                                    type="warning"
-                                    :closable="false"
-                                    description="Please log in to metamask"
-                                    show-icon>
-                                </el-alert>
-                            </div>
-                        </div>
-                        <div class="resetPass" v-show="menuTabShow == 1">
+                        <div class="resetPass">
                             <h2>{{$t('my_profile.Change_password')}}</h2>
 
                             <div class="formStyle" :class="verify.mailPassword.tipsbox ? 'border-red' : ''">
@@ -360,7 +342,8 @@ export default {
                 }
                 .resetPass{
                     float: left;
-                    width: 3rem;
+                    width: 100%;
+                    max-width: 3rem;
                     margin: 0 0 0 0.3rem;
                     h2{
                         margin: 0;

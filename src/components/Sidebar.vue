@@ -73,6 +73,13 @@ export default {
                 //     type: ''
                 // },
                 {
+                    icon: 'el-icon-s-billing',
+                    index: '5',
+                    title: this.$t('navbar.BillingHistory'),
+                    name: 'billing',
+                    type: ''
+                },
+                {
                     icon: 'el-icon-s-myAccount',
                     index: '3',
                     title: this.$t('route.myAccount'),
@@ -446,6 +453,11 @@ export default {
                 background: url(../assets/images/menuIcon/myAccount.png) no-repeat center;
             }
         }
+        .el-icon-s-billing{
+            &::before{
+                background: url(../assets/images/menuIcon/billing.png) no-repeat center;
+            }
+        }
     }
 
     .el-menu-item:hover, .is-active {
@@ -515,6 +527,11 @@ export default {
         .el-icon-s-myAccount{
             &::before{
                 background: url(../assets/images/menuIcon/myAccount-1.png) no-repeat center;
+            }
+        }
+        .el-icon-s-billing{
+            &::before{
+                background: url(../assets/images/menuIcon/billing-1.png) no-repeat center;
             }
         }
     }

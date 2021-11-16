@@ -8,7 +8,7 @@
             <div class="upload_form">
                 <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" class="demo-ruleForm">
                     <el-form-item prop="fileList" :label="$t('uploadFile.upload')">
-                        <div style="display: flex; align-items: center;">
+                        <div>
                             <el-upload
                                 class="upload-demo"
                                 ref="uploadFileRef"
@@ -19,7 +19,10 @@
                                 :on-remove="handleRemove">
                                 <el-button size="small" type="primary" icon="el-icon-plus">{{$t('uploadFile.upload')}}</el-button>
                             </el-upload>
-                            <p v-if="ruleForm.fileList.length>0">{{ruleForm.file_size}}</p>
+                            <p v-if="ruleForm.fileList.length>0" style="display: flex;align-items: center;">
+                                <svg t="1637031488880" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3310" style="width: 0.13rem;height: 0.13rem;margin: 0 7px 0 5px;"><path d="M512 1024a512 512 0 1 1 512-512 32 32 0 0 1-32 32h-448v448a32 32 0 0 1-32 32zM512 64a448 448 0 0 0-32 896V512a32 32 0 0 1 32-32h448A448 448 0 0 0 512 64z" fill="#999999" p-id="3311"></path><path d="M858.88 976a32 32 0 0 1-32-32V640a32 32 0 0 1 32-32 32 32 0 0 1 32 32v304a32 32 0 0 1-32 32z" fill="#999999" p-id="3312"></path><path d="M757.12 773.12a34.56 34.56 0 0 1-22.4-8.96 32 32 0 0 1 0-45.44l101.12-101.12a32 32 0 0 1 45.44 0 30.72 30.72 0 0 1 0 44.8l-101.12 101.76a34.56 34.56 0 0 1-23.04 8.96z" fill="#999999" p-id="3313"></path><path d="M960 773.12a32 32 0 0 1-22.4-8.96l-101.76-101.76a32 32 0 0 1 0-44.8 32 32 0 0 1 45.44 0l101.12 101.12a32 32 0 0 1-22.4 54.4z" fill="#999999" p-id="3314"></path></svg>
+                                {{ruleForm.file_size}}
+                            </p>
                         </div>
                     </el-form-item>
                     <el-form-item prop="duration">
@@ -32,7 +35,14 @@
                         </template>
                         <el-input v-model="ruleForm.duration" type="number" style="max-width:130px"></el-input> &nbsp; days
                     </el-form-item>
-                    <el-form-item prop="storage_cost" label="Estimated Storage Cost">
+                    <el-form-item prop="storage_cost">
+                        <template slot="label">
+                            Estimated Storage Cost 
+                            
+                            <el-tooltip effect="dark" content="The estimated storage cost is calculated according to your file size, the duration you set, and the average provider price." placement="top">
+                                <img src="@/assets/images/info.png"/>
+                            </el-tooltip>
+                        </template>
                         <span  style="color:#ce2f21">{{ruleForm.storage_cost | NumStorage}} FIL</span> 
                     </el-form-item>
                 </el-form>
@@ -43,6 +53,7 @@
                             <img src="@/assets/images/info.png"/>
                         </el-tooltip>
                     </div>
+                    <div class="desc">The latest exchange rate of FIL to USDC is {{biling_price}}.</div>
                     <div class="upload_plan_radio">
                         <el-radio-group v-model="ruleForm.lock_plan" @change="agreeChange">
                             <el-radio label="1" border>
@@ -124,6 +135,14 @@
             <a :href="'https://mumbai.polygonscan.com/tx/'+txHash" target="_blank">{{txHash}}</a>
             <a class="a-close" @click="failTransaction=false">Close</a>
         </el-dialog>
+
+        <el-dialog
+        title="File uploading"
+        :visible.sync="fileUploadVisible" :show-close="false" :close-on-click-modal="false"
+        :width="width" custom-class="fileUpload">
+        <h3>Your file is still in the process of uploading to IPFS. Please keep this window open until uploading completes.</h3>
+        <img src="@/assets/images/upload.gif" style="width: 100%;" alt="">
+        </el-dialog>
     </div>
 </template>
 
@@ -203,7 +222,8 @@
                 },
                 finishTransaction: false,
                 failTransaction: false,
-                txHash: ''
+                txHash: '',
+                fileUploadVisible: false
             };
         },
         components: {},
@@ -228,13 +248,13 @@
             },
             agreeChange(val){
                 switch (val) {
-                    case 1:
+                    case '1':
                         this.ruleForm.amount = this.storage_cost_low
                         break;
-                    case 2:
+                    case '2':
                         this.ruleForm.amount = this.storage_cost_average
                         break;
-                    case 3:
+                    case '3':
                         this.ruleForm.amount = this.storage_cost_high
                         break;
                     default:
@@ -273,6 +293,7 @@
                                 formData.append('file', _this._file)
                                 // formData.append('task_name', _this.ruleForm.task_name)
                                 _this.loading = true
+                                _this.fileUploadVisible = true
                                 // 发起请求
                                 axios.post(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/storage/ipfs/upload `, formData,{
                                     headers: {
@@ -297,9 +318,11 @@
                                     } else {
                                         _this.$message.error(res.data.data)
                                     }
+                                    _this.fileUploadVisible = false
                                 }).catch(error => {
                                     console.log(error)
                                     _this.loading = false
+                                    _this.fileUploadVisible = false
                                 })
                             })
                         }
@@ -655,6 +678,22 @@
                 text-decoration: unset;
             }
         }
+        .fileUpload{
+            .el-dialog__header{
+                
+            }
+            .el-dialog__body{
+                padding: 0.1rem 0.2rem 0.2rem;
+                h3{   
+                    margin: 0 0 0.1rem;
+                    font-size: 0.14rem;
+                    font-weight: normal;
+                    line-height: 1.2;
+                    color: #666;
+                    word-break: break-word;
+                }
+            }
+        }
     }
     #Create {
         position: relative;
@@ -689,7 +728,7 @@
                 width: 100%;
                 margin: 0.1rem 0 0.3rem;
                 text-align: left;
-                font-size: 0.12rem;
+                font-size: 0.15rem;
                 font-weight: 600;
                 color: #000;
                 line-height: 1.5;
@@ -805,9 +844,9 @@
                                     }
                                 }
                                 .el-upload-list{
-                                    // width: 100%;
-                                    // float: none;
-                                    // clear: both;
+                                    width: 100%;
+                                    float: none;
+                                    clear: both;
                                 }
                             }
                             .el-upload__tip{
@@ -848,7 +887,7 @@
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    margin: 0.3rem 0 0.1rem;
+                    margin: 0.3rem 0 0;
                     line-height: 1.5;
                     text-align: center;
                     font-size: 0.15rem;
@@ -863,6 +902,15 @@
                         margin: 0 0 0 5px;
                         cursor: pointer;
                     }
+                }
+                .desc{
+                    margin: 0 0 0.1rem;
+                    line-height: 1.5;
+                    text-align: center;
+                    font-size: 0.13rem;
+                    white-space: normal;
+                    color: #999;
+                    font-weight: normal;
                 }
                 .upload_plan_radio{
                     .el-radio-group /deep/{

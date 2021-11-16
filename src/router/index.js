@@ -7,6 +7,7 @@ const Upload_files = () => import("@/views/uploadFiles/index");
 const Upload_files_create = () => import("@/components/uploadFiles");
 const Search_file = () => import("@/views/searchFile/index");
 const my_account = () => import("@/views/myAccount/index");
+const billing = () => import("@/views/myAccount/billing");
 const stats = () => import("@/views/stats/index");
 
 
@@ -29,7 +30,7 @@ export default new Router({
 	routes: [
         {
             path: '/',
-            redirect: '/Upload_files'
+            redirect: '/Upload_files_create'
         },
         {
             path: '/',
@@ -104,6 +105,30 @@ export default new Router({
                     meta: {
                         metaInfo: {
                             title: 'Upload File',
+                            description: "Swan is a marketplace for Filecoin miners, clients post/bidding deals the online."
+                        }
+                    }
+                },
+                {
+                    path: '/billing',
+                    name: 'billing',
+                    component: billing,
+                    beforeEnter: (to, from, next) => {
+                        
+                        //这里判断用户是否登录，验证本地存储是否有token
+                        if (!localStorage.getItem('oaxLoginAccessToken')) { // 判断当前的token是否存在
+                            next({
+                                path: '/login',
+                                query: { redirect: to.fullPath }
+                            })
+                        } else {
+                            next()
+                        }
+
+                    },
+                    meta: {
+                        metaInfo: {
+                            title: 'Billing',
                             description: "Swan is a marketplace for Filecoin miners, clients post/bidding deals the online."
                         }
                     }
