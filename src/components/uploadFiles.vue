@@ -141,7 +141,7 @@
         :visible.sync="fileUploadVisible" :show-close="false" :close-on-click-modal="false"
         :width="width" custom-class="fileUpload">
         <h3>Your file is still in the process of uploading to IPFS. Please keep this window open until uploading completes.</h3>
-        <img src="@/assets/images/upload.gif" style="width: 100%;" alt="">
+        <img src="@/assets/images/upload.gif" class="gif_img" alt="">
         </el-dialog>
     </div>
 </template>
@@ -229,6 +229,7 @@
         components: {},
         watch: {
             'ruleForm.fileList': function(){
+                this.ruleForm.lock_plan = ''
                 this.$refs['ruleForm'].validate((valid) => {});
                 if(this.ruleForm.file_size_byte > 0){
                     this.calculation()
@@ -247,6 +248,7 @@
                 this.storage_cost_high = Number(this.ruleForm.storage_cost * this.biling_price * 5).toFixed(9)
             },
             agreeChange(val){
+                this.ruleForm.lock_plan_tip = false
                 switch (val) {
                     case '1':
                         this.ruleForm.amount = this.storage_cost_low
@@ -691,6 +693,12 @@
                     line-height: 1.2;
                     color: #666;
                     word-break: break-word;
+                }
+                .gif_img{
+                    max-width: 200px;
+                    width: 100%;
+                    margin: auto;
+                    display: block;
                 }
             }
         }
