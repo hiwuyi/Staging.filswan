@@ -49,8 +49,8 @@
                                 <el-table-column prop="locked_fee" :label="$t('billing.AMOUNT')" min-width="150">
                                     <template slot-scope="scope">{{scope.row.locked_fee | balanceFilter}}</template>
                                 </el-table-column>
-                                <el-table-column prop="unlock_user_amount" label="UNLOCK AMOUNT" min-width="150">
-                                    <template slot-scope="scope">{{scope.row.unlock_user_amount | balanceFilter}}</template>
+                                <el-table-column prop="unlock_to_user_amount" label="UNLOCK AMOUNT" min-width="150">
+                                    <template slot-scope="scope">{{scope.row.unlock_to_user_amount | balanceFilter}}</template>
                                 </el-table-column>
                                 <el-table-column prop="coin_type" label="COIN" min-width="120"></el-table-column>
                                 <el-table-column prop="payload_cid" :label="$t('billing.PAYLOADCID')" min-width="140">

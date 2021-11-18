@@ -4,7 +4,7 @@
   "data": [{
     "tx_hash": "0xc1c1f3212b9bb538b40fb8996aed3213cb079f7513d7e4b376c3699382c743b1",
     "locked_fee": "50000000000000000",
-    "unlock_user_amount": "50000000000000000",
+    "unlock_to_user_amount": "50000000000000000",
     "deadline": "1635885488",
     "payload_cid": "bafk2bzaceb7cp727fxdrzudlgvsoivdwscydp35eb6wc3bzuflggfdhfa4rfe",
     "address_from": "0xc4fcaAdCb0b00a9501e56215c37B10fAF9e79c0a",
