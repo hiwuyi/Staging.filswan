@@ -28,18 +28,18 @@
                         </div>
                         <div class="form_table">
                             <el-table v-loading="loading" :data="tableData" style="width: 100%" :empty-text="$t('deal.formNotData')" header-click="aaa">
-                                <el-table-column prop="tx_hash" :label="$t('billing.TRANSACTION')" min-width="140">
+                                <el-table-column prop="tx_hash" :label="$t('billing.TRANSACTION')" min-width="190">
                                     <template slot-scope="scope">
                                         <div class="hot-cold-box">
                                             <el-popover
                                                 placement="top"
-                                                trigger="hover" width="300"
+                                                trigger="hover" width="200"
                                                 v-model="scope.row.txHashVis">
                                                 <div class="upload_form_right">
                                                     <p>{{scope.row.tx_hash}}</p>
                                                 </div>
-                                                <el-button slot="reference" @click="copyTextToClipboard(scope.row.tx_hash)">
-                                                    <img src="@/assets/images/copy.png" alt="">
+                                                <el-button slot="reference" @click="networkLink(scope.row.tx_hash, scope.row.network)" :class="{'color': scope.row.network&&scope.row.network.toLowerCase() == 'polygon'}">
+                                                    <!-- <img src="@/assets/images/copy.png" alt=""> -->
                                                     {{scope.row.tx_hash}}
                                                 </el-button>
                                             </el-popover>
@@ -170,6 +170,11 @@
         },
         components: {},
         methods: {
+            networkLink(hash, network) {
+                if(network && network.toLowerCase() == 'polygon'){
+                    window.open('https://mumbai.polygonscan.com/tx/'+hash)
+                }
+            },
             handleCurrentChange(val) {
                 this.parma.offset = val
                 this.getData()
@@ -340,15 +345,19 @@
                 if(String(value).length > 18){
                     let v1 = String(value).substring(0, String(value).length - 18)
                     let v2 = String(value).substring(String(value).length - 18)
-                    return v1.replace(/(\d)(?=(?:\d{3})+$)/g, "$1,") + '.' + v2
-                }else if(String(value).length == 18){
-                    return String(value).replace(/(\d)(?=(?:\d{3})+$)/g, "$1,")
+                    let v3 = String(v2).replace(/(0+)\b/gi,"")
+                    if(v3){
+                        return v1 + '.' + v3
+                    }else{
+                        return v1
+                    }
+                    return parseFloat(v1.replace(/(\d)(?=(?:\d{3})+$)/g, "$1,") + '.' + v2)
                 }else{
                     let v3 = ''
                     for(let i = 0; i < 18 - String(value).length; i++){
                         v3 += '0'
                     }
-                    return '0.' + v3 + value
+                    return '0.' + String(v3 + value).replace(/(0+)\b/gi,"")
                 }
             },
         },
@@ -549,6 +558,10 @@
                                                 width: 0.17rem;
                                                 margin-top: 0.03rem;
                                             }
+                                        }
+                                        .color{
+                                            color: blue;
+                                            text-decoration: underline;
                                         }
                                         .el-button:hover{
                                             img{
