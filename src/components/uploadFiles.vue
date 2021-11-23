@@ -241,7 +241,7 @@
         },
         methods: {
             calculation(type){
-                this.ruleForm.storage_cost = type ? '' : this.ruleForm.file_size_byte * this.ruleForm.duration * this.storage
+                this.ruleForm.storage_cost = type ? '' : this.ruleForm.file_size_byte * this.ruleForm.duration * this.storage / 365
                 this.ruleForm.amount_minprice = Number(this.ruleForm.storage_cost * this.biling_price).toFixed(9)
                 this.storage_cost_low = Number(this.ruleForm.storage_cost * this.biling_price * 2).toFixed(9)
                 this.storage_cost_average = Number(this.ruleForm.storage_cost * this.biling_price * 3).toFixed(9)
@@ -293,6 +293,7 @@
                                 // 通过 FormData 对象上传文件
                                 var formData = new FormData()
                                 formData.append('file', _this._file)
+                                formData.append('duration', _this.ruleForm.duration)
                                 // formData.append('task_name', _this.ruleForm.task_name)
                                 _this.loading = true
                                 _this.fileUploadVisible = true
@@ -416,7 +417,7 @@
             sizeChange(bytes){
                 if (!bytes) return "-";
                 if (bytes === 0) return '0 B';
-                var k = 1000, // or 1024
+                var k = 1024, // or 1024
                     sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
                     i = Math.floor(Math.log(bytes) / Math.log(k));
                 return (bytes / Math.pow(k, i)).toPrecision(3) + ' ' + sizes[i];
@@ -429,7 +430,7 @@
                 }else{
                     size = limit/( 1024 * 1024 * 1024)
                 }
-                return size;
+                return Number(size).toFixed(3);
             },
             handleChange(file, fileList) {
                 if (fileList.length > 0) {
