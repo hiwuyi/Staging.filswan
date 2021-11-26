@@ -319,6 +319,7 @@
                                     if (res.data.status == "success") {
                                         if(!res.data.data.need_pay){
                                             _this.paymentPopup = true
+                                            _this.loading = false
                                             return false
                                         }
                                         contract_erc20.methods.allowance(_this.gatewayContractAddress, _this.metaAddress).call()
