@@ -399,12 +399,13 @@
             },
             sendSuccess(cid, success) {
                 let _this = this 
-                let lockParam = {
-                    payload_cid: cid,
-                    lock_payment_tx: _this.txHash,
-                    lock_payment_status: success,
-                    network_name: 'polygon'
-                }
+                
+                let lockParam = new FormData()
+                lockParam.append('payload_cid', cid)
+                lockParam.append('lock_payment_tx', _this.txHash)
+                lockParam.append('lock_payment_status', success)
+                lockParam.append('network_name', 'polygon')
+
                 axios.post(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/billing/deal/lockpayment/status`, lockParam,{
                     headers: {
                     'Authorization': "Bearer "+_this.$store.getters.accessToken
