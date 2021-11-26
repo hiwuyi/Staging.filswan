@@ -405,7 +405,7 @@
                     lock_payment_status: success,
                     network_name: 'polygon'
                 }
-                axios.post(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/billing/deal/status`, lockParam,{
+                axios.post(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/billing/deal/lockpayment/status`, lockParam,{
                     headers: {
                     'Authorization': "Bearer "+_this.$store.getters.accessToken
                     },
