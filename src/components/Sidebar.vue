@@ -55,14 +55,14 @@ export default {
                     icon: 'el-icon-s-upload',
                     index: '0',
                     title: this.$t('route.Upload_files'),
-                    name: 'Upload_files_create',
+                    name: 'upload_file',
                     type: ''
                 },
                 {
                     icon: 'el-icon-s-deal',
                     index: '1',
                     title: this.$t('route.Deal'),
-                    name: 'Upload_files',
+                    name: 'my_files',
                     type: ''
                 },
                 // {
@@ -83,7 +83,7 @@ export default {
                     icon: 'el-icon-s-myAccount',
                     index: '3',
                     title: this.$t('route.myAccount'),
-                    name: 'my_account',
+                    name: 'settings',
                     type: ''
                 },
                 {

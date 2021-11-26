@@ -3,10 +3,12 @@ import Router from 'vue-router'
 Vue.use(Router)
 //路由懒加载
 const home = () => import("@/components/Home");
-const Upload_files = () => import("@/views/uploadFiles/index");
-const Upload_files_create = () => import("@/components/uploadFiles");
+const my_files = () => import("@/views/uploadFiles/index");
+const my_files_index = () => import("@/views/uploadFiles/dashboard/index");
+const my_files_detail = () => import("@/views/uploadFiles/detail/index");
+const upload_file = () => import("@/components/uploadFiles");
 const Search_file = () => import("@/views/searchFile/index");
-const my_account = () => import("@/views/myAccount/index");
+const settings = () => import("@/views/settings/index");
 const billing = () => import("@/views/myAccount/billing");
 const stats = () => import("@/views/stats/index");
 
@@ -30,7 +32,7 @@ export default new Router({
 	routes: [
         {
             path: '/',
-            redirect: '/Upload_files_create'
+            redirect: '/upload_file'
         },
         {
             path: '/',
@@ -38,33 +40,48 @@ export default new Router({
             // meta: { title: '自述文件' },
             children: [
                 {
-                    path: '/Upload_files',
-                    name: 'Upload_files',
-                    component: Upload_files,
-                    beforeEnter: (to, from, next) => {
-                        
-                        //这里判断用户是否登录，验证本地存储是否有token
-                        if (!localStorage.getItem('oaxLoginAccessToken')) { // 判断当前的token是否存在
-                            next({
-                                path: '/login',
-                                query: { redirect: to.fullPath }
-                            })
-                        } else {
-                            next()
-                        }
-
+                  path: '/my_files',
+                  component: my_files,
+                  children: [
+                    {
+                      path: '/',
+                      redirect: '/my_files/dashboard'
                     },
-                    meta: {
-                        metaInfo: {
-                            title: 'Upload File',
-                            description: "Swan is a marketplace for Filecoin miners, clients post/bidding deals the online."
-                        }
-                    }
+                    {
+                      path: '/my_files/dashboard',
+                      name: 'my_files',
+                      component: my_files_index
+                    },
+                    {
+                      path: '/my_files/detail/:id',
+                      name: 'my_files_detail',
+                      component: my_files_detail
+                    },
+                  ],
+                  beforeEnter: (to, from, next) => {
+                      
+                      //这里判断用户是否登录，验证本地存储是否有token
+                      if (!localStorage.getItem('oaxLoginAccessToken')) { // 判断当前的token是否存在
+                          next({
+                              path: '/login',
+                              query: { redirect: to.fullPath }
+                          })
+                      } else {
+                          next()
+                      }
+
+                  },
+                  meta: {
+                      metaInfo: {
+                          title: 'Upload File',
+                          description: "Swan is a marketplace for Filecoin miners, clients post/bidding deals the online."
+                      }
+                  }
                 },
                 {
-                    path: '/Upload_files_create',
-                    name: 'Upload_files_create',
-                    component: Upload_files_create,
+                    path: '/upload_file',
+                    name: 'upload_file',
+                    component: upload_file,
                     beforeEnter: (to, from, next) => {
                         
                         //这里判断用户是否登录，验证本地存储是否有token
@@ -134,9 +151,9 @@ export default new Router({
                     }
                 },
                 {
-                    path: '/my_account',
-                    name: 'my_account',
-                    component: my_account,
+                    path: '/settings',
+                    name: 'settings',
+                    component: settings,
                     beforeEnter: (to, from, next) => {
                         
                         //这里判断用户是否登录，验证本地存储是否有token

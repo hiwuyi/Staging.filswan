@@ -44,7 +44,7 @@ import billing from '@/components/Billing.vue';
 import axios from 'axios'
 
 export default {
-    name: 'MyAccount',
+    name: 'Settings',
     data() {
       return {
             loading: false,

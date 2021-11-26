@@ -317,7 +317,7 @@
                                             }
                                             _this.contractSend(res.data.data)
                                         })
-                                        // _this.$router.push({name: 'Upload_files'})
+                                        // _this.$router.push({name: 'my_files'})
                                     } else {
                                         _this.$message.error(res.data.data)
                                     }
@@ -418,7 +418,7 @@
             },
             finishClose(){
                 this.finishTransaction = false
-                this.$router.push({name: 'Upload_files'})
+                this.$router.push({name: 'my_files'})
             },
             // 文件上传
             uploadFile(params) {

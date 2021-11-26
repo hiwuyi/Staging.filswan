@@ -35,7 +35,7 @@
                     <span class="text textTrue" v-else>{{network.name}}</span>
                 </div>
                 {{$t('navbar.hi')}}
-                <router-link :to="{name: 'Upload_files_create'}">
+                <router-link :to="{name: 'upload_file'}">
                     <b>&nbsp;{{email}}</b>
                 </router-link>
 
@@ -146,7 +146,8 @@ export default {
             let _this = this;
             let name = _this.$route.name;
             if(!localStorage.getItem("oaxLoginAccessToken")){
-                if(name == 'Upload_files' || name == 'Upload_files_create' || name == 'details'){
+                if(name == 'my_files' || name == 'my_files_detail' || name == 'upload_file' || name == 'Search_file' ||
+                   name == 'billing' || name == 'settings'){
                     _this.$store.dispatch("FedLogOut").then(() => {
                         _this.$router.push("/login");
                     });
