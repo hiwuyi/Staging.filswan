@@ -9,7 +9,7 @@ const my_files_detail = () => import("@/views/uploadFiles/detail/index");
 const upload_file = () => import("@/components/uploadFiles");
 const Search_file = () => import("@/views/searchFile/index");
 const settings = () => import("@/views/settings/index");
-const billing = () => import("@/views/myAccount/billing");
+const billing = () => import("@/views/settings/billing");
 const stats = () => import("@/views/stats/index");
 
 
