@@ -370,7 +370,7 @@
                 .on('receipt', function(receipt){
                     // receipt example
                     // console.log('receipt console:', receipt);
-                    _this.checkTransaction(receipt.transactionHash)
+                    _this.checkTransaction(receipt.transactionHash, cid)
                     _this.txHash = receipt.transactionHash
                 })
                 .on('error', function(error){
@@ -378,22 +378,42 @@
                     // console.error
                     _this.loading = false
                     _this.failTransaction = true
+                    _this.sendSuccess(cid, 'Fail')
                 }); 
             },
-            checkTransaction(txHash) {
+            checkTransaction(txHash, cid) {
                 let _this = this
                 web3.eth.getTransactionReceipt(txHash).then(
                     res => {
                         console.log('checking ... ');
-                        if (!res) { return _this.timer = setTimeout(() => { _this.checkTransaction(txHash); }, 2000); }
+                        if (!res) { return _this.timer = setTimeout(() => { _this.checkTransaction(txHash, cid); }, 2000); }
                         else {
                             _this.loading = false
                             clearTimeout(_this.timer)
                             _this.finishTransaction = true
+                            _this.sendSuccess(cid, 'Success')
                         }
                     },
                     err => { console.error(err); }
                 );
+            },
+            sendSuccess(cid, success) {
+                let _this = this 
+                let lockParam = {
+                    payload_cid: cid,
+                    lock_payment_tx: _this.txHash,
+                    lock_payment_status: success,
+                    network_name: 'polygon'
+                }
+                axios.post(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/billing/deal/status`, lockParam,{
+                    headers: {
+                    'Authorization': "Bearer "+_this.$store.getters.accessToken
+                    },
+                })
+                .then((res) => {
+                }).catch(error => {
+                    console.log(error)
+                })
             },
             finishClose(){
                 this.finishTransaction = false
