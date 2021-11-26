@@ -35,9 +35,9 @@
           :empty-text="$t('deal.formNotData')"
            v-loading="loading"
         >
-          <el-table-column prop="created_at" label="CREATED" min-width="120">
+          <el-table-column prop="create_at" label="CREATED" min-width="120">
             <template slot-scope="scope">
-              {{ scope.row.created_at }}
+              {{ scope.row.create_at }}
             </template>
           </el-table-column>
           <el-table-column prop="file_name" label="FILE NAME" min-width="120">
@@ -713,12 +713,12 @@ export default {
             _this.tableData = response.data.data;
             _this.tableData.map((item,s) => {
               item.payloadAct = false
-              item.created_at = item.created_at
-                ? item.created_at.length < 13
-                  ? moment(new Date(parseInt(item.created_at * 1000))).format(
+              item.create_at = item.create_at
+                ? item.create_at.length < 13
+                  ? moment(new Date(parseInt(item.create_at * 1000))).format(
                       "YYYY-MM-DD HH:mm:ss"
                     )
-                  : moment(new Date(parseInt(item.created_at))).format(
+                  : moment(new Date(parseInt(item.create_at))).format(
                       "YYYY-MM-DD HH:mm:ss"
                     )
                 : "-";
@@ -745,12 +745,12 @@ export default {
       //       _this.tableData = response.data.deals;
       //       _this.tableData.map((item,s) => {
       //         item.payloadAct = false
-      //         item.created_at = item.created_at
-      //           ? item.created_at.length < 13
-      //             ? moment(new Date(parseInt(item.created_at * 1000))).format(
+      //         item.create_at = item.create_at
+      //           ? item.create_at.length < 13
+      //             ? moment(new Date(parseInt(item.create_at * 1000))).format(
       //                 "YYYY-MM-DD HH:mm:ss"
       //               )
-      //             : moment(new Date(parseInt(item.created_at))).format(
+      //             : moment(new Date(parseInt(item.create_at))).format(
       //                 "YYYY-MM-DD HH:mm:ss"
       //               )
       //           : "-";
