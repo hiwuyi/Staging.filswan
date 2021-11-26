@@ -330,11 +330,11 @@
                                                     // console.log(receipt)
                                                 })
                                             }
-                                            _this.contractSend(res.data.data)
+                                            _this.contractSend(res.data.data.payload_cid)
                                         })
                                         // _this.$router.push({name: 'my_files'})
                                     } else {
-                                        _this.$message.error(res.data.data)
+                                        _this.$message.error('Fail')
                                     }
                                 }).catch(error => {
                                     console.log(error)
