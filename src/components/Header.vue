@@ -799,6 +799,9 @@ export default {
             background: #f56c6c;
             color: #fff;
             border-radius: 0.51rem;
+            @media screen and (max-width:441px) {
+                display: none;
+            }
         }
         .textTrue{
             background: #4326ab;

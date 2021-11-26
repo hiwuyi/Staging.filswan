@@ -143,6 +143,15 @@
         <h3>Your file is still in the process of uploading to IPFS. Please keep this window open until uploading completes.</h3>
         <img src="@/assets/images/upload.gif" class="gif_img" alt="">
         </el-dialog>
+
+        <el-dialog title="" :visible.sync="paymentPopup" :width="width"
+            custom-class="completeDia">
+            <img src="@/assets/images/error.png" />
+            <h2>This file has been uploaded.</h2>
+            <h4>We currently only support uploading a file once. Please select another file to upload.</h4>
+            <h4>Thank you for your comprehension.</h4>
+            <a class="a-close" @click="paymentPopup=false">OK</a>
+        </el-dialog>
     </div>
 </template>
 
@@ -223,7 +232,8 @@
                 finishTransaction: false,
                 failTransaction: false,
                 txHash: '',
-                fileUploadVisible: false
+                fileUploadVisible: false,
+                paymentPopup: false
             };
         },
         components: {},
@@ -305,7 +315,12 @@
                                 })
                                 .then((res) => {
                                     // console.log('_RequestUploads_', res)
+                                    _this.fileUploadVisible = false
                                     if (res.data.status == "success") {
+                                        if(!res.data.data.need_pay){
+                                            _this.paymentPopup = true
+                                            return false
+                                        }
                                         contract_erc20.methods.allowance(_this.gatewayContractAddress, _this.metaAddress).call()
                                         .then(resultUSDC => {
                                             console.log('allowance：'+ resultUSDC);
@@ -321,7 +336,6 @@
                                     } else {
                                         _this.$message.error(res.data.data)
                                     }
-                                    _this.fileUploadVisible = false
                                 }).catch(error => {
                                     console.log(error)
                                     _this.loading = false
@@ -678,6 +692,23 @@
                 line-height: 1.2;
                 color: #191919;
                 word-break: break-word;
+            }
+            h2{
+                margin: 0.1rem auto 0.1rem;
+                font-size: 19px;
+                font-weight: 600;
+                line-height: 1.2;
+                color: #191919;
+                word-break: break-word;
+                text-align: center;
+            }
+            h4{
+                font-size: 14px;
+                font-weight: 500;
+                line-height: 1.2;
+                color: #191919;
+                word-break: break-word;
+                text-align: center;
             }
             h3, a{
                 font-size: 0.16rem;
