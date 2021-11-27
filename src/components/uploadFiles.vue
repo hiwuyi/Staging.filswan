@@ -438,10 +438,9 @@
             // 文件上传
             uploadFile(params) {
                 this._file = params.file;
-                const isLt2M = this._file.size / 1024 / 1024 < 2;
+                const isLt2M = this._file.size / 1000 / 1000 < 2;  // or 1024
                 this.ruleForm.file_size = this.sizeChange(this._file.size)
                 this.ruleForm.file_size_byte = this.byteChange(this._file.size)
-                
                 if (!isLt2M) {
                     // this.$message.error(this.$t('deal.upload_form_file_tip'))
                     this.fileListTip = true
@@ -453,7 +452,7 @@
             sizeChange(bytes){
                 if (!bytes) return "-";
                 if (bytes === 0) return '0 B';
-                var k = 1024, // or 1024
+                var k = 1000, // or 1024
                     sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
                     i = Math.floor(Math.log(bytes) / Math.log(k));
                 return (bytes / Math.pow(k, i)).toPrecision(3) + ' ' + sizes[i];
@@ -464,7 +463,7 @@
                 if(limit <= 0){
                     return '-'
                 }else{
-                    size = limit/( 1024 * 1024 * 1024)
+                    size = limit/( 1000 * 1000 * 1000)  //or 1024
                 }
                 return Number(size).toFixed(3);
             },

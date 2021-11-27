@@ -6,14 +6,19 @@
         </div>
         <div class="files_title">
             Deal Detail #{{dealId}}
-            <img src="@/assets/images/dao_success.png" v-if="dealCont.status == 'Success'"/>
-            <img src="@/assets/images/error.png" v-else-if="dealCont.status == 'Fail'"/>
-            <img src="@/assets/images/dao_waiting.png" v-else />
+            <span>
+                <img src="@/assets/images/dao_success.png" v-if="dealCont.dao_signature_status == 'Success'"/>
+                <img src="@/assets/images/dao_waiting.png" v-else-if="dealCont.dao_signature_status == 'Waiting'"/>
+                <img src="@/assets/images/error.png" v-else />
+                <span v-if="dealCont.dao_signature_status == 'Waiting'">Waiting for signatures to unlock funds</span>
+            </span>
         </div>
         <div class="upload">
             <el-row>
                 <el-col :span="8">Network:</el-col>
                 <el-col :span="16">{{dealCont.network?dealCont.network:'-'}}</el-col>
+                <el-col :span="8">Locked funds:</el-col>
+                <el-col :span="16">{{dealCont.locked_fee?dealCont.locked_fee:'-'}}</el-col>
                 <el-col :span="8">Storage Cost:</el-col>
                 <el-col :span="16">{{dealCont.storage_cost?dealCont.storage_cost:'-'}}</el-col>
                 <el-col :span="8">Proposal CID:</el-col>
@@ -170,7 +175,8 @@ export default {
             //         verified_deal: 'verified_deal',
             //         price_per_epoach: 'price_per_epoach',
             //         signature_type: 'signature_type',
-            //         signature: 'signature'
+            //         signature: 'signature',
+            //         dao_signature_status: 'Waiting'
             //     },
             //     "dao_signature":[
             //         {
@@ -190,6 +196,7 @@ export default {
             //         }
             //     ]
             // }
+            // return false
 
             _this.loading = true
             axios.get(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/storage/deal/detail/${_this.dealId}`, {headers: {
@@ -274,6 +281,7 @@ export default {
         line-height: 2;
         @media screen and (max-width:600px){
             font-size: 16px;
+            flex-wrap: wrap;
         }
         img{
             width: 20px;
@@ -281,9 +289,19 @@ export default {
             margin: 0 0 0 15px;
             cursor: pointer;
         }
+        span{
+            display: flex;
+            align-items: center;
+            padding-left: 5px;
+            color: red;
+            font-size: 0.145rem;
+            @media screen and (max-width:600px){
+                font-size: 14px;
+            }
+        }
     }
     .upload{
-        padding: 0.1rem 0.35rem 0.2rem 0.2rem;
+        padding: 0.1rem 0.3rem 0.2rem;
         margin-bottom: 0.2rem;
         background-color: #fff;
         border-radius: 5px;

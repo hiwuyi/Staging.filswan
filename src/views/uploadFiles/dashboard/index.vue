@@ -211,7 +211,7 @@
           <el-table-column prop="active" width="120" label="DAO">
             <template slot-scope="scope">
               <div class="hot-cold-box">
-                <router-link :to="{name: 'my_files_detail', params: {id: scope.row.id}}" class="uploadBtn grey">Detail</router-link>
+                <router-link :to="{name: 'my_files_detail', params: {id: scope.row.deal_id}}" class="uploadBtn grey">Detail</router-link>
               </div>
             </template>
           </el-table-column>
