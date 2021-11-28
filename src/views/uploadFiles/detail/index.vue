@@ -6,7 +6,7 @@
         </div>
         <div class="files_title">
             Deal Detail #{{dealId}}
-            <span v-if="dealCont.deal">
+            <span v-if="dealCont.deal && dealCont.deal.dao_signature_status">
                 <img src="@/assets/images/dao_success.png" v-if="dealCont.deal.dao_signature_status == 'Success'"/>
                 <img src="@/assets/images/dao_waiting.png" v-else-if="dealCont.deal.dao_signature_status == 'Waiting'"/>
                 <img src="@/assets/images/error.png" v-else />
