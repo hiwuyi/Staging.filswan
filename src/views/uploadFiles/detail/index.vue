@@ -6,39 +6,39 @@
         </div>
         <div class="files_title">
             Deal Detail #{{dealId}}
-            <span>
-                <img src="@/assets/images/dao_success.png" v-if="dealCont.dao_signature_status == 'Success'"/>
-                <img src="@/assets/images/dao_waiting.png" v-else-if="dealCont.dao_signature_status == 'Waiting'"/>
+            <span v-if="dealCont.deal">
+                <img src="@/assets/images/dao_success.png" v-if="dealCont.deal.dao_signature_status == 'Success'"/>
+                <img src="@/assets/images/dao_waiting.png" v-else-if="dealCont.deal.dao_signature_status == 'Waiting'"/>
                 <img src="@/assets/images/error.png" v-else />
-                <span v-if="dealCont.dao_signature_status == 'Waiting'">Waiting for signatures to unlock funds</span>
+                <span v-if="dealCont.deal.dao_signature_status == 'Waiting'">Waiting for signatures to unlock funds</span>
             </span>
         </div>
         <div class="upload">
             <el-row>
                 <el-col :span="8">Network:</el-col>
-                <el-col :span="16">{{dealCont.network?dealCont.network:'-'}}</el-col>
+                <el-col :span="16">{{dealCont.deal.network_name | NumFormat}}</el-col>
                 <el-col :span="8">Locked funds:</el-col>
-                <el-col :span="16">{{dealCont.locked_fee?dealCont.locked_fee:'-'}}</el-col>
+                <el-col :span="16">{{dealCont.found.locked_fee | NumFormat}}</el-col>
                 <el-col :span="8">Storage Cost:</el-col>
-                <el-col :span="16">{{dealCont.storage_cost?dealCont.storage_cost:'-'}}</el-col>
+                <el-col :span="16">{{dealCont.deal.storage_price | NumFormat}}</el-col>
                 <el-col :span="8">Proposal CID:</el-col>
-                <el-col :span="16">{{dealCont.proposal_cid?dealCont.proposal_cid:'-'}}</el-col>
+                <el-col :span="16">{{dealCont.found.payload_cid | NumFormat}}</el-col>
                 <el-col :span="8">Create Time:</el-col>
-                <el-col :span="16">{{dealCont.create_at?dealCont.create_at:'-'}}</el-col>
+                <el-col :span="16">{{dealCont.found.create_at | NumFormat}}</el-col>
                 <el-col :span="8">Message CID:</el-col>
-                <el-col :span="16">{{dealCont.message_cid?dealCont.message_cid:'-'}}</el-col>
+                <el-col :span="16">{{dealCont.deal.message_cid | NumFormat}}</el-col>
                 <el-col :span="8">Piece CID:</el-col>
-                <el-col :span="16">{{dealCont.piece_cid?dealCont.piece_cid:'-'}}</el-col>
+                <el-col :span="16">{{dealCont.deal.piece_cid | NumFormat}}</el-col>
                 <el-col :span="8">Client Address:</el-col>
-                <el-col :span="16">{{dealCont.client_address?dealCont.client_address:'-'}}</el-col>
+                <el-col :span="16">{{dealCont.found.client_wallet_address | NumFormat}}</el-col>
                 <el-col :span="8">Verified Deal:</el-col>
-                <el-col :span="16">{{dealCont.verified_deal?dealCont.verified_deal:'-'}}</el-col>
+                <el-col :span="16">{{dealCont.deal.verified_deal?'True':'False'}}</el-col>
                 <el-col :span="8">Storage Price Per Epoch:</el-col>
-                <el-col :span="16">{{dealCont.price_per_epoach?dealCont.price_per_epoach:'-'}}</el-col>
+                <el-col :span="16">{{dealCont.deal.storage_price_per_epoch | NumFormat}}</el-col>
                 <el-col :span="8">Signature Type:</el-col>
-                <el-col :span="16">{{dealCont.signature_type?dealCont.signature_type:'-'}}</el-col>
+                <el-col :span="16">{{dealCont.deal.signature_type | NumFormat}}</el-col>
                 <el-col :span="8">Signature:</el-col>
-                <el-col :span="16">{{dealCont.signature?dealCont.signature:'-'}}</el-col>
+                <el-col :span="16">{{dealCont.deal.signature | NumFormat}}</el-col>
             </el-row>
             <div class="title">
                 DAO Signatures
@@ -80,7 +80,8 @@
                                 <div class="upload_form_right">
                                     <p>{{scope.row.tx_hash}}</p>
                                 </div>
-                                <el-button slot="reference" @click="networkLink(scope.row.tx_hash, dealCont.network)" :class="{'color': dealCont.network&&dealCont.network.toLowerCase() == 'polygon'}">
+                                 <!-- :class="{'color': dealCont.network&&dealCont.network.toLowerCase() == 'polygon'}" -->
+                                <el-button slot="reference" @click="networkLink(scope.row.tx_hash)" class="color">
                                     <!-- <img src="@/assets/images/copy.png" alt=""> -->
                                     {{scope.row.tx_hash}}
                                 </el-button>
@@ -113,7 +114,10 @@ export default {
             loading: false,
             bodyWidth: document.documentElement.clientWidth<1024?true:false,
             dealId: '',
-            dealCont: {},
+            dealCont: {
+                deal: {},
+                found: {}
+            },
             daoCont: []
       };
     },
@@ -121,9 +125,10 @@ export default {
     watch: {},
     methods: {
         networkLink(hash, network) {
-            if(network && network.toLowerCase() == 'polygon'){
-                window.open('https://mumbai.polygonscan.com/tx/'+hash)
-            }
+            window.open('https://mumbai.polygonscan.com/tx/'+hash)
+            // if(network && network.toLowerCase() == 'polygon'){
+            //     window.open('https://mumbai.polygonscan.com/tx/'+hash)
+            // }
         },
         copyTextToClipboard(text) {
             let _this = this
@@ -161,66 +166,27 @@ export default {
         },
         getData() {
             let _this = this
-            // let da = {
-            //     "status": "success",
-            //     "code": "200",
-            //     "deal_detail":{
-            //         network: 'polygon',
-            //         storage_cost: 'storage_cost',
-            //         proposal_cid: 'proposal_cid',
-            //         create_at: '1636600014',
-            //         message_cid: 'message_cid',
-            //         piece_cid: 'piece_cid',
-            //         client_address: 'client_address',
-            //         verified_deal: 'verified_deal',
-            //         price_per_epoach: 'price_per_epoach',
-            //         signature_type: 'signature_type',
-            //         signature: 'signature',
-            //         dao_signature_status: 'Waiting'
-            //     },
-            //     "dao_signature":[
-            //         {
-            //             dao_address: '0x840e9911f991e66633d695f7cbab935c41db8ac7c488f4d66a572c94a387eb36',
-            //             tx_hash: '0x840e9911f991e66633d695f7cbab935c41db8ac7c488f4d66a572c94a387eb36',
-            //             status: 'Waiting'
-            //         },
-            //         {
-            //             dao_address: 'dao_address',
-            //             tx_hash: 'tx_hash',
-            //             status: 'Success'
-            //         },
-            //         {
-            //             dao_address: 'dao_address',
-            //             tx_hash: 'tx_hash',
-            //             status: 'Fail'
-            //         }
-            //     ]
-            // }
-            // return false
-
             _this.loading = true
+
             axios.get(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/storage/deal/detail/${_this.dealId}`, {headers: {
+            // axios.get(`./static/detail_page_response.json`, {headers: {
                     'Authorization':"Bearer "+ _this.$store.getters.accessToken
             }}).then((response) => {
                 let json = response.data
                 if (json.status == 'success') {
-                    _this.daoCont = json.dao_signature
+                    _this.daoCont = json.data.dao
                     _this.daoCont.map(item => {
                         item.daoAddressVis = false
                         item.txHashVis = false
                     })
-                    
-                    _this.dealCont = json.deal_detail
-                    _this.dealCont.create_at = 
-                        _this.dealCont.create_at? 
-                            _this.dealCont.create_at.length < 13
-                                ? moment(new Date(parseInt(_this.dealCont.create_at * 1000))).format(
-                                    "YYYY-MM-DD HH:mm:ss"
-                                )
-                                : moment(new Date(parseInt(_this.dealCont.create_at))).format(
-                                    "YYYY-MM-DD HH:mm:ss"
-                                )
-                        : "-";
+
+                    _this.dealCont = json.data
+                    _this.dealCont.found.create_at = 
+                        _this.dealCont.found.create_at? 
+                            moment(new Date(parseInt(_this.dealCont.found.create_at))).format(
+                                "YYYY-MM-DD HH:mm:ss"
+                            )
+                            : "-";
                 }else{
                     _this.$message.error(json.message);
                     return false
@@ -254,6 +220,7 @@ export default {
             return realVal;
         },
         NumFormat (value) {
+            if(value == 0) return 0;
             if(!value) return '-';
             return value
         }
