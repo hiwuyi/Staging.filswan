@@ -91,9 +91,11 @@
                 </el-table-column>
                 <el-table-column prop="status" label="Status">
                     <template slot-scope="scope">
-                        <img src="@/assets/images/dao_success.png" v-if="scope.row.status == 'Success'"/>
+                        <!-- <img src="@/assets/images/dao_success.png" v-if="scope.row.status == 'Success'"/>
                         <img src="@/assets/images/error.png" v-else-if="scope.row.status == 'Fail'"/>
-                        <img src="@/assets/images/dao_waiting.png" v-else />
+                        <img src="@/assets/images/dao_waiting.png" v-else /> -->
+                        <img src="@/assets/images/dao_success.png" v-if="scope.row.status" />
+                        <img src="@/assets/images/error.png" v-else />
                     </template>
                 </el-table-column>
             </el-table>
