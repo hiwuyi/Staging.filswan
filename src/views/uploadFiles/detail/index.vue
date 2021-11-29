@@ -6,6 +6,12 @@
         </div>
         <div class="files_title">
             Deal Detail #{{dealId}}
+            <span class="title" v-if="dealId == 0">
+                Deal ID has not been created on-chain.
+                <el-tooltip effect="dark" content="This means your deal has not been accepted by a storage provider yet." placement="top">
+                    <img src="@/assets/images/info.png"/>
+                </el-tooltip>
+            </span>
             <span v-if="dealCont.deal && dealCont.deal.dao_signature_status">
                 <img src="@/assets/images/dao_success.png" v-if="dealCont.deal.dao_signature_status == 'Success'"/>
                 <img src="@/assets/images/dao_waiting.png" v-else-if="dealCont.deal.dao_signature_status == 'Waiting'"/>
@@ -124,7 +130,12 @@ export default {
       };
     },
     computed: {},
-    watch: {},
+    watch: {
+        $route: function (to, from) {
+            this.dealId = to.params.id
+            this.getData()
+        },
+    },
     methods: {
         networkLink(hash, network) {
             window.open('https://mumbai.polygonscan.com/tx/'+hash)
@@ -178,19 +189,26 @@ export default {
                 _this.loading = false
                 if (json.status == 'success') {
                     if(!json.data) return false
-                    _this.daoCont = json.data.dao
-                    _this.daoCont.map(item => {
-                        item.daoAddressVis = false
-                        item.txHashVis = false
-                    })
+                    if(json.data.dao){
+                        _this.daoCont = json.data.dao
+                        _this.daoCont.map(item => {
+                            item.daoAddressVis = false
+                            item.txHashVis = false
+                        })
+                    }
 
                     _this.dealCont = json.data
-                    _this.dealCont.found.create_at = 
-                        _this.dealCont.found.create_at? 
-                            moment(new Date(parseInt(_this.dealCont.found.create_at))).format(
-                                "YYYY-MM-DD HH:mm:ss"
-                            )
-                            : "-";
+
+                    if(!json.data.found){
+                        _this.dealCont.found = {}
+                    }else{
+                        _this.dealCont.found.create_at = 
+                            _this.dealCont.found.create_at? 
+                                moment(new Date(parseInt(_this.dealCont.found.create_at))).format(
+                                    "YYYY-MM-DD HH:mm:ss"
+                                )
+                                : "-";
+                    }
                 }else{
                     _this.$message.error(json.message);
                     return false
@@ -282,6 +300,30 @@ export default {
                 font-size: 14px;
             }
         }
+        .title{
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0 0.1rem;
+            line-height: 1.5;
+            text-align: center;
+            white-space: normal;
+            color: red;
+            text-shadow: 0 0 black;
+            text-indent: 0;
+            font-size: 13px;
+            font-weight: normal;
+            img{
+                width: 0.16rem;
+                height: 0.16rem;
+                margin: 0 0 0 5px;
+                cursor: pointer;
+                @media screen and (max-width:600px){
+                    width: 15px;
+                    height: 15px;
+                }
+            }
+        }
     }
     .upload{
         padding: 0.1rem 0.3rem 0.2rem;
@@ -333,6 +375,10 @@ export default {
                 height: 0.16rem;
                 margin: 0 0 0 5px;
                 cursor: pointer;
+                @media screen and (max-width:600px){
+                    width: 15px;
+                    height: 15px;
+                }
             }
         }
         .el-table /deep/{

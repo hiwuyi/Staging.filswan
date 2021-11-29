@@ -15,8 +15,8 @@
                 <template>
                     <!-- 折叠按钮 -->
                     <div class="header_logo pcShow" :class="{'header_left_hidd': collapseLocal}">
-                        <div class="logo" v-if="!collapseLocal"><img src="@/assets/images/FILSWAN_logo_01.png"></div>
-                        <div class="logo_small" v-else><img src="@/assets/images/logo_small.png"></div>
+                        <div class="logo" v-if="!collapseLocal"><img src="@/assets/images/MCP_logo_1.png"></div>
+                        <div class="logo_small" v-else><img src="@/assets/images/MCP_logo.png"></div>
                         <div class="collapse-btn-cont" @click="collapseChage">
                             <div class="header_btn">
                                 <span></span>
