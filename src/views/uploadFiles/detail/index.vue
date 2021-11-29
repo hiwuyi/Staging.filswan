@@ -18,9 +18,9 @@
                 <el-col :span="8">Network:</el-col>
                 <el-col :span="16">{{dealCont.deal.network_name | NumFormat}}</el-col>
                 <el-col :span="8">Locked funds:</el-col>
-                <el-col :span="16">{{dealCont.found.locked_fee | NumFormat}}</el-col>
-                <el-col :span="8">Storage Cost:</el-col>
-                <el-col :span="16">{{dealCont.deal.storage_price | NumFormat}}</el-col>
+                <el-col :span="16">{{dealCont.found.locked_fee | NumFormatPrice}} USDC</el-col>
+                <el-col :span="8">Storage Price:</el-col>
+                <el-col :span="16">{{dealCont.deal.storage_price | NumFormatPrice}} FIL</el-col>
                 <el-col :span="8">Proposal CID:</el-col>
                 <el-col :span="16">{{dealCont.found.payload_cid | NumFormat}}</el-col>
                 <el-col :span="8">Create Time:</el-col>
@@ -34,7 +34,7 @@
                 <el-col :span="8">Verified Deal:</el-col>
                 <el-col :span="16">{{dealCont.deal.verified_deal?'True':'False'}}</el-col>
                 <el-col :span="8">Storage Price Per Epoch:</el-col>
-                <el-col :span="16">{{dealCont.deal.storage_price_per_epoch | NumFormat}}</el-col>
+                <el-col :span="16">{{dealCont.deal.storage_price_per_epoch | NumFormatPrice}} FIL</el-col>
                 <el-col :span="8">Signature Type:</el-col>
                 <el-col :span="16">{{dealCont.deal.signature_type | NumFormat}}</el-col>
                 <el-col :span="8">Signature:</el-col>
@@ -175,7 +175,9 @@ export default {
                     'Authorization':"Bearer "+ _this.$store.getters.accessToken
             }}).then((response) => {
                 let json = response.data
+                _this.loading = false
                 if (json.status == 'success') {
+                    if(!json.data) return false
                     _this.daoCont = json.data.dao
                     _this.daoCont.map(item => {
                         item.daoAddressVis = false
@@ -193,7 +195,6 @@ export default {
                     _this.$message.error(json.message);
                     return false
                 }
-                _this.loading = false
             }).catch(function (error) {
                 console.log(error);
                 _this.loading = false
@@ -211,20 +212,33 @@ export default {
         _this.$store.dispatch("setHeadertitle", _this.$t('navbar.deal'));
     },
     filters: {
-        priceFilter(value) {
-            let realVal = "";
-            if (!isNaN(value) && value !== "") {
-                let tempVal = parseFloat(value).toFixed(19);
-                realVal = tempVal.substring(0, tempVal.length - 1) + " FIL";
-            } else {
-                realVal = "-";
-            }
-            return realVal;
-        },
         NumFormat (value) {
             if(value == 0) return 0;
             if(!value) return '-';
             return value
+        },
+        NumFormatPrice (value) {
+            if(value == 0) return 0;
+            if(!value) return '-';
+            // 18 - 单位换算需要 / 1000000000000000000，浮点运算显示有bug
+            let valueNum = String(value)
+            if(value.length > 18){
+                let v1 = valueNum.substring(0, valueNum.length - 18)
+                let v2 = valueNum.substring(valueNum.length - 18)
+                let v3 = String(v2).replace(/(0+)\b/gi,"")
+                if(v3){
+                    return v1 + '.' + v3
+                }else{
+                    return v1
+                }
+                return parseFloat(v1.replace(/(\d)(?=(?:\d{3})+$)/g, "$1,") + '.' + v2)
+            }else{
+                let v3 = ''
+                for(let i = 0; i < 18 - valueNum.length; i++){
+                    v3 += '0'
+                }
+                return '0.' + String(v3 + valueNum).replace(/(0+)\b/gi,"")
+            }
         }
     },
 };
