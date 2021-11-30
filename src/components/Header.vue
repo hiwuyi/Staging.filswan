@@ -327,8 +327,13 @@ export default {
                     _this.network.unit = 'ETH';
                     _this.network.text = false
                     return;
+                case 56:
+                    _this.network.name = 'BSC';
+                    _this.network.unit = 'BNB';
+                    _this.network.text = false
+                    return;
                 case 97:
-                    _this.network.name = 'BSC Network';
+                    _this.network.name = 'BSC';
                     _this.network.unit = 'BNB';
                     _this.network.text = false
                     return;

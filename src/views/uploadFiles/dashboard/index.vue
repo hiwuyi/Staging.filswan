@@ -35,14 +35,9 @@
           :empty-text="$t('deal.formNotData')"
            v-loading="loading"
         >
-          <el-table-column prop="create_at" label="CREATE TIME" min-width="120">
-            <template slot-scope="scope">
-              {{ scope.row.create_at }}
-            </template>
-          </el-table-column>
           <el-table-column prop="file_name" label="FILE NAME" min-width="120">
             <template slot-scope="scope">
-              <div class="hot-cold-box">
+              <div class="hot-cold-box" @click="toDetail(scope.row.deal_id, scope.row.payload_cid)" style="text-decoration: underline;">
                 {{ scope.row.file_name }}
               </div>
             </template>
@@ -64,7 +59,7 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="payload_cid" label="PAYLOAD CID" min-width="120">
+          <el-table-column prop="payload_cid" label="DATA CID" min-width="120">
             <template slot-scope="scope">
               <div class="hot-cold-box">
                 <el-popover
@@ -87,7 +82,14 @@
           <el-table-column prop="miner_fid" label="PROVIDER ID" width="120">
             <template slot-scope="scope">
               <div class="hot-cold-box">
-                {{ scope.row.miner_fid | NumFormat }}
+                <div v-if="scope.row.miner_fid">{{ scope.row.miner_fid | NumFormat }}</div>
+                <div v-else class="elTips">
+                  Queuing
+                  
+                  <el-tooltip effect="dark" content="The data from this upload is being aggregated for storage on Filecoin. Filecoin deals will be active within 48 hours of upload." placement="top">
+                      <img src="@/assets/images/info.png"/>
+                  </el-tooltip>
+                </div>
               </div>
             </template>
           </el-table-column>
@@ -202,16 +204,26 @@
               </div>
               <div
                   class="statusStyle"
+                  v-else-if="scope.row.status == ''" style="display:none">
+                  {{ scope.row.status }}
+              </div>
+              <div
+                  class="statusStyle"
                   v-else>
                   {{ scope.row.status }}
               </div>
               <!-- <div class="scoreStyle" @click="openScore(scope.row)" v-show="scope.row.status == 'Completed'">Score</div> -->
             </template>
           </el-table-column>
+          <el-table-column prop="create_at" label="CREATE TIME" min-width="90">
+            <template slot-scope="scope">
+              {{ scope.row.create_at }}
+            </template>
+          </el-table-column>
           <el-table-column prop="active" width="120" label="DAO">
             <template slot-scope="scope">
               <div class="hot-cold-box">
-                <router-link :to="{name: 'my_files_detail', params: {id: scope.row.deal_id}}" class="uploadBtn grey">Detail</router-link>
+                <router-link :to="{name: 'my_files_detail', params: {id: scope.row.deal_id, cid: scope.row.payload_cid}}" class="uploadBtn grey">Detail</router-link>
               </div>
             </template>
           </el-table-column>
@@ -352,6 +364,9 @@ export default {
     }
   },
   methods: {
+    toDetail(id, cid){
+      this.$router.push({name: 'my_files_detail', params: {id: id, cid: cid}})
+    },
     clickRowHandle(row, column, event) {
       if (this.expands.includes(row.uuid)) {
         // this.expands = this.expands.filter(val => val !== row.uuid);
@@ -1184,9 +1199,9 @@ export default {
       .statusStyle {
         display: inline-block;
         border: 1px solid;
-        padding: 0 0.05rem;
+        padding: 0.04rem 0.05rem;
         border-radius: 0.05rem;
-        line-height: 0.28rem;
+        line-height: 1.5;
         // color: inherit !important;
       }
 
@@ -1258,7 +1273,7 @@ export default {
           // }
 
           td {
-            padding: 0.15rem 0.1rem;
+            padding: 0.15rem 0.05rem;
             border-bottom: 1px solid #f2f2f2;
 
             .cell {
@@ -1285,6 +1300,30 @@ export default {
 
               .hot-cold-box {
                 position: relative;
+                .elTips{
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 0 0.1rem;
+                    line-height: 1.5;
+                    text-align: center;
+                    white-space: normal;
+                    color: inherit;
+                    text-shadow: 0 0 black;
+                    text-indent: 0;
+                    font-size: inherit;
+                    font-weight: normal;
+                    img{
+                        width: 0.16rem;
+                        height: 0.16rem;
+                        margin: 0 0 0 5px;
+                        cursor: pointer;
+                        @media screen and (max-width:600px){
+                            width: 15px;
+                            height: 15px;
+                        }
+                    }
+                }
                 .cidLink{
                     line-height: 0.25rem;
                     overflow: hidden;

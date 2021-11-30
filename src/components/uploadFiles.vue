@@ -104,7 +104,7 @@
 
         <el-dialog
         :title="$t('transfer.connect_wallet')"
-        :visible.sync="centerDialogVisible"
+        :visible.sync="centerDialogVisible" :close-on-click-modal="modelClose" :show-close="modelClose" :close-on-press-escape="modelClose"
         :width="width"
         custom-class="metaM"
         center>
@@ -217,6 +217,7 @@
                 storage_cost_high: 0,
                 center_fail: false,
                 centerDialogVisible: false,
+                modelClose: true,
                 width: document.body.clientWidth>600?'400px':'95%',
                 gatewayContractAddress: this.$root.SWAN_PAYMENT_CONTRACT_ADDRESS,
                 recipientAddress: this.$root.RECIPIENT,
@@ -538,54 +539,70 @@
                         _this.network.unit = 'ETH';
                         _this.center_fail = true
                         _this.centerDialogVisible = true
+                        _this.modelClose = false
                         return;
                     case 3:
                         _this.network.name = 'ropsten';
                         _this.network.unit = 'ETH';
                         _this.center_fail = true
                         _this.centerDialogVisible = true
+                        _this.modelClose = false
                         break;
                     case 4:
                         _this.network.name = 'rinkeby';
                         _this.network.unit = 'ETH';
                         _this.center_fail = true
                         _this.centerDialogVisible = true
+                        _this.modelClose = false
                         return;
                     case 5:
                         _this.network.name = 'goerli';
                         _this.network.unit = 'ETH';
                         _this.center_fail = true
                         _this.centerDialogVisible = true
+                        _this.modelClose = false
                         return;
                     case 42:
                         _this.network.name = 'kovan';
                         _this.network.unit = 'ETH';
                         _this.center_fail = true
                         _this.centerDialogVisible = true
+                        _this.modelClose = false
                         return;
-                    case 97:
-                        _this.network.name = 'BSC Network';
+                    case 56:
+                        _this.network.name = 'BSC';
                         _this.network.unit = 'BNB';
                         _this.center_fail = true
                         _this.centerDialogVisible = true
+                        _this.modelClose = false
+                        return;
+                    case 97:
+                        _this.network.name = 'BSC';
+                        _this.network.unit = 'BNB';
+                        _this.center_fail = true
+                        _this.centerDialogVisible = true
+                        _this.modelClose = false
                         return;
                     case 999:
                         _this.network.name = 'NBAI';
                         _this.network.unit = 'NBAI';
                         _this.center_fail = true
                         _this.centerDialogVisible = true
+                        _this.modelClose = false
                         return;
                     case 80001:
                         _this.network.name = 'polygon';
                         _this.network.unit = 'MATIC';
                         _this.center_fail = false
                         _this.centerDialogVisible = false
+                        _this.modelClose = true
                         return;
                     default:
-                        _this.network.name = '';
+                        _this.network.name = 'Custom';
                         _this.network.unit = '';
                         _this.center_fail = true
                         _this.centerDialogVisible = true
+                        _this.modelClose = false
                         return;
                     }
                 });
@@ -594,6 +611,11 @@
         mounted() {
             let _this = this
             that = _this
+            if(!_this.metaAddress || _this.center_fail || _this.networkID != 80001){
+                _this.centerDialogVisible = true
+                _this.modelClose = false
+            }
+            _this.walletInfo()
             _this.stats()
             _this.$store.dispatch("setRouterMenu", 0);
             _this.$store.dispatch('setHeadertitle', _this.$t('navbar.Upload_files'))

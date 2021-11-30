@@ -114,6 +114,7 @@
 
 <script>
 import axios from 'axios'
+import QS from 'qs';
 import moment from "moment";
 export default {
     name: 'my_files',
@@ -181,7 +182,10 @@ export default {
             let _this = this
             _this.loading = true
 
-            axios.get(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/storage/deal/detail/${_this.dealId}`, {headers: {
+            let dataCid = {
+                payload_cid: _this.$route.params.cid
+            }
+            axios.get(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/storage/deal/detail/${_this.dealId}?${QS.stringify(dataCid)}`, {headers: {
             // axios.get(`./static/detail_page_response.json`, {headers: {
                     'Authorization':"Bearer "+ _this.$store.getters.accessToken
             }}).then((response) => {
