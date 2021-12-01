@@ -119,7 +119,7 @@ export default {
         detailTable06: 'LAST UPDATED',
         detailTable07: 'DATE CREATED',
         detailTable08: 'NOTE',
-        detailTable09: 'PAYLOAD CID',
+        detailTable09: 'DATA CID',
         backto: 'Go Back',
         title_top_name: 'Task Name',
         title_top_miner: 'Task Storage Provider',
@@ -559,7 +559,7 @@ export default {
     billing: {
         TRANSACTION: 'TRANSACTION',
         AMOUNT: 'AMOUNT',
-        PAYLOADCID: 'PAYLOAD CID',
+        PAYLOADCID: 'DATA CID',
         WALLET: 'WALLET',
         NETWORK: 'NETWORK',
         PAYMENTDATE: 'PAYMENT DATE',

@@ -563,6 +563,9 @@ border: 0;
 }
 
 
+.elPopMiner{
+  text-align: center;
+}
 .el-popover.el-popper{
   max-width: 400px;
 }

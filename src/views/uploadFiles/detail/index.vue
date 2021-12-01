@@ -12,11 +12,12 @@
                     <img src="@/assets/images/info.png"/>
                 </el-tooltip>
             </span>
-            <span v-if="dealCont.deal && dealCont.deal.dao_signature_status">
-                <img src="@/assets/images/dao_success.png" v-if="dealCont.deal.dao_signature_status == 'Success'"/>
-                <img src="@/assets/images/dao_waiting.png" v-else-if="dealCont.deal.dao_signature_status == 'Waiting'"/>
-                <img src="@/assets/images/error.png" v-else />
-                <span v-if="dealCont.deal.dao_signature_status == 'Waiting'">Waiting for signatures to unlock funds</span>
+            <!-- v-if="dealCont.deal && dealCont.deal.dao_signature_status" -->
+            <span >
+                <!-- <img src="@/assets/images/dao_success.png" v-if="dealCont.deal.dao_signature_status == 'Success'"/> -->
+                <img src="@/assets/images/dao_waiting.png" />
+                <!-- <img src="@/assets/images/error.png" v-else /> -->
+                <span>Waiting for signatures to unlock funds: {{dealCont.signed_dao_count}}/{{dealCont.dao_thresh_hold}} </span>
             </span>
         </div>
         <div class="upload">
@@ -25,10 +26,14 @@
                 <el-col :span="16">{{dealCont.deal.network_name | NumFormat}}</el-col>
                 <el-col :span="8">Locked funds:</el-col>
                 <el-col :span="16">{{dealCont.found.locked_fee | NumFormatPrice}} USDC</el-col>
+                <el-col :span="8">Storage Provider:</el-col>
+                <el-col :span="16">{{dealCont.deal.provider | NumFormat}}</el-col>
                 <el-col :span="8">Storage Price:</el-col>
                 <el-col :span="16">{{dealCont.deal.storage_price | NumFormatPrice}} FIL</el-col>
-                <el-col :span="8">Proposal CID:</el-col>
+                <el-col :span="8">Data CID:</el-col>
                 <el-col :span="16">{{dealCont.found.payload_cid | NumFormat}}</el-col>
+                <el-col :span="8">Proposal CID:</el-col>
+                <el-col :span="16">{{dealCont.found.deal_cid | NumFormat}}</el-col>
                 <el-col :span="8">Create Time:</el-col>
                 <el-col :span="16">{{dealCont.found.create_at | NumFormat}}</el-col>
                 <el-col :span="8">Message CID:</el-col>
@@ -36,7 +41,7 @@
                 <el-col :span="8">Piece CID:</el-col>
                 <el-col :span="16">{{dealCont.deal.piece_cid | NumFormat}}</el-col>
                 <el-col :span="8">Client Address:</el-col>
-                <el-col :span="16">{{dealCont.found.client_wallet_address | NumFormat}}</el-col>
+                <el-col :span="16">{{dealCont.deal.client | NumFormat}}</el-col>
                 <el-col :span="8">Verified Deal:</el-col>
                 <el-col :span="16">{{dealCont.deal.verified_deal?'True':'False'}}</el-col>
                 <el-col :span="8">Storage Price Per Epoch:</el-col>
@@ -55,7 +60,8 @@
             <el-table :data="daoCont" stripe style="width: 100%">
                 <el-table-column type="index" width="180">
                     <template slot-scope="scope">
-                        Signature {{scope.$index+1}}
+                        <!-- Signature {{scope.$index+1}} -->
+                        Signature {{scope.row.order_index?scope.row.order_index:scope.$index+1}}
                     </template>
                 </el-table-column>
                 <el-table-column prop="dao_address" label="DAO RKH Address" min-width="220">

@@ -4,7 +4,7 @@
             <div class="form_top">
                 <div class="search">
                     <el-input
-                        placeholder="Search by full Payload CID"
+                        placeholder="Search by full Data CID"
                         prefix-icon="el-icon-search"
                         v-model="searchValue"
                     >

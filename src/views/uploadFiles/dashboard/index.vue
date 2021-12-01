@@ -49,7 +49,16 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="pin_status" label="PIN STATUS" width="120">
+          <el-table-column prop="pin_status" width="140">
+            <template slot="header" slot-scope="scope">
+              <div class="tips">
+                PIN STATUS
+                    
+                <el-tooltip effect="dark" content="Reports the status of a file or piece of data stored on FilSwan’s IPFS nodes." placement="top">
+                    <img src="@/assets/images/info.png"/>
+                </el-tooltip>
+              </div>
+            </template>
             <template slot-scope="scope">
               <div class="statusStyle" style="color: #6c757d" v-if="scope.row.pin_status&&scope.row.pin_status.toLowerCase()=='unpinned'">
                   {{scope.row.pin_status}}
@@ -59,7 +68,16 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="payload_cid" label="DATA CID" min-width="120">
+          <el-table-column prop="payload_cid" min-width="120">
+            <template slot="header" slot-scope="scope">
+              <div class="tips">
+                DATA CID
+                    
+                <el-tooltip effect="dark" content="The content identifier for a file or a piece of data." placement="top">
+                    <img src="@/assets/images/info.png"/>
+                </el-tooltip>
+              </div>
+            </template>
             <template slot-scope="scope">
               <div class="hot-cold-box">
                 <el-popover
@@ -79,21 +97,158 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="miner_fid" label="PROVIDER ID" width="120">
+          <el-table-column prop="miner_fid" width="120">
+            <template slot="header" slot-scope="scope">
+              <div class="tips">
+                STORAGE PROVIDER
+                    
+                <el-tooltip effect="dark" content="Service providers offering storage capacity to the Filecoin network." placement="top">
+                    <img src="@/assets/images/info.png"/>
+                </el-tooltip>
+              </div>
+            </template>
             <template slot-scope="scope">
               <div class="hot-cold-box">
-                <div v-if="scope.row.miner_fid">{{ scope.row.miner_fid | NumFormat }}</div>
-                <div v-else class="elTips">
-                  Queuing
-                  
-                  <el-tooltip effect="dark" content="The data from this upload is being aggregated for storage on Filecoin. Filecoin deals will be active within 48 hours of upload." placement="top">
+                <div class="elTips">
+                  <el-popover
+                      placement="top"
+                      trigger="hover" popper-class="elPopMiner"
+                      v-model="scope.row.payloadAct">
+                      <div class="upload_form_right">
+                          <div
+                            class="statusStyle"
+                            v-if="scope.row.status == 'Created'"
+                            :style="$status_color.Task_color('Created')">
+                            {{ language == "en" ? "Created" : "已创建" }}
+                          </div>
+                          <div
+                            class="statusStyle"
+                            v-else-if="scope.row.status == 'Assigned'"
+                            :style="$status_color.Task_color('Assigned')"
+                          >
+                            {{ language == "en" ? "Assigned" : "已分配" }}
+                          </div>
+                          <div
+                            class="statusStyle"
+                            v-else-if="scope.row.status == 'Accepted'"
+                            :style="$status_color.Task_color('Accepted')"
+                          >
+                            {{ language == "en" ? "Accepted" : "已接受" }}
+                          </div>
+                          <div
+                            class="statusStyle"
+                            v-else-if="scope.row.status == 'Completed'"
+                            :style="$status_color.Task_color('Completed')"
+                          >
+                            {{ language == "en" ? "Completed" : "已完成" }}
+                          </div>
+                          <div
+                            class="statusStyle"
+                            v-else-if="scope.row.status == 'Failed'"
+                            :style="$status_color.Task_color('Failed')"
+                          >
+                            {{ language == "en" ? "Failed" : "已失败" }}
+                          </div>
+                          <div
+                            class="statusStyle"
+                            v-else-if="scope.row.status == 'Cancelled'"
+                            :style="$status_color.Task_color('Cancelled')"
+                          >
+                            {{ language == "en" ? "Cancelled" : "已取消" }}
+                          </div>
+                          <div
+                            class="statusStyle"
+                            v-else-if="scope.row.status == 'Closed'"
+                            :style="$status_color.Task_color('Closed')"
+                          >
+                            {{ language == "en" ? "Closed" : "已关闭" }}
+                          </div>
+                          <div
+                            class="statusStyle"
+                            v-else-if="scope.row.status == 'Expired'"
+                            :style="$status_color.Task_color('Expired')"
+                          >
+                            {{ language == "en" ? "Expired" : "已过期" }}
+                          </div>
+                          <div
+                              class="statusStyle"
+                              v-else-if="scope.row.status == 'ActionRequired'"
+                              :style="$status_color.Task_color('ActionRequired')">
+                              {{ language == 'en' ? 'ActionRequired' : '需要操作' }}
+                          </div>
+                          <div
+                              class="statusStyle"
+                              v-else-if="scope.row.status == 'DealSent'"
+                              :style="$status_color.Task_color('DealSent')">
+                              {{ language == 'en' ? 'DealSent' : '交易已发送' }}
+                          </div>
+                          <div class="statusStyle"
+                                v-else-if="scope.row.status == 'FileImporting'"
+                                :style="$status_color.Task_color('FileImporting')">
+                              {{ language == 'en' ? 'FileImporting' : '文件导入中' }}
+                          </div>
+                          <div class="statusStyle"
+                                v-else-if="scope.row.status == 'FileImported'"
+                                :style="$status_color.Task_color('FileImported')">
+                              {{ language == 'en' ? 'FileImported' : '文件已导入' }}
+                          </div>
+                          <div class="statusStyle"
+                                v-else-if="scope.row.status == 'ImportFailed'"
+                                :style="$status_color.Task_color('ImportFailed')">
+                              {{ language == 'en' ? 'ImportFailed' : '导入失败' }}
+                          </div>
+                          <div class="statusStyle"
+                                v-else-if="scope.row.status == 'Downloading'"
+                                :style="$status_color.Task_color('Downloading')">
+                              {{ language == 'en' ? 'Downloading' : '下载中' }}
+                          </div>
+                          <div class="statusStyle"
+                                v-else-if="scope.row.status == 'DownloadFailed'"
+                                :style="$status_color.Task_color('DownloadFailed')">
+                              {{ language == 'en' ? 'DownloadFailed' : '下载失败' }}
+                          </div>
+                          <div class="statusStyle"
+                                v-else-if="scope.row.status == 'DealActive'"
+                                :style="$status_color.Task_color('DealActive')">
+                              {{ language == 'en' ? 'DealActive' : '有效交易' }}
+                          </div>
+                          <div class="statusStyle"
+                                v-else-if="scope.row.status == 'Waiting'"
+                                :style="$status_color.Task_color('Waiting')">
+                              {{ language == 'en' ? 'Waiting' : '等待中' }}
+                          </div>
+                          <div class="statusStyle"
+                                v-else-if="scope.row.status == 'ReadyForImport'"
+                                :style="$status_color.Task_color('ReadyForImport')">
+                              {{ language == 'en' ? 'ReadyForImport' : '准备导入' }}
+                          </div>
+                          <div
+                              class="statusStyle"
+                              v-else-if="scope.row.status == ''">
+                              -
+                          </div>
+                          <div
+                              class="statusStyle"
+                              v-else>
+                              {{ scope.row.status }}
+                          </div>
+                      </div>
+                      <el-button slot="reference" v-if="scope.row.miner_fid" @click="minerIdLink(scope.row.miner_fid)">
+                          {{scope.row.miner_fid}}
+                      </el-button>
+                      <div v-else slot="reference">
+                        Queuing
+                      </div>
+                  </el-popover>
+                        
+                  <el-tooltip v-if="!scope.row.miner_fid" effect="dark" content="The data from this upload is being aggregated for storage on Filecoin. Filecoin deals will be active within 48 hours of upload." placement="top">
                       <img src="@/assets/images/info.png"/>
                   </el-tooltip>
                 </div>
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="status" label="DEAL STATUS" width="120">
+          <!-- <el-table-column prop="status" label="DEAL STATUS" width="120">
             <template slot-scope="scope">
               <div
                 class="statusStyle"
@@ -212,9 +367,8 @@
                   v-else>
                   {{ scope.row.status }}
               </div>
-              <!-- <div class="scoreStyle" @click="openScore(scope.row)" v-show="scope.row.status == 'Completed'">Score</div> -->
             </template>
-          </el-table-column>
+          </el-table-column> -->
           <el-table-column prop="create_at" label="CREATE TIME" min-width="90">
             <template slot-scope="scope">
               {{ scope.row.create_at }}
@@ -364,6 +518,9 @@ export default {
     }
   },
   methods: {
+    minerIdLink(id){
+      window.open(`https://calibration.filscout.com/zh/miner/${id}`)
+    },
     toDetail(id, cid){
       this.$router.push({name: 'my_files_detail', params: {id: id, cid: cid}})
     },
@@ -1229,6 +1386,21 @@ export default {
               .caret-wrapper{
                 display: none;
               }
+              .tips{
+                display: flex;
+                align-items: center;    
+                justify-content: center;
+                img{
+                    width: 0.16rem;
+                    height: 0.16rem;
+                    margin: 0 0 0 5px;
+                    cursor: pointer;
+                    @media screen and (max-width:600px){
+                        width: 15px;
+                        height: 15px;
+                    }
+                }
+              }
             }
           }
 
@@ -1313,6 +1485,7 @@ export default {
                     text-indent: 0;
                     font-size: inherit;
                     font-weight: normal;
+                    text-decoration: underline;
                     img{
                         width: 0.16rem;
                         height: 0.16rem;
@@ -1321,6 +1494,20 @@ export default {
                         @media screen and (max-width:600px){
                             width: 15px;
                             height: 15px;
+                        }
+                    }
+                    .el-button{
+                      
+                        img{
+                            display: inline-block;
+                            float: right;
+                            width: 0.17rem;
+                            margin-top: 0.03rem;
+                        }
+                    }
+                    .el-button:hover{
+                        img{
+                            display: inline-block;
                         }
                     }
                 }

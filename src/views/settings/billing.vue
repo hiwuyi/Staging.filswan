@@ -1,5 +1,8 @@
 <template>
     <div id="dealManagement">
+        <el-alert type="warning" effect="dark" class="metatips" center show-icon v-if="metaAddress&&networkID!=80001">
+            <div slot="title">Your wallet is wrongly connected to {{network.name}} Network. To use our site, please switch to <span style="text-decoration: underline;">Mumbai Testnet</span>.</div>
+        </el-alert>
         <div class="upload">
             <div v-if="metaAddress" style="font-size:12px">
                 <div id="billing">
@@ -128,6 +131,22 @@
             </div>
         </div>
 
+        <el-dialog
+        :title="$t('transfer.connect_wallet')"
+        :visible.sync="centerDialogVisible" :close-on-click-modal="modelClose" :show-close="modelClose" :close-on-press-escape="modelClose"
+        :width="width"
+        custom-class="metaM"
+        center>
+            <el-row>
+                <el-col :span="12">MetaMask</el-col>
+                <el-col :span="12"><img src="@/assets/images/metamask.png" alt=""></el-col>
+            </el-row>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary"  @click="signFun">{{$t('transfer.connect_wallet')}}</el-button>
+                <p v-if="center_fail">Please connect your wallet to Mumbai Testnet.</p>
+            </span>
+        </el-dialog>
+
         <!-- 回到顶部 -->
         <el-backtop target=".content-box" :bottom="40" :right="20"></el-backtop>
     </div>
@@ -138,6 +157,7 @@
     import axios from 'axios'
     import QS from 'qs';
     import moment from "moment"
+    import NCWeb3 from "@/utils/web3";
 
     export default {
         name: 'Billing',
@@ -153,6 +173,14 @@
                 loading: false,
                 downCsv: localStorage.getItem("addressYM")?localStorage.getItem("addressYM"):'',
                 bodyWidth: document.documentElement.clientWidth<1024?true:false,
+                width: document.body.clientWidth>600?'400px':'95%',
+                center_fail: false,
+                network: {
+                    name: '',
+                    unit: ''
+                },
+                modelClose: true,
+                centerDialogVisible: false,
             };
         },
         computed: {
@@ -161,11 +189,23 @@
             },
             metaAddress() {
                 return this.$store.getters.metaAddress
+            },
+            networkID() {
+                return this.$store.getters.networkID
             }
         },
         watch: {
             'metaAddress': function(){
+                if(!this.metaAddress) {
+                    this.centerDialogVisible = true
+                    this.center_fail = false
+                    this.modelClose = false
+                    return false
+                }
                 this.getData()
+            },
+            networkID: function(){
+                this.walletInfo()
             }
         },
         components: {},
@@ -310,9 +350,102 @@
                 this.searchValue = ""
                 this.search();
             },
+            signFun(){
+                let _this = this
+                if(!_this.metaAddress){
+                    NCWeb3.Init(addr=>{
+                        _this.$nextTick(() => {
+                            _this.$store.dispatch('setMetaAddress', addr)
+                            _this.walletInfo()
+                        })
+                    })
+                    return false
+                }else{
+                    _this.walletInfo()
+                }
+            },
+            walletInfo() {
+                let _this = this
+                if(!_this.metaAddress){
+                    _this.modelClose = false
+                    return false
+                }
+                web3.eth.net.getId().then(netId => {
+                    // console.log('network ID:', netId)
+                    _this.$store.dispatch('setMetaNetworkId', netId)
+                    _this.modelClose = true
+                    switch (netId) {
+                        case 1:
+                            _this.network.name = 'mainnet';
+                            _this.network.unit = 'ETH';
+                            _this.center_fail = true
+                            _this.centerDialogVisible = true
+                            return;
+                        case 3:
+                            _this.network.name = 'ropsten';
+                            _this.network.unit = 'ETH';
+                            _this.center_fail = true
+                            _this.centerDialogVisible = true
+                            break;
+                        case 4:
+                            _this.network.name = 'rinkeby';
+                            _this.network.unit = 'ETH';
+                            _this.center_fail = true
+                            _this.centerDialogVisible = true
+                            return;
+                        case 5:
+                            _this.network.name = 'goerli';
+                            _this.network.unit = 'ETH';
+                            _this.center_fail = true
+                            _this.centerDialogVisible = true
+                            return;
+                        case 42:
+                            _this.network.name = 'kovan';
+                            _this.network.unit = 'ETH';
+                            _this.center_fail = true
+                            _this.centerDialogVisible = true
+                            return;
+                        case 56:
+                            _this.network.name = 'BSC';
+                            _this.network.unit = 'BNB';
+                            _this.center_fail = true
+                            _this.centerDialogVisible = true
+                            return;
+                        case 97:
+                            _this.network.name = 'BSC';
+                            _this.network.unit = 'BNB';
+                            _this.center_fail = true
+                            _this.centerDialogVisible = true
+                            return;
+                        case 999:
+                            _this.network.name = 'NBAI';
+                            _this.network.unit = 'NBAI';
+                            _this.center_fail = true
+                            _this.centerDialogVisible = true
+                            return;
+                        case 80001:
+                            _this.network.name = 'polygon';
+                            _this.network.unit = 'MATIC';
+                            _this.center_fail = false
+                            _this.centerDialogVisible = false
+                            return;
+                        default:
+                            _this.network.name = 'Custom';
+                            _this.network.unit = '';
+                            _this.center_fail = true
+                            _this.centerDialogVisible = true
+                            return;
+                    }
+                });
+            }
         },
         mounted() {
             let _this = this
+            if(!_this.metaAddress || _this.center_fail){
+                _this.centerDialogVisible = true
+                _this.modelClose = false
+            }
+            _this.walletInfo()
             _this.getData()
             this.$store.dispatch('setRouterMenu', 5)
             this.$store.dispatch('setHeadertitle', this.$t('navbar.BillingHistory'))
@@ -366,8 +499,79 @@
 
 
 <style scoped lang="scss">
+.el-dialog__wrapper /deep/ {  
+    display: flex;
+    align-items: center;
+    .metaM{
+        .el-dialog__header{
+            display: flex;
+            justify-content: center;
+        }
+        .el-dialog__body{
+            padding: 0.25rem 0.25rem 0.2rem;
+            .el-row{
+            border-radius: 0.08rem;
+            padding: 0.16rem;
+            margin: 0.12rem 0px;
+            border: 1px solid rgb(240, 185, 11);
+            text-align: center;
+            display: flex;
+            -webkit-box-pack: justify;
+            justify-content: space-between;
+            -webkit-box-align: center;
+            align-items: center;
+            transition: all 0.3s ease 0s;
+            background: rgba(240, 185, 11, 0.1);
+            position: static;
+            .el-col{
+                text-align: left;
+                font-size: 0.14rem;
+                img{
+                float: right;
+                height: 0.24rem;
+                }
+            }
+            }
+        }
+        .el-dialog__footer{
+            padding: 0 0.25rem 0.3rem;
+            .dialog-footer{
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                .el-button{
+                    width: 100%;
+                    font-size: 0.14rem;
+                    height: 0.4rem;
+                    padding: 0;
+                    background: #5c3cd3;
+                    color: #fff;
+                    border-radius: 0.08rem;
+                    &:hover{
+                    background: #4326ab;
+                    }
+                }
+                p{
+                    font-size: 0.13rem;
+                    line-height: 1.5;
+                    color: red;
+                    margin: 0.1rem 0 0;
+                }
+            }
+        }
+    }
+}
 #dealManagement{
     padding: 0.25rem 0.2rem 0.5rem;
+    .metatips /deep/{
+        position: absolute;
+        left: 0;
+        top: 0;
+        .el-alert__content{
+            display: flex;
+            align-items: center;
+        }
+    }
     .upload{
         padding: 0.1rem 0.35rem 0.2rem 0.2rem;
         margin-bottom: 0.2rem;

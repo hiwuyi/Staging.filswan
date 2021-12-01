@@ -7,7 +7,7 @@
             <el-form-item label="From" prop="from">
                 {{metaAddress}} 
             </el-form-item>
-            <el-form-item label="Payload CID" prop="cid" :class="{'err': ruleForm.cid_tip}">
+            <el-form-item label="Data CID" prop="cid" :class="{'err': ruleForm.cid_tip}">
                 <el-input v-model="ruleForm.cid" placeholder="" @blur="selectFun(2, ruleForm.cid)" @input="selectFun(2, ruleForm.cid)"></el-input>
             </el-form-item>
             <el-form-item label="Recommended Payment Amount" prop="amount" :class="{'err': ruleForm.amount_tip}">
