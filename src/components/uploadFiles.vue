@@ -96,7 +96,7 @@
                     <p>{{tableData.task_name}}</p>
                 </el-col>
                 <el-col :span="24">
-                    <label for="">Payload CID: </label>
+                    <label for="">Data CID: </label>
                     <p>{{tableData.payload_cid}}</p>
                 </el-col>
             </el-row>
@@ -137,9 +137,9 @@
         </el-dialog>
 
         <el-dialog
-        title="File uploading"
         :visible.sync="fileUploadVisible" :show-close="false" :close-on-click-modal="false"
-        :width="width" custom-class="fileUpload">
+        :width="widthUpload" custom-class="fileUpload">
+        <span slot="title">File uploading... {{percentIn?'('+percentIn+')':''}}</span>
         <h3>Your file is still in the process of uploading to IPFS. Please keep this window open until uploading completes.</h3>
         <img src="@/assets/images/upload.gif" class="gif_img" alt="">
         </el-dialog>
@@ -219,6 +219,7 @@
                 centerDialogVisible: false,
                 modelClose: true,
                 width: document.body.clientWidth>600?'400px':'95%',
+                widthUpload: document.body.clientWidth>600?'450px':'95%',
                 gatewayContractAddress: this.$root.SWAN_PAYMENT_CONTRACT_ADDRESS,
                 recipientAddress: this.$root.RECIPIENT,
                 usdcAddress: this.$root.USDC_ADDRESS,
@@ -234,7 +235,8 @@
                 failTransaction: false,
                 txHash: '',
                 fileUploadVisible: false,
-                paymentPopup: false
+                paymentPopup: false,
+                percentIn: ''
             };
         },
         components: {},
@@ -293,7 +295,7 @@
                             .then(resultUSDC => {
                                 _this.usdcAvailable = web3.utils.fromWei(resultUSDC, 'ether');
                                 console.log('Available:', _this.usdcAvailable)
-                                console.log(_this.ruleForm.amount, _this.usdcAvailable)
+                                // console.log(_this.ruleForm.amount, _this.usdcAvailable)
 
                                 // 判断支付金额是否大于代币余额
                                 if(_this.ruleForm.amount > _this.usdcAvailable ){
@@ -308,6 +310,77 @@
                                 // formData.append('task_name', _this.ruleForm.task_name)
                                 _this.loading = true
                                 _this.fileUploadVisible = true
+
+
+                                let xhr = new XMLHttpRequest()
+                                xhr.open("POST", `${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/storage/ipfs/upload`, true);   // 设置xhr得请求方式和url。
+                                xhr.withCredentials = false
+                                const token = _this.$store.getters.accessToken
+                                if (token) {
+                                    xhr.setRequestHeader(
+                                    "Authorization",
+                                    "Bearer " + _this.$store.getters.accessToken
+                                    )
+                                }
+
+                                xhr.onreadystatechange = function() {   // 等待ajax请求完成。
+                                    if (xhr.status === 200) { 
+                                        _this.fileUploadVisible = false
+                                        let res = JSON.parse(xhr.responseText)
+                                        if(res.status == "success"){
+                                            if(!res.data.need_pay){
+                                                _this.paymentPopup = true
+                                                _this.loading = false
+                                                return false
+                                            }
+                                            contract_erc20.methods.allowance(_this.gatewayContractAddress, _this.metaAddress).call()
+                                            .then(resultUSDC => {
+                                                console.log('allowance：'+ resultUSDC);
+                                                if(resultUSDC < web3.utils.toWei(_this.ruleForm.amount, 'ether')){
+                                                    contract_erc20.methods.approve(_this.gatewayContractAddress, web3.utils.toWei(_this.ruleForm.amount, 'ether')).send({from:  _this.metaAddress})
+                                                    .then(receipt => {
+                                                        // console.log(receipt)
+                                                    })
+                                                }
+                                                _this.contractSend(res.data.payload_cid)
+                                            })
+                                        }else{
+                                            _this.$message.error('Fail')
+                                        }
+                                    } else {
+                                        _this.loading = false
+                                        _this.fileUploadVisible = false
+                                    }
+                                    xhr.upload.addEventListener("error", event => {
+                                        _this.$message.error('Fail')
+                                    })
+
+                                    xhr.upload.addEventListener("progress", event => {
+                                        if (event.lengthComputable) {
+                                            let loaded = event.loaded
+                                            let total = event.total
+                                            console.log('total-loaded', total, loaded)
+                                            let percentIn = Math.floor(event.loaded / event.total * 100);
+                                            // 设置进度显示
+                                            _this.percentIn = percentIn+'%'
+                                            console.log(percentIn+'%-')
+                                        }
+                                    })
+                                };
+                                // 获取上传进度
+                                xhr.upload.onprogress = function(event) { 
+                                    console.log('event.loaded', event.loaded)
+                                    console.log('event.total', event.total)
+                                    if (event.lengthComputable) {
+                                        let percentIn = Math.floor(event.loaded / event.total * 100);
+                                        // 设置进度显示
+                                        _this.percentIn = percentIn+'%'
+                                        console.log(percentIn+'%')
+                                    }
+                                };
+                                xhr.send(formData);
+                                return false
+
                                 // 发起请求
                                 axios.post(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/storage/ipfs/upload `, formData,{
                                     headers: {
@@ -442,6 +515,9 @@
                 const isLt2M = this._file.size / 1000 / 1000 < 2;  // or 1024
                 this.ruleForm.file_size = this.sizeChange(this._file.size)
                 this.ruleForm.file_size_byte = this.byteChange(this._file.size)
+                console.log('实际大小bytes', this._file.size)
+                console.log('页面显示文件大小', this.ruleForm.file_size)
+                console.log('计算成GB大小', this.ruleForm.file_size_byte)
                 if (!isLt2M) {
                     // this.$message.error(this.$t('deal.upload_form_file_tip'))
                     this.fileListTip = true
@@ -466,7 +542,8 @@
                 }else{
                     size = limit/( 1000 * 1000 * 1000)  //or 1024
                 }
-                return Number(size).toFixed(3);
+                return size
+                // return Number(size).toFixed(3);
             },
             handleChange(file, fileList) {
                 if (fileList.length > 0) {
@@ -482,34 +559,40 @@
             stats(){
                 let _this = this
                 _this.loading = true
-                let stats_api = `${process.env.BASE_API}stats/storage`
-                axios.get(stats_api, {
-                    headers: {
-                        'Authorization': "Bearer "+ _this.$store.getters.accessToken
-                    },
-                }).then(res => {
-                    if(res.data.data){
-                        let cost = res.data.data.average_price_per_GB_per_year.split(" ")
-                        if(cost[0]) _this.storage = cost[0]
-                    }
-                    _this.loading = false
-                }).catch(error => {
-                    console.log(error)
-                    _this.loading = false
-                })
-                
-                let billing_api = `${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/billing/price/filecoin`
-                axios.get(billing_api, {
-                    headers: {
-                        'Authorization': "Bearer "+ _this.$store.getters.accessToken
-                    },
-                }).then(res => {
-                    if(res.data.data){
-                        _this.biling_price = res.data.data
-                    }
+                if(_this.$root.SWAN_PAYMENT_CONTRACT_ADDRESS){
+                    _this.gatewayContractAddress = _this.$root.SWAN_PAYMENT_CONTRACT_ADDRESS
+                    let stats_api = `${process.env.BASE_API}stats/storage`
+                    axios.get(stats_api, {
+                        headers: {
+                            'Authorization': "Bearer "+ _this.$store.getters.accessToken
+                        },
+                    }).then(res => {
+                        if(res.data.data){
+                            let cost = res.data.data.average_price_per_GB_per_year.split(" ")
+                            if(cost[0]) _this.storage = cost[0]
+                        }
+                        _this.loading = false
+                    }).catch(error => {
+                        console.log(error)
+                        _this.loading = false
+                    })
+                    
+                    let billing_api = `${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/billing/price/filecoin`
+                    axios.get(billing_api, {
+                        headers: {
+                            'Authorization': "Bearer "+ _this.$store.getters.accessToken
+                        },
+                    }).then(res => {
+                        if(res.data.data){
+                            _this.biling_price = res.data.data
+                        }
 
-                })
-
+                    })
+                }else {
+                    setTimeout(function(){
+                        _this.stats()
+                    }, 1000)
+                }
             },
             signFun(){
                 let _this = this
@@ -528,90 +611,192 @@
             walletInfo() {
                 let _this = this
                 if(!_this.metaAddress){
+                    _this.modelClose = false
                     return false
                 }
                 web3.eth.net.getId().then(netId => {
                     // console.log('network ID:', netId)
                     _this.$store.dispatch('setMetaNetworkId', netId)
+                    _this.modelClose = true
                     switch (netId) {
                     case 1:
                         _this.network.name = 'mainnet';
                         _this.network.unit = 'ETH';
                         _this.center_fail = true
                         _this.centerDialogVisible = true
-                        _this.modelClose = false
                         return;
                     case 3:
                         _this.network.name = 'ropsten';
                         _this.network.unit = 'ETH';
                         _this.center_fail = true
                         _this.centerDialogVisible = true
-                        _this.modelClose = false
                         break;
                     case 4:
                         _this.network.name = 'rinkeby';
                         _this.network.unit = 'ETH';
                         _this.center_fail = true
                         _this.centerDialogVisible = true
-                        _this.modelClose = false
                         return;
                     case 5:
                         _this.network.name = 'goerli';
                         _this.network.unit = 'ETH';
                         _this.center_fail = true
                         _this.centerDialogVisible = true
-                        _this.modelClose = false
                         return;
                     case 42:
                         _this.network.name = 'kovan';
                         _this.network.unit = 'ETH';
                         _this.center_fail = true
                         _this.centerDialogVisible = true
-                        _this.modelClose = false
                         return;
                     case 56:
                         _this.network.name = 'BSC';
                         _this.network.unit = 'BNB';
                         _this.center_fail = true
                         _this.centerDialogVisible = true
-                        _this.modelClose = false
                         return;
                     case 97:
                         _this.network.name = 'BSC';
                         _this.network.unit = 'BNB';
                         _this.center_fail = true
                         _this.centerDialogVisible = true
-                        _this.modelClose = false
                         return;
                     case 999:
                         _this.network.name = 'NBAI';
                         _this.network.unit = 'NBAI';
                         _this.center_fail = true
                         _this.centerDialogVisible = true
-                        _this.modelClose = false
                         return;
                     case 80001:
                         _this.network.name = 'polygon';
                         _this.network.unit = 'MATIC';
                         _this.center_fail = false
                         _this.centerDialogVisible = false
-                        _this.modelClose = true
                         return;
                     default:
                         _this.network.name = 'Custom';
                         _this.network.unit = '';
                         _this.center_fail = true
                         _this.centerDialogVisible = true
-                        _this.modelClose = false
                         return;
                     }
                 });
+            },
+            a(){
+                let _this = this
+                let xhr
+                xhr = new XMLHttpRequest()
+
+
+                xhr.open("GET", 'https://api.filswan.com/stats/storage');   // 设置xhr得请求方式和url。
+            
+                xhr.onreadystatechange = function() {   // 等待ajax请求完成。
+                    if (xhr.status === 200) { 
+                        
+                        console.log(JSON.parse(xhr.responseText).status);
+                    } else {
+                        console.log('上传出错');
+                    }
+                };
+                // 获取上传进度
+                xhr.upload.onprogress = function(event) { 
+                    console.log(event.loaded)
+                    console.log(event.total)
+                    if (event.lengthComputable) {
+                        var percentIn = Math.floor(event.loaded / event.total * 100);
+                        // 设置进度显示
+                        _this.percentIn = percentIn
+                        console.log(percentIn)
+                    }
+                };
+                xhr.send();
+
+                return false
+    
+              
+              xhr.open("GET", 'https://api.filswan.com/stats/storage', true)
+            //   xhr.open("POST", `${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/storage/ipfs/upload`, true)
+              xhr.withCredentials = false
+              const token = _this.$store.getters.accessToken
+              if (token) {
+                xhr.setRequestHeader(
+                  "Authorization",
+                  "Bearer " + _this.$store.getters.accessToken
+                )
+              }
+                                _this.fileUploadVisible = true
+
+
+              xhr.onload = function(event) {
+                  console.log(event)
+                if (xhr.status == 401 || xhr.status == 403) {
+                  _this.$message({
+                      message: "Unauthorized request.",
+                      type: 'danger'
+                  });
+                }
+                if (xhr.status == 500) {
+                  _this.$message({
+                      message: xhr.responseText,
+                      type: 'danger'
+                  });
+                }
+                if (xhr.status == 200) {
+                    _this.$message({
+                        message: "File '" + _this._file.name + "' uploaded successfully.",
+                        type: 'success'
+                    });
+                }
+
+                xhr.upload.addEventListener("error", event => {
+                    _this.$message({
+                        message: "Error occurred uploading '" + _this._file.name + "'.",
+                        type: 'danger'
+                    });
+                })
+
+                xhr.upload.addEventListener("progress", event => {
+                    console.log(123)
+                  if (event.lengthComputable) {
+                    let loaded = event.loaded
+                    let total = event.total
+                  }
+                })
+
+             }
+
+                xhr.upload.onprogress = _this.progressFunction();
+                xhr.upload.onloadstart = function(){//上传开始执行方法
+                    let ot = new Date().getTime();   //设置上传开始时间
+                    let oloaded = 0;//设置上传开始时，以上传的文件大小为0
+                    console.log('jinlaile')
+                };
+
+            var formData = new FormData()
+            formData.append('file', _this._file)
+            formData.append('duration', _this.ruleForm.duration)
+             xhr.send(formData)
+            },
+            //Upload progress implementation method, which will be called frequently during the upload process
+            progressFunction(evt) {
+                let _this = this
+                console.log(evt)
+                let progressBar = document.getElementById("progressBar01");
+                let percentageDiv = document.getElementById("percentage");
+                if (evt.lengthComputable) {//
+                    progressBar.max = evt.total;
+                    progressBar.value = evt.loaded;
+                    // _this.percentage_new = Math.round(evt.loaded / evt.total * 100);
+                    console.log(Math.round(evt.loaded / evt.total * 100))
+                    console.log("(" + Math.round(evt.loaded / evt.total * 100) + "%)")
+                    percentageDiv.innerHTML = "(" + Math.round(evt.loaded / evt.total * 100) + "%)";
+                }
             }
         },
         mounted() {
             let _this = this
             that = _this
-            if(!_this.metaAddress || _this.center_fail || _this.networkID != 80001){
+            if(!_this.metaAddress || _this.center_fail){
                 _this.centerDialogVisible = true
                 _this.modelClose = false
             }
@@ -757,7 +942,8 @@
         }
         .fileUpload{
             .el-dialog__header{
-                
+                font-size: 0.16rem;
+                font-weight: 600;
             }
             .el-dialog__body{
                 padding: 0.1rem 0.2rem 0.2rem;

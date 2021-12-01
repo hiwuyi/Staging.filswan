@@ -11,7 +11,6 @@ const Search_file = () => import("@/views/searchFile/index");
 const settings = () => import("@/views/settings/index");
 const billing = () => import("@/views/settings/billing");
 const stats = () => import("@/views/stats/index");
-// const metamask_login = () => import("@/components/metaMaskTips");
 
 
 const login = () => import("@/views/login/index");
@@ -74,7 +73,7 @@ export default new Router({
                   },
                   meta: {
                       metaInfo: {
-                          title: 'Upload File',
+                          title: 'My Files',
                           description: "Swan is a marketplace for Filecoin miners, clients post/bidding deals the online."
                       }
                   }
@@ -210,18 +209,6 @@ export default new Router({
                     }
 
                 },
-                // {
-                //     path: '/metamask_login',
-                //     name: 'metamask_login',
-                //     component: metamask_login,
-                //     // meta: { title: 'login' },
-                //     meta: {
-                //         metaInfo: {
-                //             title: 'metamask_login',
-                //             description: "Swan is a marketplace for Filecoin miners, clients post/bidding deals the online."
-                //         }
-                //     }
-                // },
                 {
                     path: '/login',
                     name: 'login',
