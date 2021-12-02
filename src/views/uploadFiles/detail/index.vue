@@ -7,16 +7,16 @@
         <div class="files_title">
             Deal Detail #{{dealId}}
             <span class="title" v-if="dealId == 0">
-                Deal ID has not been created on-chain.
                 <el-tooltip effect="dark" content="This means your deal has not been accepted by a storage provider yet." placement="top">
                     <img src="@/assets/images/info.png"/>
                 </el-tooltip>
             </span>
-            <!-- v-if="dealCont.deal && dealCont.deal.dao_signature_status" -->
-            <span >
-                <!-- <img src="@/assets/images/dao_success.png" v-if="dealCont.deal.dao_signature_status == 'Success'"/> -->
+            <span v-if="dealCont.signed_dao_count == dealCont.dao_thresh_hold">
+                <img src="@/assets/images/dao_success.png" />
+                <span>Successfully unlock funds.</span>
+            </span>
+            <span v-else>
                 <img src="@/assets/images/dao_waiting.png" />
-                <!-- <img src="@/assets/images/error.png" v-else /> -->
                 <span>Waiting for signatures to unlock funds: {{dealCont.signed_dao_count}}/{{dealCont.dao_thresh_hold}} </span>
             </span>
         </div>
@@ -33,7 +33,7 @@
                 <el-col :span="8">Data CID:</el-col>
                 <el-col :span="16">{{dealCont.found.payload_cid | NumFormat}}</el-col>
                 <el-col :span="8">Proposal CID:</el-col>
-                <el-col :span="16">{{dealCont.found.deal_cid | NumFormat}}</el-col>
+                <el-col :span="16">{{dealCont.deal.deal_cid | NumFormat}}</el-col>
                 <el-col :span="8">Create Time:</el-col>
                 <el-col :span="16">{{dealCont.found.create_at | NumFormat}}</el-col>
                 <el-col :span="8">Message CID:</el-col>
@@ -101,13 +101,11 @@
                         </div>
                     </template>
                 </el-table-column>
+                <el-table-column prop="dao_pass_time" label="Time"></el-table-column>
                 <el-table-column prop="status" label="Status">
                     <template slot-scope="scope">
-                        <!-- <img src="@/assets/images/dao_success.png" v-if="scope.row.status == 'Success'"/>
-                        <img src="@/assets/images/error.png" v-else-if="scope.row.status == 'Fail'"/>
-                        <img src="@/assets/images/dao_waiting.png" v-else /> -->
-                        <img src="@/assets/images/dao_success.png" v-if="scope.row.status" />
-                        <img src="@/assets/images/error.png" v-else />
+                        <img src="@/assets/images/dao_success.png" v-if="scope.row.status == 1" />
+                        <img src="@/assets/images/dao_waiting.png" v-else />
                     </template>
                 </el-table-column>
             </el-table>
@@ -204,6 +202,12 @@ export default {
                         _this.daoCont.map(item => {
                             item.daoAddressVis = false
                             item.txHashVis = false
+                            item.dao_pass_time =  
+                                item.dao_pass_time? 
+                                    moment(new Date(parseInt(item.dao_pass_time * 1000))).format(
+                                        "YYYY-MM-DD HH:mm:ss"
+                                    )
+                                    : "-";
                         })
                     }
 
@@ -314,7 +318,7 @@ export default {
             display: flex;
             align-items: center;
             justify-content: flex-start;
-            padding: 0 0.1rem;
+            padding: 0;
             line-height: 1.5;
             text-align: center;
             white-space: normal;
@@ -398,6 +402,7 @@ export default {
                     justify-content: center;
                     align-items: center;
                     word-break: break-word;
+                    text-align: center;
                     .hot-cold-box{
                         .el-button{
                             width: 100%;

@@ -445,7 +445,7 @@
                 _this.centerDialogVisible = true
                 _this.modelClose = false
             }
-            _this.walletInfo()
+            setTimeout(function(){_this.walletInfo()}, 100)
             _this.getData()
             this.$store.dispatch('setRouterMenu', 5)
             this.$store.dispatch('setHeadertitle', this.$t('navbar.BillingHistory'))

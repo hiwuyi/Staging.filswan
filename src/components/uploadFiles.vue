@@ -688,30 +688,30 @@
                 xhr = new XMLHttpRequest()
 
 
-                xhr.open("GET", 'https://api.filswan.com/stats/storage');   // 设置xhr得请求方式和url。
+                // xhr.open("GET", 'https://api.filswan.com/stats/storage');   // 设置xhr得请求方式和url。
             
-                xhr.onreadystatechange = function() {   // 等待ajax请求完成。
-                    if (xhr.status === 200) { 
+                // xhr.onreadystatechange = function() {   // 等待ajax请求完成。
+                //     if (xhr.status === 200) { 
                         
-                        console.log(JSON.parse(xhr.responseText).status);
-                    } else {
-                        console.log('上传出错');
-                    }
-                };
-                // 获取上传进度
-                xhr.upload.onprogress = function(event) { 
-                    console.log(event.loaded)
-                    console.log(event.total)
-                    if (event.lengthComputable) {
-                        var percentIn = Math.floor(event.loaded / event.total * 100);
-                        // 设置进度显示
-                        _this.percentIn = percentIn
-                        console.log(percentIn)
-                    }
-                };
-                xhr.send();
+                //         console.log(JSON.parse(xhr.responseText).status);
+                //     } else {
+                //         console.log('上传出错');
+                //     }
+                // };
+                // // 获取上传进度
+                // xhr.upload.onprogress = function(event) { 
+                //     console.log(event.loaded)
+                //     console.log(event.total)
+                //     if (event.lengthComputable) {
+                //         var percentIn = Math.floor(event.loaded / event.total * 100);
+                //         // 设置进度显示
+                //         _this.percentIn = percentIn
+                //         console.log(percentIn)
+                //     }
+                // };
+                // xhr.send();
 
-                return false
+                // return false
     
               
               xhr.open("GET", 'https://api.filswan.com/stats/storage', true)
@@ -724,7 +724,7 @@
                   "Bearer " + _this.$store.getters.accessToken
                 )
               }
-                                _this.fileUploadVisible = true
+                                // _this.fileUploadVisible = true
 
 
               xhr.onload = function(event) {
@@ -748,48 +748,59 @@
                     });
                 }
 
-                xhr.upload.addEventListener("error", event => {
+                xhr.upload.addEventListener("error", events => {
                     _this.$message({
                         message: "Error occurred uploading '" + _this._file.name + "'.",
                         type: 'danger'
                     });
                 })
 
-                xhr.upload.addEventListener("progress", event => {
-                    console.log(123)
-                  if (event.lengthComputable) {
-                    let loaded = event.loaded
-                    let total = event.total
-                  }
+                
+                xhr.upload.addEventListener("progress", events => {
+                    if (event.lengthComputable) {
+                        let loaded = events.loaded
+                        let total = events.total
+                        console.log('total-loaded', total, loaded)
+                        let percentIn = Math.floor(events.loaded / events.total * 100);
+                        // 设置进度显示
+                        _this.percentIn = percentIn+'%'
+                        console.log(percentIn+'%-')
+                    }
                 })
+            };
+            // 获取上传进度
+            xhr.upload.onprogress = function(event) { 
+                console.log('event.loaded', event.loaded)
+                console.log('event.total', event.total)
+                if (event.lengthComputable) {
+                    let percentIn = Math.floor(event.loaded / event.total * 100);
+                    // 设置进度显示
+                    _this.percentIn = percentIn+'%'
+                    console.log(percentIn+'%')
+                }
+            };
 
-             }
-
-                xhr.upload.onprogress = _this.progressFunction();
+                // xhr.upload.onprogress = _this.progressFunction();
                 xhr.upload.onloadstart = function(){//上传开始执行方法
                     let ot = new Date().getTime();   //设置上传开始时间
                     let oloaded = 0;//设置上传开始时，以上传的文件大小为0
                     console.log('jinlaile')
                 };
 
-            var formData = new FormData()
-            formData.append('file', _this._file)
-            formData.append('duration', _this.ruleForm.duration)
-             xhr.send(formData)
+                var formData = new FormData()
+                formData.append('file', _this._file)
+                formData.append('duration', _this.ruleForm.duration)
+                xhr.send(formData)
             },
             //Upload progress implementation method, which will be called frequently during the upload process
             progressFunction(evt) {
                 let _this = this
                 console.log(evt)
-                let progressBar = document.getElementById("progressBar01");
-                let percentageDiv = document.getElementById("percentage");
+                return false
                 if (evt.lengthComputable) {//
-                    progressBar.max = evt.total;
-                    progressBar.value = evt.loaded;
                     // _this.percentage_new = Math.round(evt.loaded / evt.total * 100);
                     console.log(Math.round(evt.loaded / evt.total * 100))
                     console.log("(" + Math.round(evt.loaded / evt.total * 100) + "%)")
-                    percentageDiv.innerHTML = "(" + Math.round(evt.loaded / evt.total * 100) + "%)";
                 }
             }
         },
@@ -800,7 +811,7 @@
                 _this.centerDialogVisible = true
                 _this.modelClose = false
             }
-            _this.walletInfo()
+            setTimeout(function(){_this.walletInfo()}, 100)
             _this.stats()
             _this.$store.dispatch("setRouterMenu", 0);
             _this.$store.dispatch('setHeadertitle', _this.$t('navbar.Upload_files'))
