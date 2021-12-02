@@ -389,40 +389,40 @@
                                 return false
 
                                 // 发起请求
-                                axios.post(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/storage/ipfs/upload `, formData,{
-                                    headers: {
-                                    'Authorization': "Bearer "+_this.$store.getters.accessToken
-                                    },
-                                })
-                                .then((res) => {
-                                    // console.log('_RequestUploads_', res)
-                                    _this.fileUploadVisible = false
-                                    if (res.data.status == "success") {
-                                        if(!res.data.data.need_pay){
-                                            _this.paymentPopup = true
-                                            _this.loading = false
-                                            return false
-                                        }
-                                        contract_erc20.methods.allowance(_this.gatewayContractAddress, _this.metaAddress).call()
-                                        .then(resultUSDC => {
-                                            console.log('allowance：'+ resultUSDC);
-                                            if(resultUSDC < web3.utils.toWei(_this.ruleForm.amount, 'ether')){
-                                                contract_erc20.methods.approve(_this.gatewayContractAddress, web3.utils.toWei(_this.ruleForm.amount, 'ether')).send({from:  _this.metaAddress})
-                                                .then(receipt => {
-                                                    // console.log(receipt)
-                                                })
-                                            }
-                                            _this.contractSend(res.data.data.payload_cid)
-                                        })
-                                        // _this.$router.push({name: 'my_files'})
-                                    } else {
-                                        _this.$message.error('Fail')
-                                    }
-                                }).catch(error => {
-                                    console.log(error)
-                                    _this.loading = false
-                                    _this.fileUploadVisible = false
-                                })
+                                // axios.post(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/storage/ipfs/upload `, formData,{
+                                //     headers: {
+                                //     'Authorization': "Bearer "+_this.$store.getters.accessToken
+                                //     },
+                                // })
+                                // .then((res) => {
+                                //     // console.log('_RequestUploads_', res)
+                                //     _this.fileUploadVisible = false
+                                //     if (res.data.status == "success") {
+                                //         if(!res.data.data.need_pay){
+                                //             _this.paymentPopup = true
+                                //             _this.loading = false
+                                //             return false
+                                //         }
+                                //         contract_erc20.methods.allowance(_this.gatewayContractAddress, _this.metaAddress).call()
+                                //         .then(resultUSDC => {
+                                //             console.log('allowance：'+ resultUSDC);
+                                //             if(resultUSDC < web3.utils.toWei(_this.ruleForm.amount, 'ether')){
+                                //                 contract_erc20.methods.approve(_this.gatewayContractAddress, web3.utils.toWei(_this.ruleForm.amount, 'ether')).send({from:  _this.metaAddress})
+                                //                 .then(receipt => {
+                                //                     // console.log(receipt)
+                                //                 })
+                                //             }
+                                //             _this.contractSend(res.data.data.payload_cid)
+                                //         })
+                                //         // _this.$router.push({name: 'my_files'})
+                                //     } else {
+                                //         _this.$message.error('Fail')
+                                //     }
+                                // }).catch(error => {
+                                //     console.log(error)
+                                //     _this.loading = false
+                                //     _this.fileUploadVisible = false
+                                // })
                             })
                         }
                     } else {

@@ -13,11 +13,11 @@
             </span>
             <span v-if="dealCont.signed_dao_count >= dealCont.dao_thresh_hold && dealCont.unlock_status">
                 <img src="@/assets/images/dao_success.png" />
-                <span>Successfully unlock funds.</span>
+                <span>Successfully unlocked funds.</span>
             </span>
             <span v-else-if="dealCont.signed_dao_count >= dealCont.dao_thresh_hold && !dealCont.unlock_status">
                 <img src="@/assets/images/dao_waiting.png" />
-                <span>Signature successfully {{dealCont.signed_dao_count}}/{{dealCont.dao_total_count}} </span>
+                <span>Successfully signed, waiting for unlock fund. {{dealCont.signed_dao_count}}/{{dealCont.dao_total_count}} </span>
             </span>
             <span v-else>
                 <img src="@/assets/images/dao_waiting.png" />
