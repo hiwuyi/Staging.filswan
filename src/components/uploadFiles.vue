@@ -322,30 +322,37 @@
                                     "Bearer " + _this.$store.getters.accessToken
                                     )
                                 }
+                                let i = 0;
 
                                 xhr.onreadystatechange = function() {   // 等待ajax请求完成。
                                     if (xhr.status === 200) { 
-                                        _this.fileUploadVisible = false
-                                        let res = JSON.parse(xhr.responseText)
-                                        if(res.status == "success"){
-                                            if(!res.data.need_pay){
-                                                _this.paymentPopup = true
-                                                _this.loading = false
-                                                return false
-                                            }
-                                            contract_erc20.methods.allowance(_this.gatewayContractAddress, _this.metaAddress).call()
-                                            .then(resultUSDC => {
-                                                console.log('allowance：'+ resultUSDC);
-                                                if(resultUSDC < web3.utils.toWei(_this.ruleForm.amount, 'ether')){
-                                                    contract_erc20.methods.approve(_this.gatewayContractAddress, web3.utils.toWei(_this.ruleForm.amount, 'ether')).send({from:  _this.metaAddress})
-                                                    .then(receipt => {
-                                                        // console.log(receipt)
-                                                    })
+                                        if(xhr.responseText){
+                                            _this.fileUploadVisible = false
+                                            let res = JSON.parse(xhr.responseText)
+                                            i += 1
+                                            if(i <= 1){
+                                                if(res.status == "success"){
+                                                    if(!res.data.need_pay){
+                                                        _this.paymentPopup = true
+                                                        _this.loading = false
+                                                        return false
+                                                    }else{
+                                                        contract_erc20.methods.allowance(_this.gatewayContractAddress, _this.metaAddress).call()
+                                                        .then(resultUSDC => {
+                                                            console.log('allowance：'+ resultUSDC);
+                                                            if(resultUSDC < web3.utils.toWei(_this.ruleForm.amount, 'ether')){
+                                                                contract_erc20.methods.approve(_this.gatewayContractAddress, web3.utils.toWei(_this.ruleForm.amount, 'ether')).send({from:  _this.metaAddress})
+                                                                .then(receipt => {
+                                                                    // console.log(receipt)
+                                                                })
+                                                            }
+                                                            _this.contractSend(res.data.payload_cid)
+                                                        })
+                                                    }
+                                                }else{
+                                                    _this.$message.error('Fail')
                                                 }
-                                                _this.contractSend(res.data.payload_cid)
-                                            })
-                                        }else{
-                                            _this.$message.error('Fail')
+                                            }
                                         }
                                     } else {
                                         _this.loading = false
@@ -515,9 +522,7 @@
                 const isLt2M = this._file.size / 1000 / 1000 < 2;  // or 1024
                 this.ruleForm.file_size = this.sizeChange(this._file.size)
                 this.ruleForm.file_size_byte = this.byteChange(this._file.size)
-                console.log('实际大小bytes', this._file.size)
-                console.log('页面显示文件大小', this.ruleForm.file_size)
-                console.log('计算成GB大小', this.ruleForm.file_size_byte)
+                console.log('bytes', this._file.size)
                 if (!isLt2M) {
                     // this.$message.error(this.$t('deal.upload_form_file_tip'))
                     this.fileListTip = true
@@ -591,7 +596,7 @@
                 }else {
                     setTimeout(function(){
                         _this.stats()
-                    }, 1000)
+                    }, 100)
                 }
             },
             signFun(){
@@ -682,127 +687,54 @@
                     }
                 });
             },
-            a(){
+            ceshiXHR(){
                 let _this = this
                 let xhr
                 xhr = new XMLHttpRequest()
-
-
-                // xhr.open("GET", 'https://api.filswan.com/stats/storage');   // 设置xhr得请求方式和url。
-            
-                // xhr.onreadystatechange = function() {   // 等待ajax请求完成。
-                //     if (xhr.status === 200) { 
-                        
-                //         console.log(JSON.parse(xhr.responseText).status);
-                //     } else {
-                //         console.log('上传出错');
-                //     }
-                // };
-                // // 获取上传进度
-                // xhr.upload.onprogress = function(event) { 
-                //     console.log(event.loaded)
-                //     console.log(event.total)
-                //     if (event.lengthComputable) {
-                //         var percentIn = Math.floor(event.loaded / event.total * 100);
-                //         // 设置进度显示
-                //         _this.percentIn = percentIn
-                //         console.log(percentIn)
-                //     }
-                // };
-                // xhr.send();
-
-                // return false
-    
               
-              xhr.open("GET", 'https://api.filswan.com/stats/storage', true)
-            //   xhr.open("POST", `${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/storage/ipfs/upload`, true)
-              xhr.withCredentials = false
-              const token = _this.$store.getters.accessToken
-              if (token) {
-                xhr.setRequestHeader(
-                  "Authorization",
-                  "Bearer " + _this.$store.getters.accessToken
-                )
-              }
-                                // _this.fileUploadVisible = true
-
-
-              xhr.onload = function(event) {
-                  console.log(event)
-                if (xhr.status == 401 || xhr.status == 403) {
-                  _this.$message({
-                      message: "Unauthorized request.",
-                      type: 'danger'
-                  });
+                xhr.open("GET", 'https://api.filswan.com/stats/storage', true)
+                xhr.withCredentials = false
+                const token = _this.$store.getters.accessToken
+                if (token) {
+                    xhr.setRequestHeader(
+                    "Authorization",
+                    "Bearer " + _this.$store.getters.accessToken
+                    )
                 }
-                if (xhr.status == 500) {
-                  _this.$message({
-                      message: xhr.responseText,
-                      type: 'danger'
-                  });
-                }
-                if (xhr.status == 200) {
-                    _this.$message({
-                        message: "File '" + _this._file.name + "' uploaded successfully.",
-                        type: 'success'
-                    });
-                }
+                let i = 0;
 
-                xhr.upload.addEventListener("error", events => {
-                    _this.$message({
-                        message: "Error occurred uploading '" + _this._file.name + "'.",
-                        type: 'danger'
-                    });
-                })
-
-                
-                xhr.upload.addEventListener("progress", events => {
+                xhr.onreadystatechange = function() {   // 等待ajax请求完成。
+                    if (xhr.status === 200) { 
+                        if(xhr.responseText){
+                            let res = JSON.parse(xhr.responseText)
+                            i += 1
+                            if(i <= 1){
+                                console.log(res)
+                                console.log(i)
+                            }
+                        }
+                    } else {
+                        _this.loading = false
+                        _this.fileUploadVisible = false
+                    }
+                    xhr.upload.addEventListener("error", event => {
+                        _this.$message.error('Fail')
+                    })
+                };
+                // 获取上传进度
+                xhr.upload.onprogress = function(event) { 
+                    console.log('event.loaded', event.loaded)
+                    console.log('event.total', event.total)
                     if (event.lengthComputable) {
-                        let loaded = events.loaded
-                        let total = events.total
-                        console.log('total-loaded', total, loaded)
-                        let percentIn = Math.floor(events.loaded / events.total * 100);
+                        let percentIn = Math.floor(event.loaded / event.total * 100);
                         // 设置进度显示
                         _this.percentIn = percentIn+'%'
-                        console.log(percentIn+'%-')
+                        console.log(percentIn+'%')
                     }
-                })
-            };
-            // 获取上传进度
-            xhr.upload.onprogress = function(event) { 
-                console.log('event.loaded', event.loaded)
-                console.log('event.total', event.total)
-                if (event.lengthComputable) {
-                    let percentIn = Math.floor(event.loaded / event.total * 100);
-                    // 设置进度显示
-                    _this.percentIn = percentIn+'%'
-                    console.log(percentIn+'%')
-                }
-            };
-
-                // xhr.upload.onprogress = _this.progressFunction();
-                xhr.upload.onloadstart = function(){//上传开始执行方法
-                    let ot = new Date().getTime();   //设置上传开始时间
-                    let oloaded = 0;//设置上传开始时，以上传的文件大小为0
-                    console.log('jinlaile')
                 };
+                xhr.send();
 
-                var formData = new FormData()
-                formData.append('file', _this._file)
-                formData.append('duration', _this.ruleForm.duration)
-                xhr.send(formData)
             },
-            //Upload progress implementation method, which will be called frequently during the upload process
-            progressFunction(evt) {
-                let _this = this
-                console.log(evt)
-                return false
-                if (evt.lengthComputable) {//
-                    // _this.percentage_new = Math.round(evt.loaded / evt.total * 100);
-                    console.log(Math.round(evt.loaded / evt.total * 100))
-                    console.log("(" + Math.round(evt.loaded / evt.total * 100) + "%)")
-                }
-            }
         },
         mounted() {
             let _this = this
