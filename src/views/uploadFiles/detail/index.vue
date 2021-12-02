@@ -249,8 +249,8 @@ export default {
     },
     filters: {
         NumFormat (value) {
-            if(value == 0) return 0;
             if(!value) return '-';
+            if(value == 0) return 0;
             return value
         },
         NumFormatPrice (value) {

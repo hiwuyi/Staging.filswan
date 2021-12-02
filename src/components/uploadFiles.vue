@@ -100,6 +100,13 @@
                     <p>{{tableData.payload_cid}}</p>
                 </el-col>
             </el-row>
+
+            <div class="loadMetamaskPay" v-if="loadMetamaskPay">
+                <div>
+                    <div class="el-loading-spinner"><svg viewBox="25 25 50 50" class="circular"><circle cx="50" cy="50" r="20" fill="none" class="path"></circle></svg><!----></div>
+                    <p>Please wait until the process of locking funds completed.</p>
+                </div>
+            </div>
         </div>
 
         <el-dialog
@@ -236,7 +243,8 @@
                 txHash: '',
                 fileUploadVisible: false,
                 paymentPopup: false,
-                percentIn: ''
+                percentIn: '',
+                loadMetamaskPay: false
             };
         },
         components: {},
@@ -458,6 +466,8 @@
                 .send(payObject)
                 .on('transactionHash', function(hash){
                     // console.log('hash console:', hash);
+                    _this.loadMetamaskPay = true
+                    _this.loading = false
                     _this.txHash = hash
                 })
                 .on('confirmation', function(confirmationNumber, receipt){
@@ -473,6 +483,7 @@
                     // console.log('error console:', error)
                     // console.error
                     _this.loading = false
+                    _this.loadMetamaskPay = false
                     _this.failTransaction = true
                     _this.sendSuccess(cid, 'Fail')
                 }); 
@@ -485,6 +496,7 @@
                         if (!res) { return _this.timer = setTimeout(() => { _this.checkTransaction(txHash, cid); }, 2000); }
                         else {
                             _this.loading = false
+                            _this.loadMetamaskPay = false
                             clearTimeout(_this.timer)
                             _this.finishTransaction = true
                             _this.sendSuccess(cid, 'Success')
@@ -596,7 +608,7 @@
                 }else {
                     setTimeout(function(){
                         _this.stats()
-                    }, 100)
+                    }, 1000)
                 }
             },
             signFun(){
@@ -912,6 +924,28 @@
         height: calc(100% - 0.6rem);
         padding: 0.4rem 0.2rem;
         font-size: 0.24rem;
+        .loadMetamaskPay{
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 99;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(255,255,255,.9);
+            .el-loading-spinner{
+                top: 0;
+                position: relative;
+                margin: 0 0 0.2rem;
+            }
+            p{
+                font-size: 14px;
+                font-weight: 600;
+                color: #666;
+            }
+        }
         .el-alert /deep/{
             position: absolute;
             left: 0;
