@@ -472,8 +472,10 @@
                 return value
             },
             balanceFilter (value) {
-                if (!Number(value)) return 0;
-                if (isNaN(value)) return value;
+                if (String(value) === '0') return 0;
+                if (!value) return '-';
+                // if (!Number(value)) return 0;
+                // if (isNaN(value)) return value;
                 // 18 - 单位换算需要 / 1000000000000000000，浮点运算显示有bug
                 if(String(value).length > 18){
                     let v1 = String(value).substring(0, String(value).length - 18)

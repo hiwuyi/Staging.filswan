@@ -11,7 +11,11 @@
                     <img src="@/assets/images/info.png"/>
                 </el-tooltip>
             </span>
-            <span v-if="dealCont.signed_dao_count >= dealCont.dao_thresh_hold && dealCont.unlock_status">
+            <span v-if="!dealCont.found.locked_fee">
+                <img src="@/assets/images/error.png" />
+                <span>No fund locked.</span>
+            </span>
+            <span v-else-if="dealCont.signed_dao_count >= dealCont.dao_thresh_hold && dealCont.unlock_status">
                 <img src="@/assets/images/dao_success.png" />
                 <span>Successfully unlocked funds.</span>
             </span>
@@ -249,13 +253,13 @@ export default {
     },
     filters: {
         NumFormat (value) {
-            if(!value) return '-';
-            if(value == 0) return 0;
+            if (String(value) === '0') return 0;
+            if (!value) return '-';
             return value
         },
         NumFormatPrice (value) {
-            if(value == 0) return 0;
-            if(!value) return '-';
+            if (String(value) === '0') return 0;
+            if (!value) return '-';
             // 18 - 单位换算需要 / 1000000000000000000，浮点运算显示有bug
             let valueNum = String(value)
             if(value.length > 18){
