@@ -1,6 +1,6 @@
 <template>
 
-    <el-dialog title="" :modal="false" :width="widthDia" :visible.sync="payVisible"
+    <el-dialog title="Pay the file" :modal="true" :width="widthDia" :visible.sync="payVisible"
         :before-close="closeDia">
         <div class="load" v-if="hashload" v-loading="hashload"></div>
         <div class="upload_form">

@@ -1170,6 +1170,7 @@ export default {
             _this.tableData = response.data.data;
             _this.tableData.map((item,s) => {
               item.payloadAct = false
+              item.duration = item.duration/2880
               item.file_size_byte = _this.byteChange(item.file_size)
               item.create_at = item.create_at
                 ? item.create_at.length < 13
