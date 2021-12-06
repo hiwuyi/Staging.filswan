@@ -1,5 +1,8 @@
 <template>
   <div id="dealManagement">
+    <el-alert type="warning" effect="dark" center show-icon v-if="metaAddress&&networkID!=80001">
+        <div slot="title">Your wallet is wrongly connected to {{network.name}} Network. To use our site, please switch to <span style="text-decoration: underline;">Mumbai Testnet</span>.</div>
+    </el-alert>
     <div class="tabTaskStyle">
       <div class="createTask">
         <!-- name: 'upload_file' -->
@@ -10,6 +13,7 @@
     </div>
     <div class="form">
       <div class="form_top">
+        <div class="upload_title">Please click the file name to view Deal Details and DAO Signatures details.</div>
         <div class="search_file">
           <p>Search by File Name</p>
 
@@ -47,6 +51,28 @@
               <div class="hot-cold-box">
                 {{ scope.row.file_size | formatbytes }}
               </div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="status" label="STATUS" width="140">
+            <template slot-scope="scope">
+              <el-button type="danger" class="statusStyle" v-if="scope.row.status&&scope.row.status.toLowerCase()=='failed'">
+                  {{scope.row.status}}
+              </el-button>
+              <el-button type="warning" class="statusStyle" v-else-if="scope.row.status&&scope.row.status.toLowerCase()=='pending payment'">
+                  {{scope.row.status}}
+              </el-button>
+              <el-button type="primary" class="statusStyle" v-else-if="scope.row.status&&scope.row.status.toLowerCase()=='processing'">
+                  {{scope.row.status}}
+              </el-button>
+              <el-button type="success" class="statusStyle" v-else-if="scope.row.status&&scope.row.status.toLowerCase()=='active'">
+                  {{scope.row.status}}
+              </el-button>
+              <el-button type="info" class="statusStyle" v-else-if="scope.row.status&&scope.row.status.toLowerCase()=='refunded'">
+                  {{scope.row.status}}
+              </el-button>
+              <el-button type="info" plain class="statusStyle" v-else>
+                  {{scope.row.status}}
+              </el-button>
             </template>
           </el-table-column>
           <el-table-column prop="pin_status" width="140">
@@ -102,7 +128,7 @@
               <div class="tips">
                 STORAGE PROVIDER
                     
-                <el-tooltip effect="dark" content="Service providers offering storage capacity to the Filecoin network." placement="top">
+                <el-tooltip effect="dark" content="Storage providers offering storage capacity to the Filecoin network." placement="top">
                     <img src="@/assets/images/info.png"/>
                 </el-tooltip>
               </div>
@@ -374,10 +400,22 @@
               {{ scope.row.create_at }}
             </template>
           </el-table-column>
-          <el-table-column prop="active" width="120" label="DAO">
+          <el-table-column prop="active" width="120" label="ACTION">
             <template slot-scope="scope">
               <div class="hot-cold-box">
-                <router-link :to="{name: 'my_files_detail', params: {id: scope.row.deal_id, cid: scope.row.payload_cid}}" class="uploadBtn grey">Detail</router-link>
+                <el-button class="uploadBtn blue"
+                  v-if="tableData[scope.$index].status.toLowerCase()=='pending payment'"
+                  @click.stop="payClick(scope.row)">
+                  PAY
+                </el-button>
+                <el-button 
+                  v-else-if="tableData[scope.$index].status.toLowerCase()=='failed'"
+                  :disabled="true"
+                  class="uploadBtn grey opacity">FAILED</el-button>
+                <el-button 
+                  v-else
+                  :disabled="true"
+                  class="uploadBtn grey opacity">PAID</el-button>
               </div>
             </template>
           </el-table-column>
@@ -410,20 +448,38 @@
 
 
     <el-dialog
-      :title="$t('transfer.connect_wallet')"
-      :visible.sync="centerDialogVisible"
-      :width="width"
-      custom-class="metaM"
-      center>
-      <el-row>
-        <el-col :span="12">MetaMask</el-col>
-        <el-col :span="12"><img src="@/assets/images/metamask.png" alt=""></el-col>
-      </el-row>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary"  @click="signFun">{{$t('transfer.connect_wallet')}}</el-button>
-        <p v-if="center_fail">Please connect your wallet to Mumbai Testnet.</p>
-      </span>
-    </el-dialog>
+        :title="$t('transfer.connect_wallet')"
+        :visible.sync="centerDialogVisible" :close-on-click-modal="modelClose" :show-close="modelClose" :close-on-press-escape="modelClose"
+        :width="width"
+        custom-class="metaM"
+        center>
+        <el-row>
+            <el-col :span="12">MetaMask</el-col>
+            <el-col :span="12"><img src="@/assets/images/metamask.png" alt=""></el-col>
+        </el-row>
+        <span slot="footer" class="dialog-footer">
+            <el-button type="primary"  @click="signFun">{{$t('transfer.connect_wallet')}}</el-button>
+            <p v-if="center_fail">Please connect your wallet to Mumbai Testnet.</p>
+        </span>
+        </el-dialog>
+
+        <el-dialog title="" :visible.sync="finishTransaction" :width="width"
+            custom-class="completeDia">
+            <img src="@/assets/images/alert-icon.png" />
+            <h1>Completed!</h1>
+            <h3>Your transaction has been submitted successfully. Check more detail in your transaction history.</h3>
+            <a :href="'https://mumbai.polygonscan.com/tx/'+txHash" target="_blank">{{txHash}}</a>
+            <a class="a-close" @click="finishTransaction">Close</a>
+        </el-dialog>
+
+        <el-dialog title="" :visible.sync="failTransaction" :width="width"
+            custom-class="completeDia">
+            <img src="@/assets/images/error.png" />
+            <h1>Fail!</h1>
+            <h3>Your transaction has failed. Check the transaction history for more details.</h3>
+            <a :href="'https://mumbai.polygonscan.com/tx/'+txHash" target="_blank">{{txHash}}</a>
+            <a class="a-close" @click="failTransaction=false">Close</a>
+        </el-dialog>
 
     <el-dialog
     title="Tips"
@@ -444,6 +500,10 @@ import * as myAjax from "@/api/uploadFile";
 import moment from "moment";
 import payTip from "@/components/payTip"
 import NCWeb3 from "@/utils/web3";
+import first_contract_json from "@/utils/swanPayment.json";
+import erc20_contract_json from "@/utils/ERC20.json";
+let contract_erc20
+let that
 
 export default {
   name: "uploadFiles",
@@ -487,7 +547,20 @@ export default {
       wrongVisible: false,
       paySuccess: false,
       timer: '',
-      timeIndex: 0
+      timeIndex: 0,
+      modelClose: false,
+      network: {
+          name: '',
+          unit: '',
+          text: false
+      },
+      gatewayContractAddress: this.$root.SWAN_PAYMENT_CONTRACT_ADDRESS,
+      recipientAddress: this.$root.RECIPIENT,
+      usdcAddress: this.$root.USDC_ADDRESS,
+      txHash: '',
+      finishTransaction: false,
+      failTransaction: false,
+      loadMetamaskPay: false
     };
   },
   computed: {
@@ -496,6 +569,9 @@ export default {
     },
     metaAddress() {
         return this.$store.getters.metaAddress
+    },
+    networkID() {
+        return this.$store.getters.networkID
     }
   },
   components: {
@@ -509,6 +585,9 @@ export default {
       _this.parmaChild.limit = 10
       _this.parmaChild.offset = 1
       _this.getData()
+    },
+    networkID: function(){
+        this.walletInfo()
     }
   },
   created() {
@@ -538,21 +617,126 @@ export default {
     },
     payClick(row){
       let _this = this
-      if(row.status.toLowerCase() == 'created' || row.status.toLowerCase() == 'actionRequired'){
-        _this.wrongVisible = true
+      console.log(row)
+      
+      if(_this.metaAddress){
+        _this.loading = true
+        // 发起请求
+        axios.get(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/billing/deal/lockpayment/info?payload_cid=${row.payload_cid}`,{
+            headers: {
+            'Authorization': "Bearer "+_this.$store.getters.accessToken
+            },
+        })
+        .then((res) => {
+            if (res.data.status == "success") {
+                if(res.data.data.tx_hash){
+                    _this.$message.error('This file has been paid.')
+                    _this.loading = false
+                    return false
+                }else{
+                  // 授权代币
+                  contract_erc20 = new web3.eth.Contract( erc20_contract_json );
+                  contract_erc20.options.address = _this.usdcAddress
+                  // 查询剩余代币余额为：
+                  contract_erc20.methods.balanceOf(_this.metaAddress).call()
+                  .then(balance => {
+                      console.log('Available:', balance, res.data.data.locked_fee)
+                      // 判断支付金额是否大于代币余额
+                      if(Number(res.data.data.locked_fee) > Number(balance)){
+                          _this.$message.error('Insufficient balance')
+                          return false
+                      }else{
+                        contract_erc20.methods.allowance(_this.gatewayContractAddress, _this.metaAddress).call()
+                        .then(resultUSDC => {
+                            console.log('allowance：'+ resultUSDC);
+                            if(resultUSDC < res.data.data.locked_fee){
+                                contract_erc20.methods.approve(_this.gatewayContractAddress, res.data.data.locked_fee).send({from:  _this.metaAddress})
+                                .then(receipt => {
+                                    // console.log(receipt)
+                                })
+                            }
+                            _this.contractSend(res.data.data.payload_cid, res.data.data.locked_fee)
+                        })
+                      }
+                  })
+                }
+            } else {
+                _this.$message.error('Fail')
+                _this.loading = false
+            }
+        }).catch(error => {
+            console.log(error)
+            _this.loading = false
+        })
+
         return false
       }
-      if(!_this.metaAddress){
-        _this.centerDialogVisible = true
-      }else{
-        if(_this.expands.indexOf(row.uuid) > -1){
-          _this.walletInfo()
-        }else{
-          _this.expands = []
-          _this.expands.push(row.uuid)
-          _this.tableTrClick(row, 1)
+    },
+    contractSend(cid, payAmount){
+        let _this = this
+        // 合约转账
+        let contract_instance = new web3.eth.Contract( first_contract_json );
+        contract_instance.options.address = _this.gatewayContractAddress
+        // console.log( 'contract_instance合约实例：', contract_instance );
+        // console.log(contract_instance.options.jsonInterface)
+
+        let payObject = {
+            from: _this.metaAddress,
+            gas: web3.utils.toHex(_this.$root.PAY_GAS_LIMIT),
+            // gasPrice: web3.utils.toHex(web3.utils.toWei(_this.ruleForm.gasprice + '', 'gwei')),
+            // value: web3.utils.toHex(web3.utils.toWei(_this.ruleForm.amount, 'ether')),
+        };
+        
+        let lockObj = {
+            id: cid,
+            minPayment: web3.utils.toWei('0.0000000001', 'ether'),
+            amount: payAmount,
+            lockTime: 86400 * Number(_this.$root.LOCK_TIME), // one day
+            recipient: _this.recipientAddress, //todo:
         }
-      }
+        
+        contract_instance.methods.lockTokenPayment(lockObj)
+        .send(payObject)
+        .on('transactionHash', function(hash){
+            // console.log('hash console:', hash);
+            _this.loadMetamaskPay = true
+            // _this.loading = false
+            _this.txHash = hash
+        })
+        .on('confirmation', function(confirmationNumber, receipt){
+            // console.log('confirmationNumber console:', confirmationNumber, receipt);
+        })
+        .on('receipt', function(receipt){
+            // receipt example
+            // console.log('receipt console:', receipt);
+            _this.checkTransaction(receipt.transactionHash, cid)
+            _this.txHash = receipt.transactionHash
+        })
+        .on('error', function(error){
+            // console.log('error console:', error)
+            // console.error
+            _this.loading = false
+            _this.loadMetamaskPay = false
+            _this.failTransaction = true
+            // _this.sendSuccess(cid, 'Fail')
+        }); 
+    },
+    checkTransaction(txHash, cid) {
+        let _this = this
+        web3.eth.getTransactionReceipt(txHash).then(
+            res => {
+                console.log('checking ... ');
+                if (!res) { return _this.timer = setTimeout(() => { _this.checkTransaction(txHash, cid); }, 2000); }
+                else {
+                    _this.loading = false
+                    _this.loadMetamaskPay = false
+                    clearTimeout(_this.timer)
+                    _this.finishTransaction = true
+                    // _this.sendSuccess(cid, 'Success')
+                }
+            },
+            err => { console.error(err); }
+        );
     },
     signFun(){
         let _this = this
@@ -571,25 +755,75 @@ export default {
     walletInfo() {
         let _this = this
         if(!_this.metaAddress){
+            _this.modelClose = false
             return false
         }
         web3.eth.net.getId().then(netId => {
             _this.$store.dispatch('setMetaNetworkId', netId)
             // console.log('network ID:', netId)
             switch (netId) {
-              case 80001:
-                  _this.center_fail = false
-                  _this.centerDialogVisible = false
-                  break;
-              default:
+              case 1:
+                  _this.network.name = 'mainnet';
+                  _this.network.unit = 'ETH';
                   _this.center_fail = true
                   _this.centerDialogVisible = true
                   return;
-            }
-
-            if(!_this.center_fail){
-              _this.payVisible = true
-            }
+              case 3:
+                  _this.network.name = 'ropsten';
+                  _this.network.unit = 'ETH';
+                  _this.center_fail = true
+                  _this.centerDialogVisible = true
+                  break;
+              case 4:
+                  _this.network.name = 'rinkeby';
+                  _this.network.unit = 'ETH';
+                  _this.center_fail = true
+                  _this.centerDialogVisible = true
+                  return;
+              case 5:
+                  _this.network.name = 'goerli';
+                  _this.network.unit = 'ETH';
+                  _this.center_fail = true
+                  _this.centerDialogVisible = true
+                  return;
+              case 42:
+                  _this.network.name = 'kovan';
+                  _this.network.unit = 'ETH';
+                  _this.center_fail = true
+                  _this.centerDialogVisible = true
+                  return;
+              case 56:
+                  _this.network.name = 'BSC';
+                  _this.network.unit = 'BNB';
+                  _this.center_fail = true
+                  _this.centerDialogVisible = true
+                  return;
+              case 97:
+                  _this.network.name = 'BSC';
+                  _this.network.unit = 'BNB';
+                  _this.center_fail = true
+                  _this.centerDialogVisible = true
+                  return;
+              case 999:
+                  _this.network.name = 'NBAI';
+                  _this.network.unit = 'NBAI';
+                  _this.center_fail = true
+                  _this.centerDialogVisible = true
+                  return;
+              case 80001:
+                  _this.network.name = 'polygon';
+                  _this.network.unit = 'MATIC';
+                  _this.center_fail = false
+                  _this.centerDialogVisible = false
+                  _this.modelClose = true
+                  return;
+              default:
+                  _this.network.name = 'Custom';
+                  _this.network.unit = '';
+                  _this.center_fail = true
+                  _this.centerDialogVisible = true
+                  return;
+              }
         });
     },
     getDialog(dialog, rows){
@@ -795,16 +1029,6 @@ export default {
         })
 
     },
-    byteChange(limit){
-      var size = "";
-      // 只转换成GB
-      if(limit <= 0){
-        return '-'
-      }else{
-        size = limit/( 1024 * 1024 * 1024)
-      }
-      return size;
-    },
     //查询
     search() {
       let _this = this;
@@ -885,6 +1109,7 @@ export default {
             _this.tableData = response.data.data;
             _this.tableData.map((item,s) => {
               item.payloadAct = false
+              item.file_size_byte = _this.byteChange(item.file_size)
               item.create_at = item.create_at
                 ? item.create_at.length < 13
                   ? moment(new Date(parseInt(item.create_at * 1000))).format(
@@ -938,6 +1163,17 @@ export default {
       //     _this.loading = false;
       //   });
     },
+    byteChange(limit){
+        var size = "";
+        // 只转换成GB
+        if(limit <= 0){
+            return '-'
+        }else{
+            size = limit/( 1000 * 1000 * 1000)  //or 1024
+        }
+        return size
+        // return Number(size).toFixed(3);
+    },
     unique(arr) {
       const res = new Map();
       return arr.filter((arr) => !res.has(arr.value) && res.set(arr.value, 1));
@@ -949,6 +1185,11 @@ export default {
     _this.$store.dispatch("setRouterMenu", 1);
     _this.$store.dispatch("setHeadertitle", _this.$t('navbar.deal'));
     // _this.stats()
+    if(!_this.metaAddress || _this.center_fail){
+        _this.centerDialogVisible = true
+        _this.modelClose = false
+    }
+    setTimeout(function(){_this.walletInfo()}, 500)
     _this.getData()
     document.onkeydown = function (e) {
       if (e.keyCode === 13) {
@@ -983,6 +1224,15 @@ export default {
   position: relative;
   padding: 0.25rem 0.2rem 0.5rem;
 
+        .el-alert /deep/{
+            position: absolute;
+            left: 0;
+            top: 0;
+            .el-alert__content{
+                display: flex;
+                align-items: center;
+            }
+        }
   .tabTaskStyle {
     display: flex;
     justify-content: flex-end;
@@ -1218,6 +1468,17 @@ export default {
         text-indent: 0;
       }
 
+      .upload_title{
+        width: 100%;
+        margin: 0 0 0.1rem;
+        text-align: left;
+        font-weight: 600;
+        line-height: 1.5;
+        text-indent: 0;
+        font-size: 0.13rem;
+        color: #222;
+      }
+
       .search {
         display: flex;
         align-items: center;
@@ -1353,13 +1614,16 @@ export default {
       border: 1px solid #e6e6e6;
       border-radius: 4px;
       overflow: hidden;
-      .statusStyle {
+      .statusStyle /deep/{
         display: inline-block;
         border: 1px solid;
         padding: 0.04rem 0.05rem;
         border-radius: 0.05rem;
         line-height: 1.5;
         // color: inherit !important;
+        span{
+          white-space: normal;
+        }
       }
 
       .el-table /deep/ {
@@ -2188,6 +2452,64 @@ export default {
           }
         }
       }
+    }
+    .completeDia{
+        text-align: center;
+        .el-dialog__header{
+        display: none;
+        }
+        img{
+            display: block;
+            max-width: 100px;
+            margin: auto;
+        }
+        h1{
+            margin: 0.32rem auto 0.1rem;
+            font-size: 0.32rem;
+            font-weight: 500;
+            line-height: 1.2;
+            color: #191919;
+            word-break: break-word;
+        }
+        h2{
+            margin: 0.1rem auto 0.1rem;
+            font-size: 19px;
+            font-weight: 600;
+            line-height: 1.2;
+            color: #191919;
+            word-break: break-word;
+            text-align: center;
+        }
+        h4{
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.2;
+            color: #191919;
+            word-break: break-word;
+            text-align: center;
+        }
+        h3, a{
+            font-size: 0.16rem;
+            font-weight: 500;
+            line-height: 1.2;
+            color: #191919;
+            word-break: break-word;
+        }
+        a{
+            text-decoration: underline;
+            color: #007bff;
+        }
+        a.a-close{
+            padding: 5px 45px;
+            background: #5c3cd3;
+            color: #fff;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 0.2rem auto 0;
+            display: block;
+            width: max-content;
+            text-decoration: unset;
+        }
     }
 
     .wrongNet{

@@ -179,7 +179,7 @@
                     name: '',
                     unit: ''
                 },
-                modelClose: true,
+                modelClose: false,
                 centerDialogVisible: false,
             };
         },
@@ -373,7 +373,6 @@
                 web3.eth.net.getId().then(netId => {
                     // console.log('network ID:', netId)
                     _this.$store.dispatch('setMetaNetworkId', netId)
-                    _this.modelClose = true
                     switch (netId) {
                         case 1:
                             _this.network.name = 'mainnet';
@@ -428,6 +427,7 @@
                             _this.network.unit = 'MATIC';
                             _this.center_fail = false
                             _this.centerDialogVisible = false
+                            _this.modelClose = true
                             return;
                         default:
                             _this.network.name = 'Custom';
@@ -445,7 +445,7 @@
                 _this.centerDialogVisible = true
                 _this.modelClose = false
             }
-            setTimeout(function(){_this.walletInfo()}, 100)
+            setTimeout(function(){_this.walletInfo()}, 500)
             _this.getData()
             this.$store.dispatch('setRouterMenu', 5)
             this.$store.dispatch('setHeadertitle', this.$t('navbar.BillingHistory'))

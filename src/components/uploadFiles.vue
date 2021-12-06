@@ -153,11 +153,20 @@
 
         <el-dialog title="" :visible.sync="paymentPopup" :width="width"
             custom-class="completeDia">
-            <img src="@/assets/images/error.png" />
+            <img src="@/assets/images/box-important.png" />
             <h2>This file has been uploaded.</h2>
             <h4>We currently only support uploading a file once. Please select another file to upload.</h4>
             <h4>Thank you for your comprehension.</h4>
             <a class="a-close" @click="paymentPopup=false">OK</a>
+        </el-dialog>
+
+        <el-dialog title="" :visible.sync="paymentPopup01" :width="width"
+            custom-class="completeDia">
+            <img src="@/assets/images/box-important.png" />
+            <h2>This file has been uploaded.</h2>
+            <h4>You don’t need to pay this file, it will add to your files. Because we currently only support uploading a file once.</h4>
+            <h4>Thank you for your comprehension.</h4>
+            <a class="a-close" @click="paymentPopup01=false">OK</a>
         </el-dialog>
     </div>
 </template>
@@ -243,6 +252,7 @@
                 txHash: '',
                 fileUploadVisible: false,
                 paymentPopup: false,
+                paymentPopup01: false,
                 percentIn: '',
                 loadMetamaskPay: false
             };
@@ -340,11 +350,7 @@
                                             i += 1
                                             if(i <= 1){
                                                 if(res.status == "success"){
-                                                    if(!res.data.need_pay){
-                                                        _this.paymentPopup = true
-                                                        _this.loading = false
-                                                        return false
-                                                    }else{
+                                                    if(res.data.need_pay == 0 || res.data.need_pay == 2 || res.data.need_pay == 4){
                                                         contract_erc20.methods.allowance(_this.gatewayContractAddress, _this.metaAddress).call()
                                                         .then(resultUSDC => {
                                                             console.log('allowance：'+ resultUSDC);
@@ -356,6 +362,15 @@
                                                             }
                                                             _this.contractSend(res.data.payload_cid)
                                                         })
+                                                    }else if(res.data.need_pay == 3){
+                                                        _this.paymentPopup01 = true
+                                                        _this.loading = false
+                                                        return false
+                                                    }else{
+                                                        // res.data.need_pay == 1 && 其他情况
+                                                        _this.paymentPopup = true
+                                                        _this.loading = false
+                                                        return false
                                                     }
                                                 }else{
                                                     _this.$message.error('Fail')

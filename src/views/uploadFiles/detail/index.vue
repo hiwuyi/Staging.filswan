@@ -58,7 +58,12 @@
                 <el-col :span="16">{{dealCont.deal.signature_type | NumFormat}}</el-col>
                 <el-col :span="8">Signature:</el-col>
                 <el-col :span="16">{{dealCont.deal.signature | NumFormat}}</el-col>
+                <el-col :span="24">
+                    <div class="lotupTitle">Retrieval From Filecoin Network： <img src="@/assets/images/copy.png" @click="copyTextToClipboard(copy_filename)" alt=""></div>
+                    <div class="lotupContent" @click="copyTextToClipboard(copy_filename)">{{copy_filename}}</div>
+                </el-col>
             </el-row>
+                   
             <div class="title">
                 DAO Signatures
                 <el-tooltip effect="dark" content="The signatures are used to unlock funds to provider." placement="top">
@@ -139,7 +144,8 @@ export default {
                 deal: {},
                 found: {}
             },
-            daoCont: []
+            daoCont: [],
+            copy_filename: ''
       };
     },
     computed: {},
@@ -220,6 +226,7 @@ export default {
                     }
 
                     _this.dealCont = json.data
+                    _this.copy_filename = 'lotus client retrieve --miner '+json.data.deal.provider+' '+json.data.found.payload_cid+' [absolute_output_path]';
 
                     if(!json.data.found){
                         _this.dealCont.found = {}
@@ -369,6 +376,36 @@ export default {
                     width: 100%;
                     font-size: 14px;
                 }
+                        .lotupTitle{
+                            display: flex;
+                            margin: 0 0 0.1rem;
+                            font-size: inherit;
+                            color: inherit;
+                            img {
+                                width: 0.16rem;
+                                margin: 0 0.08rem;
+                                cursor: pointer;
+                            }
+                            span{
+                                display: block;
+                                margin: 0 0 0 0.1rem;
+                                color: #696262;
+                            }
+                        }
+                        .lotupContent {
+                            margin: 0;
+                            border-radius: 5px;
+                            background-color: rgba(0, 0, 0, 0.04);
+                            color: #696262;
+                            line-height: 1.3;
+                            padding: 0.128rem 0.16rem;
+                            font-size: inherit;
+                            word-break: break-all;
+                            cursor: pointer;
+                            &:hover{
+                                color: #333;
+                            }
+                        }
             }
             .el-col:nth-child(2n+1){
                 color: #4b4b4b;
