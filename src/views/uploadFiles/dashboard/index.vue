@@ -1118,7 +1118,8 @@ export default {
             _this.gatewayContractAddress = _this.$root.SWAN_PAYMENT_CONTRACT_ADDRESS
             _this.usdcAddress = _this.$root.USDC_ADDRESS
             
-        console.log(_this.usdcAddress, ' ', _this.$root.USDC_ADDRESS)
+        console.log('USDC_ADDRESS:', _this.usdcAddress)
+        console.log('gatewayContractAddress:', _this.gatewayContractAddress)
             _this.getData()
             let stats_api = `${process.env.BASE_API}stats/storage`
             axios.get(stats_api, {
