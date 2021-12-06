@@ -87,7 +87,7 @@ new Vue({
         PAY_WITH_MULTIPLY_FACTOR: "1.5",
         RECIPIENT: "",
         SWAN_PAYMENT_CONTRACT_ADDRESS: "",
-        USDC_ADDRESS: "0xe11A86849d99F524cAC3E7A0Ec1241828e332C62"
+        USDC_ADDRESS: ""
       }
   }
 })

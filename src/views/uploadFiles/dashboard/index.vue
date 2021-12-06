@@ -733,6 +733,8 @@ export default {
             lockTime: 86400 * Number(_this.$root.LOCK_TIME), // one day
             recipient: _this.recipientAddress, //todo:
         }
+        console.log(lockObj)
+        console.log(_this.usdcAddress, ' ', _this.$root.USDC_ADDRESS)
         
         contract_instance.methods.lockTokenPayment(lockObj)
         .send(payObject)
