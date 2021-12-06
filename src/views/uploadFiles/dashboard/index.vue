@@ -469,7 +469,7 @@
             <h1>Completed!</h1>
             <h3>Your transaction has been submitted successfully. Check more detail in your transaction history.</h3>
             <a :href="'https://mumbai.polygonscan.com/tx/'+txHash" target="_blank">{{txHash}}</a>
-            <a class="a-close" @click="finishTransaction">Close</a>
+            <a class="a-close" @click="finishClose">Close</a>
         </el-dialog>
 
         <el-dialog title="" :visible.sync="failTransaction" :width="width"
@@ -795,6 +795,10 @@ export default {
         }).catch(error => {
             console.log(error)
         })
+    },
+    finishClose(){
+        this.finishTransaction = false
+        this.getData()
     },
     signFun(){
         let _this = this
