@@ -598,6 +598,8 @@
                 _this.loading = true
                 if(_this.$root.SWAN_PAYMENT_CONTRACT_ADDRESS){
                     _this.gatewayContractAddress = _this.$root.SWAN_PAYMENT_CONTRACT_ADDRESS
+                    _this.usdcAddress = _this.$root.USDC_ADDRESS
+                    _this.recipientAddress = _this.$root.RECIPIENT
                     let stats_api = `${process.env.BASE_API}stats/storage`
                     axios.get(stats_api, {
                         headers: {

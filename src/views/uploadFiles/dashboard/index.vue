@@ -1117,6 +1117,7 @@ export default {
         if(_this.$root.SWAN_PAYMENT_CONTRACT_ADDRESS){
             _this.gatewayContractAddress = _this.$root.SWAN_PAYMENT_CONTRACT_ADDRESS
             _this.usdcAddress = _this.$root.USDC_ADDRESS
+            _this.recipientAddress = _this.$root.RECIPIENT
             
         console.log('USDC_ADDRESS:', _this.usdcAddress)
         console.log('gatewayContractAddress:', _this.gatewayContractAddress)
