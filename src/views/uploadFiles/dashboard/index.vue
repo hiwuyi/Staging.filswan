@@ -733,8 +733,6 @@ export default {
             lockTime: 86400 * Number(_this.$root.LOCK_TIME), // one day
             recipient: _this.recipientAddress, //todo:
         }
-        console.log(lockObj)
-        console.log(_this.usdcAddress, ' ', _this.$root.USDC_ADDRESS)
         
         contract_instance.methods.lockTokenPayment(lockObj)
         .send(payObject)
@@ -769,11 +767,13 @@ export default {
                 console.log('checking ... ');
                 if (!res) { return _this.timer = setTimeout(() => { _this.checkTransaction(txHash, cid); }, 2000); }
                 else {
-                    _this.loading = false
-                    _this.loadMetamaskPay = false
                     clearTimeout(_this.timer)
-                    _this.finishTransaction = true
-                    // _this.sendSuccess(cid, 'Success')
+                    setTimeout(function(){
+                      _this.loading = false
+                      _this.loadMetamaskPay = false
+                      _this.finishTransaction = true
+                      // _this.sendSuccess(cid, 'Success')
+                    },2000)
                 }
             },
             err => { console.error(err); }
