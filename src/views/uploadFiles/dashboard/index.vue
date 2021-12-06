@@ -1116,6 +1116,10 @@ export default {
         let _this = this
         if(_this.$root.SWAN_PAYMENT_CONTRACT_ADDRESS){
             _this.gatewayContractAddress = _this.$root.SWAN_PAYMENT_CONTRACT_ADDRESS
+            _this.usdcAddress = _this.$root.USDC_ADDRESS
+            
+        console.log(_this.usdcAddress, ' ', _this.$root.USDC_ADDRESS)
+            _this.getData()
             let stats_api = `${process.env.BASE_API}stats/storage`
             axios.get(stats_api, {
                 headers: {
@@ -1258,7 +1262,6 @@ export default {
     }
     setTimeout(function(){_this.walletInfo()}, 500)
     _this.stats()
-    _this.getData()
     document.onkeydown = function (e) {
       if (e.keyCode === 13) {
       }
