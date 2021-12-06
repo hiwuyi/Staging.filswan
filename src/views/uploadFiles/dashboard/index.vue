@@ -632,6 +632,7 @@ export default {
                 if(res.data.data.tx_hash){
                     _this.$message.error('This file has been paid.')
                     _this.loading = false
+                    _this.getData()
                     return false
                 }else{
                   // 授权代币
