@@ -58,7 +58,7 @@
               <el-button type="danger" class="statusStyle" v-if="scope.row.status&&scope.row.status.toLowerCase()=='failed'">
                   {{scope.row.status}}
               </el-button>
-              <el-button type="warning" class="statusStyle" v-else-if="scope.row.status&&scope.row.status.toLowerCase()=='pending payment'">
+              <el-button type="warning" class="statusStyle" v-else-if="scope.row.status&&scope.row.status.toLowerCase()=='pending'">
                   {{scope.row.status}}
               </el-button>
               <el-button type="primary" class="statusStyle" v-else-if="scope.row.status&&scope.row.status.toLowerCase()=='processing'">
@@ -143,120 +143,120 @@
                       <div class="upload_form_right">
                           <div
                             class="statusStyle"
-                            v-if="scope.row.status == 'Created'"
+                            v-if="scope.row.deal_status == 'Created'"
                             :style="$status_color.Task_color('Created')">
                             {{ language == "en" ? "Created" : "已创建" }}
                           </div>
                           <div
                             class="statusStyle"
-                            v-else-if="scope.row.status == 'Assigned'"
+                            v-else-if="scope.row.deal_status == 'Assigned'"
                             :style="$status_color.Task_color('Assigned')"
                           >
                             {{ language == "en" ? "Assigned" : "已分配" }}
                           </div>
                           <div
                             class="statusStyle"
-                            v-else-if="scope.row.status == 'Accepted'"
+                            v-else-if="scope.row.deal_status == 'Accepted'"
                             :style="$status_color.Task_color('Accepted')"
                           >
                             {{ language == "en" ? "Accepted" : "已接受" }}
                           </div>
                           <div
                             class="statusStyle"
-                            v-else-if="scope.row.status == 'Completed'"
+                            v-else-if="scope.row.deal_status == 'Completed'"
                             :style="$status_color.Task_color('Completed')"
                           >
                             {{ language == "en" ? "Completed" : "已完成" }}
                           </div>
                           <div
                             class="statusStyle"
-                            v-else-if="scope.row.status == 'Failed'"
+                            v-else-if="scope.row.deal_status == 'Failed'"
                             :style="$status_color.Task_color('Failed')"
                           >
                             {{ language == "en" ? "Failed" : "已失败" }}
                           </div>
                           <div
                             class="statusStyle"
-                            v-else-if="scope.row.status == 'Cancelled'"
+                            v-else-if="scope.row.deal_status == 'Cancelled'"
                             :style="$status_color.Task_color('Cancelled')"
                           >
                             {{ language == "en" ? "Cancelled" : "已取消" }}
                           </div>
                           <div
                             class="statusStyle"
-                            v-else-if="scope.row.status == 'Closed'"
+                            v-else-if="scope.row.deal_status == 'Closed'"
                             :style="$status_color.Task_color('Closed')"
                           >
                             {{ language == "en" ? "Closed" : "已关闭" }}
                           </div>
                           <div
                             class="statusStyle"
-                            v-else-if="scope.row.status == 'Expired'"
+                            v-else-if="scope.row.deal_status == 'Expired'"
                             :style="$status_color.Task_color('Expired')"
                           >
                             {{ language == "en" ? "Expired" : "已过期" }}
                           </div>
                           <div
                               class="statusStyle"
-                              v-else-if="scope.row.status == 'ActionRequired'"
+                              v-else-if="scope.row.deal_status == 'ActionRequired'"
                               :style="$status_color.Task_color('ActionRequired')">
                               {{ language == 'en' ? 'ActionRequired' : '需要操作' }}
                           </div>
                           <div
                               class="statusStyle"
-                              v-else-if="scope.row.status == 'DealSent'"
+                              v-else-if="scope.row.deal_status == 'DealSent'"
                               :style="$status_color.Task_color('DealSent')">
                               {{ language == 'en' ? 'DealSent' : '交易已发送' }}
                           </div>
                           <div class="statusStyle"
-                                v-else-if="scope.row.status == 'FileImporting'"
+                                v-else-if="scope.row.deal_status == 'FileImporting'"
                                 :style="$status_color.Task_color('FileImporting')">
                               {{ language == 'en' ? 'FileImporting' : '文件导入中' }}
                           </div>
                           <div class="statusStyle"
-                                v-else-if="scope.row.status == 'FileImported'"
+                                v-else-if="scope.row.deal_status == 'FileImported'"
                                 :style="$status_color.Task_color('FileImported')">
                               {{ language == 'en' ? 'FileImported' : '文件已导入' }}
                           </div>
                           <div class="statusStyle"
-                                v-else-if="scope.row.status == 'ImportFailed'"
+                                v-else-if="scope.row.deal_status == 'ImportFailed'"
                                 :style="$status_color.Task_color('ImportFailed')">
                               {{ language == 'en' ? 'ImportFailed' : '导入失败' }}
                           </div>
                           <div class="statusStyle"
-                                v-else-if="scope.row.status == 'Downloading'"
+                                v-else-if="scope.row.deal_status == 'Downloading'"
                                 :style="$status_color.Task_color('Downloading')">
                               {{ language == 'en' ? 'Downloading' : '下载中' }}
                           </div>
                           <div class="statusStyle"
-                                v-else-if="scope.row.status == 'DownloadFailed'"
+                                v-else-if="scope.row.deal_status == 'DownloadFailed'"
                                 :style="$status_color.Task_color('DownloadFailed')">
                               {{ language == 'en' ? 'DownloadFailed' : '下载失败' }}
                           </div>
                           <div class="statusStyle"
-                                v-else-if="scope.row.status == 'DealActive'"
+                                v-else-if="scope.row.deal_status == 'DealActive'"
                                 :style="$status_color.Task_color('DealActive')">
                               {{ language == 'en' ? 'DealActive' : '有效交易' }}
                           </div>
                           <div class="statusStyle"
-                                v-else-if="scope.row.status == 'Waiting'"
+                                v-else-if="scope.row.deal_status == 'Waiting'"
                                 :style="$status_color.Task_color('Waiting')">
                               {{ language == 'en' ? 'Waiting' : '等待中' }}
                           </div>
                           <div class="statusStyle"
-                                v-else-if="scope.row.status == 'ReadyForImport'"
+                                v-else-if="scope.row.deal_status == 'ReadyForImport'"
                                 :style="$status_color.Task_color('ReadyForImport')">
                               {{ language == 'en' ? 'ReadyForImport' : '准备导入' }}
                           </div>
                           <div
                               class="statusStyle"
-                              v-else-if="scope.row.status == ''">
+                              v-else-if="scope.row.deal_status == ''">
                               -
                           </div>
                           <div
                               class="statusStyle"
                               v-else>
-                              {{ scope.row.status }}
+                              {{ scope.row.deal_status }}
                           </div>
                       </div>
                       <el-button slot="reference" v-if="scope.row.miner_fid" @click="minerIdLink(scope.row.miner_fid)">
@@ -404,7 +404,7 @@
             <template slot-scope="scope">
               <div class="hot-cold-box">
                 <el-button class="uploadBtn blue"
-                  v-if="tableData[scope.$index].status.toLowerCase()=='pending payment'"
+                  v-if="tableData[scope.$index].status.toLowerCase()=='pending'"
                   @click.stop="payClick(scope.row)">
                   PAY
                 </el-button>
@@ -441,13 +441,13 @@
       </div>
 
     </div>
+ <!-- @getPay="getPay" -->
+    <pay-tip v-if="payVisible" :payVisible="payVisible" 
+        :payRow="payRow" :cost="cost" :bilingPrice="biling_price"
+        @getDialog="getDialog"></pay-tip>
 
-    <pay-tip v-if="payVisible" :payVisible="payVisible"
-                :cid="payment.cid" :paymentAmount="payment.amount"
-                @getDialog="getDialog" @getPay="getPay"></pay-tip>
 
-
-    <el-dialog
+      <el-dialog
         :title="$t('transfer.connect_wallet')"
         :visible.sync="centerDialogVisible" :close-on-click-modal="modelClose" :show-close="modelClose" :close-on-press-escape="modelClose"
         :width="width"
@@ -481,12 +481,14 @@
             <a class="a-close" @click="failTransaction=false">Close</a>
         </el-dialog>
 
-    <el-dialog
-    title="Tips"
-    :visible.sync="wrongVisible" :show-close="false"
-    :width="width" custom-class="wrongNet">
-    <span>Please wait until the task is assigned to a storage provider.</span>
-    </el-dialog>
+        <el-dialog
+          title="Tips"
+          :visible.sync="wrongVisible" :show-close="false"
+          :width="width" custom-class="wrongNet">
+          <span>Please wait until the task is assigned to a storage provider.</span>
+        </el-dialog>
+
+      
     <!-- 回到顶部 -->
     <el-backtop target=".content-box" :bottom="40" :right="20"></el-backtop>
   </div>
@@ -560,7 +562,15 @@ export default {
       txHash: '',
       finishTransaction: false,
       failTransaction: false,
-      loadMetamaskPay: false
+      loadMetamaskPay: false,
+      payRow: {},
+      storage: 0,
+      biling_price: 0,
+      cost: {
+        storage_cost_low: 0,
+        storage_cost_average: 0,
+        storage_cost_high: 0,
+      }
     };
   },
   computed: {
@@ -618,16 +628,38 @@ export default {
     payClick(row){
       let _this = this
       console.log(row)
-      
+      _this.payRow = row
+      _this.payRow.storage_cost = row.file_size_byte * row.duration * _this.storage / 365
+      _this.payRow.amount_minprice = Number(_this.payRow.storage_cost * _this.biling_price).toFixed(9)
+      _this.cost.storage_cost_low = Number(_this.payRow.storage_cost * _this.biling_price * 2).toFixed(9)
+      _this.cost.storage_cost_average = Number(_this.payRow.storage_cost * _this.biling_price * 3).toFixed(9)
+      _this.cost.storage_cost_high = Number(_this.payRow.storage_cost * _this.biling_price * 5).toFixed(9)
+
+      _this.payVisible = true
+      return false
+    },
+    payStartClick(rowAmount){
+      let _this = this
       if(_this.metaAddress){
         _this.loading = true
         // 发起请求
-        axios.get(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/billing/deal/lockpayment/info?payload_cid=${row.payload_cid}`,{
+        axios.get(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/billing/deal/lockpayment/info?payload_cid=${_this.payRow.payload_cid}`,{
             headers: {
             'Authorization': "Bearer "+_this.$store.getters.accessToken
             },
         })
         .then((res) => {
+          // let res = {
+          //   data: {
+          //       "status": "success",
+          //       "code": "200",
+          //       "data": {
+          //           "locked_fee": "62147079000000000",
+          //           "payload_cid": "bafykbzacednzoz5mo6h622uhf3nfht6ednrfv5qbzk6h4cnwjhf7ns53oeyhm",
+          //           "tx_hash": ""
+          //       }
+          //   }
+          // }
             if (res.data.status == "success") {
                 if(res.data.data.tx_hash){
                     _this.$message.error('This file has been paid.')
@@ -641,22 +673,28 @@ export default {
                   // 查询剩余代币余额为：
                   contract_erc20.methods.balanceOf(_this.metaAddress).call()
                   .then(balance => {
-                      console.log('Available:', balance, res.data.data.locked_fee)
+                      let usdcAvailable = web3.utils.fromWei(balance, 'ether');
+                      console.log('Available:', usdcAvailable, rowAmount)
                       // 判断支付金额是否大于代币余额
-                      if(Number(res.data.data.locked_fee) > Number(balance)){
+                      if(Number(rowAmount) > Number(usdcAvailable)){
                           _this.$message.error('Insufficient balance')
+                          _this.sendSuccess(cid, 'Fail')
                           return false
                       }else{
                         contract_erc20.methods.allowance(_this.gatewayContractAddress, _this.metaAddress).call()
                         .then(resultUSDC => {
                             console.log('allowance：'+ resultUSDC);
-                            if(resultUSDC < res.data.data.locked_fee){
-                                contract_erc20.methods.approve(_this.gatewayContractAddress, res.data.data.locked_fee).send({from:  _this.metaAddress})
+                            if(resultUSDC < web3.utils.toWei(rowAmount, 'ether')){
+                                contract_erc20.methods.approve(_this.gatewayContractAddress, web3.utils.toWei(rowAmount, 'ether')).send({from:  _this.metaAddress})
                                 .then(receipt => {
                                     // console.log(receipt)
                                 })
+                                .catch(error => {
+                                  // console.log('errorerrorerror', error)
+                                  _this.sendSuccess(res.data.data.payload_cid, 'Pending ')
+                                })
                             }
-                            _this.contractSend(res.data.data.payload_cid, res.data.data.locked_fee)
+                            _this.contractSend(res.data.data.payload_cid, web3.utils.toWei(rowAmount, 'ether'))
                         })
                       }
                   })
@@ -690,7 +728,7 @@ export default {
         
         let lockObj = {
             id: cid,
-            minPayment: web3.utils.toWei('0.0000000001', 'ether'),
+            minPayment: web3.utils.toWei(String(_this.payRow.amount_minprice), 'ether'),
             amount: payAmount,
             lockTime: 86400 * Number(_this.$root.LOCK_TIME), // one day
             recipient: _this.recipientAddress, //todo:
@@ -719,7 +757,7 @@ export default {
             _this.loading = false
             _this.loadMetamaskPay = false
             _this.failTransaction = true
-            // _this.sendSuccess(cid, 'Fail')
+            _this.sendSuccess(cid, 'Fail')
         }); 
     },
     checkTransaction(txHash, cid) {
@@ -738,6 +776,25 @@ export default {
             },
             err => { console.error(err); }
         );
+    },
+    sendSuccess(cid, success) {
+        let _this = this 
+        
+        let lockParam = new FormData()
+        lockParam.append('payload_cid', cid)
+        lockParam.append('lock_payment_tx', _this.txHash)
+        lockParam.append('lock_payment_status', success)
+        lockParam.append('network_name', 'polygon')
+
+        axios.post(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/billing/deal/lockpayment/status`, lockParam,{
+            headers: {
+            'Authorization': "Bearer "+_this.$store.getters.accessToken
+            },
+        })
+        .then((res) => {
+        }).catch(error => {
+            console.log(error)
+        })
     },
     signFun(){
         let _this = this
@@ -829,7 +886,7 @@ export default {
     },
     getDialog(dialog, rows){
         this.payVisible = dialog
-        if(rows) this.getData()
+        if(rows) this.payStartClick(rows)
     },
     exChange(row, rowList) {
       var that = this
@@ -1050,36 +1107,39 @@ export default {
       this.getData();
     },
     stats(){
-      let _this = this
-      _this.loading = true;
-      let stats_api = `${process.env.BASE_API}stats/storage`
-      axios.get(stats_api, {
-          headers: {
-            'Authorization': "Bearer "+ _this.$store.getters.accessToken
-          },
-      }).then(res => {
-        if(res.data.data){
-          let cost = res.data.data.average_price_per_GB_per_year.split(" ")
-          if(cost[0]) _this.storage = cost[0]
-        }
-        _this.getData()
-      }).catch(error => {
-          console.log(error)
-          _this.getData()
-      })
-      
-      let billing_api = `${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/billing/price/filecoin`
-      axios.get(billing_api, {
-          headers: {
-            'Authorization': "Bearer "+ _this.$store.getters.accessToken
-          },
-      }).then(res => {
-        if(res.data.data){
-          _this.payment.biling_price = res.data.data
-        }
+        let _this = this
+        if(_this.$root.SWAN_PAYMENT_CONTRACT_ADDRESS){
+            _this.gatewayContractAddress = _this.$root.SWAN_PAYMENT_CONTRACT_ADDRESS
+            let stats_api = `${process.env.BASE_API}stats/storage`
+            axios.get(stats_api, {
+                headers: {
+                    'Authorization': "Bearer "+ _this.$store.getters.accessToken
+                },
+            }).then(res => {
+                if(res.data.data){
+                    let cost = res.data.data.average_price_per_GB_per_year.split(" ")
+                    if(cost[0]) _this.storage = cost[0]
+                }
+            }).catch(error => {
+                console.log(error)
+            })
+            
+            let billing_api = `${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/billing/price/filecoin`
+            axios.get(billing_api, {
+                headers: {
+                    'Authorization': "Bearer "+ _this.$store.getters.accessToken
+                },
+            }).then(res => {
+                if(res.data.data){
+                    _this.biling_price = res.data.data
+                }
 
-      })
-
+            })
+        }else {
+            setTimeout(function(){
+                _this.stats()
+            }, 1000)
+        }
     },
     getData() {
       let _this = this;
@@ -1185,17 +1245,21 @@ export default {
     document.getElementById("content-box").scrollTop = 0;
     _this.$store.dispatch("setRouterMenu", 1);
     _this.$store.dispatch("setHeadertitle", _this.$t('navbar.deal'));
-    // _this.stats()
     if(!_this.metaAddress || _this.center_fail){
         _this.centerDialogVisible = true
         _this.modelClose = false
     }
     setTimeout(function(){_this.walletInfo()}, 500)
+    _this.stats()
     _this.getData()
     document.onkeydown = function (e) {
       if (e.keyCode === 13) {
       }
     };
+
+        // _this.$root.SWAN_PAYMENT_CONTRACT_ADDRESS = "0xABeAAb124e6b52afFF504DB71bbF08D0A768D053"
+        // _this.gatewayContractAddress = '0xABeAAb124e6b52afFF504DB71bbF08D0A768D053'
+        // _this.recipientAddress = '0xABeAAb124e6b52afFF504DB71bbF08D0A768D053'
 
   },
   filters: {
@@ -1224,16 +1288,15 @@ export default {
 #dealManagement {
   position: relative;
   padding: 0.25rem 0.2rem 0.5rem;
-
-        .el-alert /deep/{
-            position: absolute;
-            left: 0;
-            top: 0;
-            .el-alert__content{
-                display: flex;
-                align-items: center;
-            }
-        }
+  .el-alert /deep/{
+      position: absolute;
+      left: 0;
+      top: 0;
+      .el-alert__content{
+          display: flex;
+          align-items: center;
+      }
+  }
   .tabTaskStyle {
     display: flex;
     justify-content: flex-end;
@@ -1419,37 +1482,8 @@ export default {
     }
   }
 
-  .readme_cont {
-    height: 4.1rem;
-    padding: 0.1rem 0.1rem;
-    background-color: #fff;
-    border-radius: 0.1rem;
-
-    #content {
-      width: calc(100% - 0.34rem);
-      height: calc(100% - 0.2rem);
-      padding: 0.1rem 0.17rem;
-      font-size: 0.1372rem;
-      overflow-y: auto;
-    }
-
-    #content::-webkit-scrollbar-track {
-      background: #fff;
-    }
-
-    #content::-webkit-scrollbar {
-      width: 6px;
-      background: #fff;
-    }
-
-    #content::-webkit-scrollbar-thumb {
-      background: #f2f2f2;
-      border-radius: 0.08rem;
-    }
-  }
-
   .form {
-    padding: 0.2rem 0.17rem 0.2rem;
+    padding: 0.1rem 0.17rem 0.2rem;
     background-color: #fff;
     border-radius: 0.1rem;
 
@@ -1471,7 +1505,7 @@ export default {
 
       .upload_title{
         width: 100%;
-        margin: 0 0 0.1rem;
+        margin: 0 0 0.05rem;
         text-align: left;
         font-weight: 600;
         line-height: 1.5;

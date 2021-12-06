@@ -1,80 +1,96 @@
 <template>
 
-    <el-dialog title="Pay" :modal="false" :width="widthDia" :visible.sync="payVisible"
+    <el-dialog title="" :modal="false" :width="widthDia" :visible.sync="payVisible"
         :before-close="closeDia">
         <div class="load" v-if="hashload" v-loading="hashload"></div>
-        <el-form :model="ruleForm" ref="ruleForm">
-            <el-form-item label="From" prop="from">
-                {{metaAddress}} 
-            </el-form-item>
-            <el-form-item label="Data CID" prop="cid" :class="{'err': ruleForm.cid_tip}">
-                <el-input v-model="ruleForm.cid" placeholder="" @blur="selectFun(2, ruleForm.cid)" @input="selectFun(2, ruleForm.cid)"></el-input>
-            </el-form-item>
-            <el-form-item label="Recommended Payment Amount" prop="amount" :class="{'err': ruleForm.amount_tip}">
-                <el-input v-model="ruleForm.amount" placeholder="" @blur="selectFun(1, ruleForm.amount)" @input="selectFun(1, ruleForm.amount)" onkeyup="value=value.replace(/^\D*(\d*(?:\.\d{0,18})?).*$/g, '$1')" style="width: calc(100% - 50px);"></el-input> USDC
-                <p style="font-size:12px">Available: {{usdcAvailable}} USDC</p>
-                <p v-if="ruleForm.amount_tip" style="font-size:12px">Amount should be a number</p>
-                <p v-if="ruleForm.amount_incorrect" style="font-size:12px">Insufficient balance</p>
-                <p v-if="ruleForm.amount_minprice_incorrect" style="font-size:12px">The minimum payment amount should be greater than {{ruleForm.amount_minprice}}</p>
-            </el-form-item>
-            <!-- <el-form-item label="Gas Limit" prop="gaslimit" :class="{'err': ruleForm.gaslimit_tip}">
-                <el-input v-model="ruleForm.gaslimit" @blur="selectFun(4, ruleForm.gaslimit)" @input="selectFun(4, ruleForm.gaslimit)" maxlength="7"></el-input>
-                <p v-if="ruleForm.gaslimit_tip" style="font-size:12px">Gas Limit Must Be Between 21000 UNITS And 4928871 UNITS.</p>
-            </el-form-item>
-            <el-form-item label="Gas Price" prop="gasprice" :class="{'err': ruleForm.gasprice_tip}">
-                <el-input v-model="ruleForm.gasprice" @blur="selectFun(5, ruleForm.gasprice)" @input="selectFun(5, ruleForm.gasprice)" maxlength="5"></el-input>
-            </el-form-item> -->
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-            <el-button 
-                :disabled="!ruleForm.amount ||!ruleForm.cid || ruleForm.gaslimit_tip || ruleForm.gasprice_tip || ruleForm.amount_tip || 
-                            ruleForm.cid_tip || ruleForm.amount_incorrect || ruleForm.amount_minprice_incorrect"
-                type="primary" @click="submitForm('ruleForm')">pay</el-button>
+        <div class="upload_form">
+            <el-form :model="payRow" status-icon ref="ruleForm" class="demo-ruleForm">
+                <el-form-item prop="fileList" :label="$t('uploadFile.upload')">
+                    <div>
+                        <p>{{payRow.file_name}}</p>
+                        <p style="display: flex;align-items: center;">
+                            <svg t="1637031488880" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3310" style="width: 0.13rem;height: 0.13rem;margin: 0 7px 0 5px;"><path d="M512 1024a512 512 0 1 1 512-512 32 32 0 0 1-32 32h-448v448a32 32 0 0 1-32 32zM512 64a448 448 0 0 0-32 896V512a32 32 0 0 1 32-32h448A448 448 0 0 0 512 64z" fill="#999999" p-id="3311"></path><path d="M858.88 976a32 32 0 0 1-32-32V640a32 32 0 0 1 32-32 32 32 0 0 1 32 32v304a32 32 0 0 1-32 32z" fill="#999999" p-id="3312"></path><path d="M757.12 773.12a34.56 34.56 0 0 1-22.4-8.96 32 32 0 0 1 0-45.44l101.12-101.12a32 32 0 0 1 45.44 0 30.72 30.72 0 0 1 0 44.8l-101.12 101.76a34.56 34.56 0 0 1-23.04 8.96z" fill="#999999" p-id="3313"></path><path d="M960 773.12a32 32 0 0 1-22.4-8.96l-101.76-101.76a32 32 0 0 1 0-44.8 32 32 0 0 1 45.44 0l101.12 101.12a32 32 0 0 1-22.4 54.4z" fill="#999999" p-id="3314"></path></svg>
+                            {{payRow.file_size | sizeChange}}
+                        </p>
+                    </div>
+                </el-form-item>
+                <el-form-item prop="duration">
+                    <template slot="label">
+                        Duration 
+                        
+                        <el-tooltip effect="dark" content="Duration refers to the terms in which you want the file to be stored on the Filecoin network." placement="top">
+                            <img src="@/assets/images/info.png"/>
+                        </el-tooltip>
+                    </template>
+                    {{payRow.duration}} days
+                </el-form-item>
+                <el-form-item prop="storage_cost">
+                    <template slot="label">
+                        Estimated Storage Cost 
+                        
+                        <el-tooltip effect="dark" content="The estimated storage cost is calculated according to your file size, the duration you set, and the average provider price." placement="top">
+                            <img src="@/assets/images/info.png"/>
+                        </el-tooltip>
+                    </template>
+                    <span  style="color:#ce2f21">{{payRow.storage_cost | NumStorage}} FIL</span> 
+                </el-form-item>
+            </el-form>
+            <div class="upload_plan">
+                <div class="title" :style="{'color': pay.lock_plan_tip? '#f67e7e' : '#000'}">
+                    Select Lock Funds Plan
+                    <el-tooltip effect="dark" content="The more funds locked, the sooner your file will be stored on the Filecoin network. The overpaid funds will be returned automatically after the deal is on chain." placement="top">
+                        <img src="@/assets/images/info.png"/>
+                    </el-tooltip>
+                </div>
+                <div class="desc">The latest exchange rate of FIL to USDC is {{bilingPrice}}.</div>
+                <div class="upload_plan_radio">
+                    <el-radio-group v-model="pay.lock_plan" @change="agreeChange">
+                        <el-radio label="1" border>
+                            <div class="title">Low</div>
+                            <div class="cont">
+                                {{cost.storage_cost_low}} <br/> USDC
+                            </div>
+                        </el-radio>
+                        <el-radio label="2" border>
+                            <div class="title">Average</div>
+                            <div class="cont">
+                                {{cost.storage_cost_average}} <br/> USDC
+                            </div>
+                        </el-radio>
+                        <el-radio label="3" border>
+                            <div class="title">High</div>
+                            <div class="cont">
+                                {{cost.storage_cost_high}} <br/> USDC
+                            </div>
+                        </el-radio>
+                    </el-radio-group>
+                </div>
+            </div>
+            <div class="upload_bot">
+                <el-button type="primary" @click="payCom">{{$t('deal.Submit')}}</el-button>
+            </div>
         </div>
     </el-dialog>
 
 </template>
 
 <script>
-    import NCWeb3 from "@/utils/web3";
-    import first_contract_json from "@/utils/swanPayment.json";
-    import erc20_contract_json from "@/utils/ERC20.json";
-    import axios from 'axios'
-    let contract_erc20
-
     export default {
         name: "pay_tip",
         data() {
             return {
-                ruleForm: {
-                    amount: '',
-                    amount_balance: 0,
-                    amount_tip: false,
-                    amount_incorrect: false,
-                    amount_minprice_incorrect: false,
-                    amount_minprice: '0',
-                    gaslimit: this.$root.PAY_GAS_LIMIT,
-                    gaslimit_tip: false,
-                    gasprice: '1',
-                    gasprice_tip: false,
-                    cid: this.cid,
-                    cid_tip: false
-                },
-                widthDia: document.body.clientWidth<600?'90%':'500px',
+                widthDia: document.body.clientWidth<=600?'95%':'600px',
                 inputAmount: /^\d+(?:\.\d{0,8})?[\s]{0,5}/,
                 inputG: /^[1-9]\d*$/,
                 hashload: false,
-                timer: '',
-                usdcAvailable: '',
-
-                gatewayContractAddress: this.$root.SWAN_PAYMENT_CONTRACT_ADDRESS,
-                recipientAddress: this.$root.RECIPIENT,
-                usdcAddress: this.$root.USDC_ADDRESS,
-                one: '1000000000000000000',
-                oneThousand: "1000000000000000000000"
+                pay: {
+                    amount: '',
+                    lock_plan_tip: false,
+                    lock_plan: ''
+                }
             };
         },
-        props: ['payVisible', 'cid', 'paymentAmount'],
+        props: ['payVisible', 'payRow', 'cost', 'bilingPrice'],
         components: {},
         computed: {
             metaAddress() {
@@ -82,158 +98,55 @@
             }
         },
         methods: {
-            submitForm(formName) {
-                let _this = this
-                _this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        if(_this.metaAddress){
-                            web3.eth.getBalance(_this.metaAddress).then(balance => {
-                                // _this.ruleForm.amount_balance = web3.utils.fromWei(balance, 'ether')
-                                let amount_balance = 0.000000000000000001 * balance
-                                // if(Number(_this.ruleForm.amount.trim()) > Number(amount_balance)){
-                                //     _this.ruleForm.amount_incorrect = true
-                                //     return false
-                                // }else 
-                                if(Number(_this.ruleForm.amount.trim()) <= _this.ruleForm.amount_minprice){
-                                    _this.ruleForm.amount_minprice_incorrect = true
-                                    return false
-                                }
-
-                                // 查询剩余授权余额为：
-                                contract_erc20.methods.allowance(_this.gatewayContractAddress, _this.metaAddress).call()
-                                .then(resultUSDC => {
-                                    console.log('allowance：'+ resultUSDC);
-                                    if(resultUSDC < web3.utils.toWei(_this.ruleForm.amount, 'ether')){
-                                        contract_erc20.methods.approve(_this.gatewayContractAddress, web3.utils.toWei(_this.ruleForm.amount, 'ether')).send({from:  _this.metaAddress})
-                                        .then(receipt => {
-                                            // console.log(receipt)
-                                        })
-                                    }
-                                    _this.contractSend()
-                                })
-
-                            });
-                        }
-                    } else {
-                        console.log('error submit!!');
-                        return false;
-                    }
-                });
-            },
-            contractSend(){
-                let _this = this
-                // 合约转账
-                let contract_instance = new web3.eth.Contract( first_contract_json );
-                contract_instance.options.address = _this.gatewayContractAddress
-                // console.log( 'contract_instance合约实例：', contract_instance );
-                // console.log(contract_instance.options.jsonInterface)
-
-                let payObject = {
-                    from: _this.metaAddress,
-                    gas: web3.utils.toHex(_this.ruleForm.gaslimit),
-                    // gasPrice: web3.utils.toHex(web3.utils.toWei(_this.ruleForm.gasprice + '', 'gwei')),
-                    // value: web3.utils.toHex(web3.utils.toWei(_this.ruleForm.amount, 'ether')),
-                };
-                
-                let lockObj = {
-                    id: _this.ruleForm.cid,
-                    minPayment: web3.utils.toWei(_this.ruleForm.amount_minprice, 'ether'),
-                    amount: web3.utils.toWei(_this.ruleForm.amount, 'ether'),
-                    lockTime: 86400 * Number(_this.$root.LOCK_TIME), // one day
-                    recipient: _this.recipientAddress, //todo:
-                }
-                
-                contract_instance.methods.lockTokenPayment(lockObj)
-                .send(payObject)
-                .on('transactionHash', function(hash){
-                    // console.log('hash console:', hash);
-                    _this.hashload = true
-                })
-                .on('confirmation', function(confirmationNumber, receipt){
-                    // console.log('confirmationNumber console:', confirmationNumber, receipt);
-                })
-                .on('receipt', function(receipt){
-                    // receipt example
-                    // console.log('receipt console:', receipt);
-                    _this.checkTransaction(receipt.transactionHash)
-
-                })
-                .on('error', function(error){
-                    // console.log('error console:', error)
-                    console.error
-                    _this.hashload = false
-                    _this.$message.error('Fail');
-                }); 
-            },
-            checkTransaction(txHash) {
-                let _this = this
-                web3.eth.getTransactionReceipt(txHash).then(
-                    res => {
-                        console.log('checking ... ');
-                        if (!res) { return _this.timer = setTimeout(() => { _this.checkTransaction(txHash); }, 2000); }
-                        else {
-                            _this.hashload = false
-                            clearTimeout(_this.timer)
-                            _this.closeDia()
-                            _this.$message({
-                                message: 'Success',
-                                type: 'success'
-                            });
-                            _this.$emit('getPay', true, _this.cid)
-                        }
-                    },
-                    err => { console.error(err); }
-                );
-            },
             closeDia() {
-                this.$emit('getDialog', false, false)
+                this.$emit('getDialog', false)
             },
-            selectFun(index, val){
-                if(index == 1){
-                    this.ruleForm.amount_tip = !this.inputAmount.test(val) ? true : false
-                    this.ruleForm.amount_incorrect = false
-                    this.ruleForm.amount_minprice_incorrect = val > this.ruleForm.amount_minprice ? false : true
-                }else if(index == 2){
-                    this.ruleForm.cid_tip = !val ? true : false
-                }else if(index == 4){
-                    this.ruleForm.gaslimit_tip = !this.inputG.test(val) || val < 21000 || val > 4928871 ? true : false
-                }else if(index == 5){
-                    this.ruleForm.gasprice_tip = !this.inputG.test(val) ? true : false
+            agreeChange(val){
+                this.pay.lock_plan_tip = false
+                switch (val) {
+                    case '1':
+                        this.pay.amount = this.cost.storage_cost_low
+                        break;
+                    case '2':
+                        this.pay.amount = this.cost.storage_cost_average
+                        break;
+                    case '3':
+                        this.pay.amount = this.cost.storage_cost_high
+                        break;
+                    default:
+                        this.pay.amount = this.cost.storage_cost_low
+                        return;
                 }
             },
-            init(){
-                // 授权代币
-                let _this = this
-                contract_erc20 = new web3.eth.Contract( erc20_contract_json );
-                contract_erc20.options.address = _this.usdcAddress
-                // 查询剩余代币余额为：
-                contract_erc20.methods.balanceOf(_this.metaAddress).call()
-                .then(resultUSDC => {
-                    _this.usdcAvailable = web3.utils.fromWei(resultUSDC, 'ether');
-                })
-                
-                if(_this.paymentAmount){
-                    let number = Number(_this.paymentAmount).toFixed(18)
-                    _this.ruleForm.amount = String(number)
-                    _this.ruleForm.amount_minprice = String(number)
+            payCom() {
+                if(!this.pay.lock_plan){
+                    this.pay.lock_plan_tip = true
+                    return false
+                }else{
+                    this.$emit('getDialog', false, this.pay.amount)
                 }
             }
         },
         mounted() {
-            // web3.eth.getCode(this.gatewayContractAddress).then(res => {
-            //     this.ruleForm.gaslimit = res.toLowerCase() == '0x' ? '21000' : '9999999'
-            // })
-            this.init()
+            
         },
         watch: {
-            'payVisible': function() {
-                if(this.payVisible){
-                    this.ruleForm.amount = ''
-                    this.ruleForm.currencyValue = '3'
-                }
-            }
+            
         },
-        filters: {}
+        filters: {
+            NumStorage(value) {
+                if (!value) return "-";
+                return value.toFixed(8);
+            },
+            sizeChange(bytes){
+                if (!bytes) return "-";
+                if (bytes === 0) return '0 B';
+                var k = 1000, // or 1024
+                    sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+                    i = Math.floor(Math.log(bytes) / Math.log(k));
+                return (bytes / Math.pow(k, i)).toPrecision(3) + ' ' + sizes[i];
+            }
+        }
     };
 </script>
 
@@ -258,7 +171,7 @@
         }
     }
     .el-dialog{
-        background: #fafafa;
+        background: #fff;
         box-shadow: 0 0 13px rgba(128,128,128,0.8);
         .el-dialog__header{
             padding: 0.2rem 0.2rem 0.1rem;
@@ -271,52 +184,270 @@
         }
         .el-dialog__body{
             padding: 0.2rem 0.2rem 0;
-            .el-form{
-                .err{
-                    .el-form-item__label{
-                    color: red;
-                    }
-                    .el-input{
-                    .el-input__inner{
-                        border-color: red;
-                    }
-                    }
-                }
-                .el-form-item{
-                    display: flex;
-                    align-items: center;
-                    flex-wrap: wrap;
-                    margin-bottom: 0.05rem;
-                    .el-form-item__label{
-                        width: 100%;
-                        color: #000000;
-                        line-height: 2.5;
-                        word-break: break-word;
-                        text-align: left;
-                    }
-                    .el-form-item__content{
-                        width: 100%;
+            .upload_form{
+                // display: flex;
+                // align-items: baseline;
+                width: 100%; 
+                margin: auto; 
+                justify-content: flex-start;
+                .el-form{
+                    width: 96%;
+                    margin: 0 2%;
+                    .el-form-item{
                         display: flex;
-                        flex-wrap: wrap;
-                        overflow: hidden;
-                        font-size: 0.14rem;
-                        .el-input{
-                            margin: 0 5px 0 0;
-                            .el-input__inner{
+                        align-items: center;
+                        width: auto;
+                        margin: 0.15rem auto;
+                        .el-form-item__label{
+                            display: flex;
+                            justify-content: flex-end;
+                            align-items: center;
+                            width: 47%;
+                            padding: 0 3% 0 0;
+                            // max-width: 2rem;
+                            line-height: 1.5;
+                            text-align: left;
+                            font-size: 0.1372rem;
+                            white-space: normal;
+                            color: #000;
+                            font-weight: 500;
+                            text-shadow: 0 0 black;
+                            text-align: right;
+                            img{
+                                width: 0.16rem;
+                                height: 0.16rem;
+                                margin: 0 0 0 5px;
+                                cursor: pointer;
+                            }
+                            &::before{
+                                display: none;
+                            }
+                        }
+                        .el-form-item__content{
+                            display: flex;
+                            align-items: center;
+                            font-size: 0.1372rem;
+                            white-space: normal;
+                            word-break: break-word;
+                            line-height: 1.5;
+                            color: #666;
+                            h4{
                                 width: 100%;
+                                font-size: 0.1372rem;
+                                font-weight: 500;
+                                line-height: 1.7;
+                            }
+                            h5{
+                                width: 90%;
+                                margin-top: 5px;
+                                font-size: 0.11rem;
+                                font-weight: 500;
+                                line-height: 1.2;
+                                color: #737373;
+                            }
+                            .el-tag, .el-button--small{
+                                margin: 0 5px 5px 0;
+                            }
+                            .el-input{
+                                width: auto;
+                                .el-input__inner{
+                                    height: 0.32rem;
+                                    font-size: 0.1372rem;
+                                    line-height: 0.32rem;
+                                }
+                                .el-input__suffix{
+                                    display: none;
+                                }
+                            }
+                            .el-form-item__error {
+                                padding-top: 0;
+                                margin: 0 0.1rem;
+                                position: relative;
+                                float: right;
+                            }
+                            .el-textarea{
+                                width: 90% !important;
+                            }
+                            .upload-demo{
+                                display:flex;
+                                align-items: center;
+                                flex-wrap: wrap;
+                                .el-upload-list__item:first-child{
+                                    margin-top: 0;
+                                }
+                                .el-upload--text{
+                                    float: left;
+                                    width: auto;
+                                    height: auto;
+                                    text-align: left;
+                                    border: 0;
+                                    .el-button--primary{
+                                        height: 0.32rem;
+                                        padding: 0 0.2rem;
+                                        margin: 0 5px 0 0;
+                                        line-height: 0.32rem;
+                                        background-color:transparent;
+                                        border: 1px solid #2c4c9e;
+                                        border-radius: 0.08rem;
+                                        color: #2c4c9e;
+                                        font-size: 0.1372rem;
+                                    }
+                                }
+                                .el-upload-list{
+                                    width: 100%;
+                                    float: none;
+                                    clear: both;
+                                }
+                            }
+                            .el-upload__tip{
+                                // float: left;
+                                height: 100%;
+                                align-items: center;
+                                display: flex;
+                                margin: 0 0 0 0.1rem;
+                                color: #737373;
+                                line-height: 1;
+                                font-size: 0.12rem;
+                            }
+                            .el-radio{
+                                .el-radio__inner{
+                                    border-color: #d9d9d9;
+                                    background-color: #d9d9d9;
+                                }
+                            }
+                            .el-radio.is-checked{
+                                .el-radio__inner{
+                                    border-color: #0b318f;
+                                    background-color: #0b318f;
+                                }
+                                .el-radio__inner::after{
+                                    width: 6px;
+                                    height: 6px;
+                                }
                             }
                         }
                     }
-                    p{
-                        width: 100%;
-                        margin: 0.05rem 0;
-                        font-size: 0.16rem;
-                        font-weight: 100;
-                        color: red;
-                        white-space: normal;
-                        word-break: break-all;
-                        line-height: 1;
+                }
+            }
+            .upload_plan{
+                width: 100%;
+                margin: auto; 
+                justify-content: flex-start;
+                .title{
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 0.3rem 0 0;
+                    line-height: 1.5;
+                    text-align: center;
+                    font-size: 0.15rem;
+                    white-space: normal;
+                    color: #000;
+                    font-weight: 500;
+                    text-shadow: 0 0 black;
+                    text-indent: 0;
+                    img{
+                        width: 0.16rem;
+                        height: 0.16rem;
+                        margin: 0 0 0 5px;
+                        cursor: pointer;
                     }
+                }
+                .desc{
+                    margin: 0 0 0.1rem;
+                    line-height: 1.5;
+                    text-align: center;
+                    font-size: 0.13rem;
+                    white-space: normal;
+                    color: #999;
+                    font-weight: normal;
+                }
+                .upload_plan_radio{
+                    .el-radio-group{
+                        width: 100%;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        .el-radio{
+                            min-width: 25%;
+                            height: auto;
+                            padding: 0 0.1rem 0.15rem;
+                            margin: auto;
+                            // line-height:30px;
+                            .el-radio__input{
+                                display: none;
+                            }
+                            .el-radio__label{
+                                .title{
+                                    margin: 0 0 0.05rem;
+                                    font-size: 0.13rem;
+                                }
+                                .cont{
+                                    font-size: 0.145rem;
+                                    font-weight: bold;
+                                    line-height: 1.5;
+                                    text-align: center;
+                                }
+                            }
+                        }
+                        .el-radio:nth-child(3n+1){
+                            .el-radio__label{
+                                .cont{
+                                    color: #56c4a6;
+                                }
+                            }
+                        }
+                        .el-radio:nth-child(3n+2){
+                            .el-radio__label{
+                                .cont{
+                                    color: #4a92d3;
+                                }
+                            }
+                        }
+                        .el-radio:nth-child(3n+3){
+                            .el-radio__label{
+                                .cont{
+                                    color: #922b26;
+                                }
+                            }
+                        }
+                        .is-checked{
+                            position: relative;
+                            &:after {
+                                content: "";
+                                display: block;
+                                height: 25px;
+                                width: 25px;
+                                background-image: url(../assets/images/plan.png);
+                                background-size: 100%;
+                                position: absolute;
+                                right:0;
+                                top:0;
+                            }
+                        }
+                        .el-radio:hover{
+                            background-color: rgba(64,158,255,0.1);
+                        }
+
+                    }
+
+                }
+            }
+            .upload_bot{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+                margin: 0.25rem auto 0.15rem;
+                .el-button{
+                    height: 0.35rem;
+                    padding: 0 0.4rem;
+                    margin-left: 0;
+                    background-color: #0b318f;
+                    line-height: 0.35rem;
+                    font-size: 0.1372rem;
+                    color: #fff;
+                    border: 0;
                 }
             }
         }

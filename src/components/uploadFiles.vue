@@ -318,6 +318,7 @@
                                 // 判断支付金额是否大于代币余额
                                 if(_this.ruleForm.amount > _this.usdcAvailable ){
                                     _this.$message.error('Insufficient balance')
+                                    _this.sendSuccess(cid, 'Fail')
                                     return false
                                 }
 
@@ -358,6 +359,10 @@
                                                                 contract_erc20.methods.approve(_this.gatewayContractAddress, web3.utils.toWei(_this.ruleForm.amount, 'ether')).send({from:  _this.metaAddress})
                                                                 .then(receipt => {
                                                                     // console.log(receipt)
+                                                                })
+                                                                .catch(error => {
+                                                                    // console.log('errorerrorerror', error)
+                                                                    _this.sendSuccess(res.data.payload_cid, 'Pending')
                                                                 })
                                                             }
                                                             _this.contractSend(res.data.payload_cid)
@@ -514,7 +519,7 @@
                             _this.loadMetamaskPay = false
                             clearTimeout(_this.timer)
                             _this.finishTransaction = true
-                            _this.sendSuccess(cid, 'Success')
+                            // _this.sendSuccess(cid, 'Success')
                         }
                     },
                     err => { console.error(err); }
