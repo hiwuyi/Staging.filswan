@@ -128,7 +128,8 @@ export default {
         "password": _this.formData.mail.password,
         "repeatPassword": _this.formData.mail.passwordComfirm,
         "email": _this.linkData.email,
-        "emailCode": _this.linkData.checkCode
+        "emailCode": _this.linkData.checkCode,
+        source: 2
       }
       _this.mailresetLoad = true
       myAjax

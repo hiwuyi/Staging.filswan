@@ -179,6 +179,7 @@ export default {
       if(_this.verify.mailPassword.tipsbox == false && _this.verify.mailPasswordVerify.tipsbox == false){
         _this.regLoad = true
         // 注册
+        _this.formData.mail.source = 2
         myAjax
           .emailRegister(_this.formData.mail)
           .then(response => {

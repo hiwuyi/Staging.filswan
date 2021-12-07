@@ -152,7 +152,8 @@ export default {
       }
       _this.forgetLoad = true
       var checkData = {
-        email: _this.formData.mail.email
+        email: _this.formData.mail.email,
+        source: 2 
       }
       myAjax
         .sendForgetPasswordUrl(checkData)

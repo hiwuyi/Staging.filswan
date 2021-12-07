@@ -69,7 +69,8 @@ export default {
 
       _this.mailforgetLoad = true
       var checkData = {
-        email: _this.mail
+        email: _this.mail,
+        source: 2
       }
 
       myAjax

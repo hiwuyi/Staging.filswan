@@ -59,7 +59,8 @@ export default {
       }
       _this.activationLoad = true
       var newData = {
-        email: _this.mail
+        email: _this.mail,
+        source: 2
       }
       myAjax
         .sendActivateLink(newData)
