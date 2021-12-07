@@ -173,7 +173,7 @@ export default {
                   if(response.data.status == 'success'){
                     _this.$store.dispatch("FedLogOut").then(() => {
                         _this.$router.push("/supplierAllBack");
-                        _this.loginShow = localStorage.getItem("oaxLoginAccessToken") ? false : true
+                        _this.loginShow = localStorage.getItem("mcpLoginAccessToken") ? false : true
                     });
                   }else{
                       console.log(response.data.message);
@@ -193,7 +193,7 @@ export default {
                 
                     _this.$store.dispatch("FedLogOut").then(() => {
                         _this.$router.push("/login");
-                        _this.loginShow = localStorage.getItem("oaxLoginAccessToken") ? false : true
+                        _this.loginShow = localStorage.getItem("mcpLoginAccessToken") ? false : true
                     });
             });
 

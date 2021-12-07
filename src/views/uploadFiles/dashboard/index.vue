@@ -1114,14 +1114,12 @@ export default {
     },
     stats(){
         let _this = this
+        _this.loading = true
         if(_this.$root.SWAN_PAYMENT_CONTRACT_ADDRESS){
             _this.gatewayContractAddress = _this.$root.SWAN_PAYMENT_CONTRACT_ADDRESS
             _this.usdcAddress = _this.$root.USDC_ADDRESS
             _this.recipientAddress = _this.$root.RECIPIENT
             
-        console.log('USDC_ADDRESS:', _this.usdcAddress)
-        console.log('gatewayContractAddress:', _this.gatewayContractAddress)
-            _this.getData()
             let stats_api = `${process.env.BASE_API}stats/storage`
             axios.get(stats_api, {
                 headers: {
@@ -1145,8 +1143,10 @@ export default {
                 if(res.data.data){
                     _this.biling_price = res.data.data
                 }
-
+            }).catch(error => {
+                console.log(error)
             })
+            _this.getData()
         }else {
             setTimeout(function(){
                 _this.stats()
@@ -1194,11 +1194,13 @@ export default {
                     )
                 : "-";
             });
-
+            setTimeout(function(){
+              _this.loading = false
+            }, 2000)
           } else {
             _this.$message.error(response.message);
+            _this.loading = false
           }
-          _this.loading = false
       }).catch(error => {
           console.log(error)
           _this.loading = false;

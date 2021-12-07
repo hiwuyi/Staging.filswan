@@ -6,10 +6,10 @@ const user = {
     enable: sessionStorage.getItem('login') || 0,
     name: sessionStorage.oaxLoginName || '',
     showName: sessionStorage.oaxShowName || '',
-    email: localStorage.getItem('oaxLoginEmail') || '',
+    email: localStorage.getItem('mcpLoginEmail') || '',
     phone: sessionStorage.oaxLoginPhone || '',
     userId: sessionStorage.oaxLoginUserId || '',
-    accessToken: localStorage.getItem('oaxLoginAccessToken') || '',
+    accessToken: localStorage.getItem('mcpLoginAccessToken') || '',
     checkStatus: sessionStorage.oaxLoginCheckStatus || '',
     level: sessionStorage.oaxLoginLevel || '',
     registerType: sessionStorage.oaxLoginRegisterTypee || '',
@@ -85,10 +85,10 @@ const user = {
             _this.loginLoad = false
             if (response.success === true) {
               sessionStorage.oaxLoginUserId = response.data.userId
-              sessionStorage.oaxLoginAccessToken = response.data.accessToken
+              sessionStorage.mcpLoginAccessToken = response.data.accessToken
               sessionStorage.oaxLoginName = response.data.name
               sessionStorage.oaxShowName = response.data.showName
-              sessionStorage.oaxLoginEmail = response.data.email
+              sessionStorage.mcpLoginEmail = response.data.email
               sessionStorage.oaxLoginPhone = response.data.phone
               sessionStorage.oaxLoginCheckStatus = response.data.checkStatus
               sessionStorage.oaxLoginLevel = response.data.level
@@ -141,10 +141,10 @@ const user = {
         logout(state.enable)
           .then(() => {
             sessionStorage.removeItem('oaxLoginUserId')
-            sessionStorage.removeItem('oaxLoginAccessToken')
+            sessionStorage.removeItem('mcpLoginAccessToken')
             sessionStorage.removeItem('oaxLoginName')
             sessionStorage.removeItem('oaxShowName')
-            sessionStorage.removeItem('oaxLoginEmail')
+            sessionStorage.removeItem('mcpLoginEmail')
             sessionStorage.removeItem('oaxLoginPhone')
             sessionStorage.removeItem('oaxLoginCheckStatus')
             sessionStorage.removeItem('oaxLoginLevel')
@@ -176,10 +176,10 @@ const user = {
       // var _this = this
       return new Promise(resolve => {
         sessionStorage.removeItem('oaxLoginUserId')
-        localStorage.removeItem('oaxLoginAccessToken')
+        localStorage.removeItem('mcpLoginAccessToken')
         sessionStorage.removeItem('oaxLoginName')
         sessionStorage.removeItem('oaxShowName')
-        localStorage.removeItem('oaxLoginEmail')
+        localStorage.removeItem('mcpLoginEmail')
         localStorage.removeItem('oaxLoginAvater')
         sessionStorage.removeItem('oaxLoginPhone')
         sessionStorage.removeItem('oaxLoginCheckStatus')

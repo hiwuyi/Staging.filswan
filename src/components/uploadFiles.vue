@@ -610,7 +610,9 @@
                             let cost = res.data.data.average_price_per_GB_per_year.split(" ")
                             if(cost[0]) _this.storage = cost[0]
                         }
-                        _this.loading = false
+                        setTimeout(function(){
+                            _this.loading = false
+                        }, 2000)
                     }).catch(error => {
                         console.log(error)
                         _this.loading = false
@@ -625,7 +627,8 @@
                         if(res.data.data){
                             _this.biling_price = res.data.data
                         }
-
+                    }).catch(error => {
+                        console.log(error)
                     })
                 }else {
                     setTimeout(function(){

@@ -207,8 +207,8 @@ import bus from '@/components/bus';
           .then(response => {
             // console.log(response)
             if (response.status == "success") {
-              localStorage.setItem('oaxLoginAccessToken',response.auth_token)
-              localStorage.setItem('oaxLoginEmail',_this.formData.mail.email)
+              localStorage.setItem('mcpLoginAccessToken',response.auth_token)
+              localStorage.setItem('mcpLoginEmail',_this.formData.mail.email)
               sessionStorage.oaxLoginpassword = _this.formData.mail.password
               _this.$store.state.user.accessToken = response.auth_token
               _this.$store.state.user.email = _this.formData.mail.email
@@ -235,7 +235,7 @@ import bus from '@/components/bus';
       // 是否已登录
       isLogin() {
         var _this = this
-        if (localStorage.getItem("oaxLoginAccessToken")) {
+        if (localStorage.getItem("mcpLoginAccessToken")) {
           _this.$router.push({ path: '/dashboard' })
         }
       },

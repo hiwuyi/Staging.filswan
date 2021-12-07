@@ -87,15 +87,15 @@ export default {
             message: 2,
             langNew: '',
             userShow: false,
-            loginShow: localStorage.getItem("oaxLoginAccessToken") ? false : true,
+            loginShow: localStorage.getItem("mcpLoginAccessToken") ? false : true,
             bodyWidth: document.body.clientWidth<1024?true:false,
             langShow: true,
             loadIndexing: false,
             // 控制是否在路由栈中清理当前页面的数据
             replaceData:null,
             tools: '1',
-            tabOaxLogin: localStorage.getItem("oaxLoginAccessToken"),
-            tabOaxNew: localStorage.getItem("oaxLoginAccessToken"),
+            tabOaxLogin: localStorage.getItem("mcpLoginAccessToken"),
+            tabOaxNew: localStorage.getItem("mcpLoginAccessToken"),
             priceAccound: 0,
             network: {
                 name: '',
@@ -145,7 +145,7 @@ export default {
         'tabOaxLogin': function() {
             let _this = this;
             let name = _this.$route.name;
-            if(!localStorage.getItem("oaxLoginAccessToken")){
+            if(!localStorage.getItem("mcpLoginAccessToken")){
                 if(name == 'my_files' || name == 'my_files_detail' || name == 'upload_file' || name == 'Search_file' ||
                    name == 'billing' || name == 'settings'){
                     _this.$store.dispatch("FedLogOut").then(() => {
@@ -153,7 +153,7 @@ export default {
                     });
                 }
             }
-            if(!_this.email && localStorage.getItem("oaxLoginAccessToken")){
+            if(!_this.email && localStorage.getItem("mcpLoginAccessToken")){
                 location. reload()
             }
         },
@@ -201,7 +201,7 @@ export default {
                   if(response.data.status == 'success'){
                     _this.$store.dispatch("FedLogOut").then(() => {
                         _this.$router.push("/supplierAllBack");
-                        _this.loginShow = localStorage.getItem("oaxLoginAccessToken") ? false : true
+                        _this.loginShow = localStorage.getItem("mcpLoginAccessToken") ? false : true
                     });
                   }else{
                     console.log(response.data.message);
@@ -211,7 +211,7 @@ export default {
                 console.log(error.config);
                 _this.$store.dispatch("FedLogOut").then(() => {
                     _this.$router.push("/login");
-                    _this.loginShow = localStorage.getItem("oaxLoginAccessToken") ? false : true
+                    _this.loginShow = localStorage.getItem("mcpLoginAccessToken") ? false : true
                 });
             });
 
@@ -220,7 +220,7 @@ export default {
             //   if (res.status == "success") {
             //     _this.$store.dispatch("FedLogOut").then(() => {
             //         _this.$router.push("/supplierAllBack");
-            //         _this.loginShow = localStorage.getItem("oaxLoginAccessToken") ? false : true
+            //         _this.loginShow = localStorage.getItem("mcpLoginAccessToken") ? false : true
             //     });
             //   } else {
             //       _this.$message.error(res.message)
