@@ -400,7 +400,7 @@
               {{ scope.row.create_at }}
             </template>
           </el-table-column>
-          <el-table-column prop="active" width="120" label="ACTION">
+          <el-table-column prop="active" width="120" label="PAYMENT">
             <template slot-scope="scope">
               <div class="hot-cold-box">
                 <el-button class="uploadBtn blue"
@@ -438,8 +438,14 @@
             />
           </div>
         </div>
-      </div>
 
+        <div class="loadMetamaskPay" v-if="loadMetamaskPay">
+            <div>
+                <div class="el-loading-spinner"><svg viewBox="25 25 50 50" class="circular"><circle cx="50" cy="50" r="20" fill="none" class="path"></circle></svg><!----></div>
+                <p>Please wait until the process of locking funds completed.</p>
+            </div>
+        </div>
+      </div>
     </div>
  <!-- @getPay="getPay" -->
     <pay-tip v-if="payVisible" :payVisible="payVisible" 
@@ -464,6 +470,7 @@
         </el-dialog>
 
         <el-dialog title="" :visible.sync="finishTransaction" :width="width"
+            :before-close="finishClose"
             custom-class="completeDia">
             <img src="@/assets/images/alert-icon.png" />
             <h1>Completed!</h1>
@@ -608,7 +615,7 @@ export default {
   },
   methods: {
     minerIdLink(id){
-      window.open(`https://calibration.filscout.com/zh/miner/${id}`)
+      window.open(`https://calibration.filscout.com/en/miner/${id}`)
     },
     toDetail(id, cid){
       this.$router.push({name: 'my_files_detail', params: {id: id, cid: cid}})
@@ -739,7 +746,7 @@ export default {
         .on('transactionHash', function(hash){
             // console.log('hash console:', hash);
             _this.loadMetamaskPay = true
-            // _this.loading = false
+            _this.loading = false
             _this.txHash = hash
         })
         .on('confirmation', function(confirmationNumber, receipt){
@@ -1271,10 +1278,6 @@ export default {
       }
     };
 
-        // _this.$root.SWAN_PAYMENT_CONTRACT_ADDRESS = "0xABeAAb124e6b52afFF504DB71bbF08D0A768D053"
-        // _this.gatewayContractAddress = '0xABeAAb124e6b52afFF504DB71bbF08D0A768D053'
-        // _this.recipientAddress = '0xABeAAb124e6b52afFF504DB71bbF08D0A768D053'
-
   },
   filters: {
     NumFormat(value) {
@@ -1497,10 +1500,33 @@ export default {
   }
 
   .form {
+    position: relative;
     padding: 0.1rem 0.17rem 0.2rem;
     background-color: #fff;
     border-radius: 0.1rem;
 
+    .loadMetamaskPay{
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 99;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(255,255,255,.9);
+        .el-loading-spinner{
+            top: 0;
+            position: relative;
+            margin: 0 0 0.2rem;
+        }
+        p{
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+        }
+    }
     .form_top {
       display: flex;
       align-items: center;
@@ -1659,6 +1685,7 @@ export default {
     }
 
     .form_table {
+      position: relative;
       margin: 0.1rem 0 0.1rem;
       border: 1px solid #e6e6e6;
       border-radius: 4px;

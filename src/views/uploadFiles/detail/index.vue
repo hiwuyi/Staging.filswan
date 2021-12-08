@@ -30,6 +30,13 @@
         </div>
         <div class="upload">
             <el-row>
+                <el-col :span="8">File Name:</el-col>
+                <el-col :span="16">{{dealCont.deal.file_name | NumFormat}}</el-col>
+                <el-col :span="8">IPFS Download:</el-col>
+                <el-col :span="16">
+                    <a :href="dealCont.deal.ipfs_url" target="_blank" v-if="dealCont.deal.ipfs_url" class="linkTo">{{dealCont.deal.ipfs_url}}</a>
+                    <span v-else>-</span>
+                </el-col>
                 <el-col :span="8">Network:</el-col>
                 <el-col :span="16">{{dealCont.deal.network_name | NumFormat}}</el-col>
                 <el-col :span="8">Locked funds:</el-col>
@@ -226,7 +233,12 @@ export default {
                     }
 
                     _this.dealCont = json.data
-                    _this.copy_filename = 'lotus client retrieve --miner '+json.data.deal.provider+' '+json.data.found.payload_cid+' [absolute_output_path]';
+
+                    if(json.data.deal.provider && json.data.found.payload_cid){
+                        _this.copy_filename = 'lotus client retrieve --miner '+json.data.deal.provider+' '+json.data.found.payload_cid+' [absolute_output_path]';
+                    }else{
+                        _this.copy_filename = 'lotus client retrieve [absolute_output_path/'+_this.dealCont.deal.file_name+']';
+                    }
 
                     if(!json.data.found){
                         _this.dealCont.found = {}
@@ -376,6 +388,10 @@ export default {
                     width: 100%;
                     font-size: 14px;
                 }
+                .linkTo{
+                    color: #4326ab;
+                    text-decoration: underline;
+                }
                         .lotupTitle{
                             display: flex;
                             margin: 0 0 0.1rem;
@@ -458,7 +474,7 @@ export default {
                             font-size: 0.1372rem;
                             word-break: break-word;
                             color: #000;
-                            text-align: center;
+                            text-align: left;
                             line-height: 0.25rem;
                             overflow: hidden;
                             text-overflow: ellipsis;
