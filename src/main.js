@@ -33,7 +33,7 @@ Vue.prototype.$status_color = status_color;
 Vue.config.productionTip = false
 Vue.prototype.data_api=process.env.NODE_ENV === 'production' ? process.env.BASE_API : '/api/';
 
-import './utils/web3.1.min.js';
+import './utils/web3.min.js';
 import Web3 from 'web3'
 Vue.prototype.Web3 = Web3
 

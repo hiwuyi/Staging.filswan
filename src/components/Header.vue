@@ -343,7 +343,7 @@ export default {
                     _this.network.text = false
                     return;
                 case 80001:
-                    _this.network.name = 'polygon';
+                    _this.network.name = 'mumbai';
                     _this.network.unit = 'MATIC';
                     _this.network.text = true
                     return;
@@ -365,7 +365,8 @@ export default {
                     // console.log('account header:', accounts[0]);  //Once the account is switched, it will be executed here
                 }
             });
-            ethereum.on("networkChanged", function(accounts) {
+            // networkChanged
+            ethereum.on("chainChanged", function(accounts) {
                 _this.walletInfo()
             });
         },

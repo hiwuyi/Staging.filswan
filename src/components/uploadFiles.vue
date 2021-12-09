@@ -515,11 +515,13 @@
                         console.log('checking ... ');
                         if (!res) { return _this.timer = setTimeout(() => { _this.checkTransaction(txHash, cid); }, 2000); }
                         else {
-                            _this.loading = false
-                            _this.loadMetamaskPay = false
-                            clearTimeout(_this.timer)
-                            _this.finishTransaction = true
-                            // _this.sendSuccess(cid, 'Success')
+                            setTimeout(function(){
+                                _this.loading = false
+                                _this.loadMetamaskPay = false
+                                clearTimeout(_this.timer)
+                                _this.finishTransaction = true
+                                // _this.sendSuccess(cid, 'Success')
+                            }, 2000)
                         }
                     },
                     err => { console.error(err); }
@@ -638,7 +640,7 @@
             },
             signFun(){
                 let _this = this
-                if(!_this.metaAddress){
+                if(!_this.metaAddress || _this.metaAddress == 'undefined'){
                     NCWeb3.Init(addr=>{
                         _this.$nextTick(() => {
                             _this.$store.dispatch('setMetaAddress', addr)
@@ -652,7 +654,7 @@
             },
             walletInfo() {
                 let _this = this
-                if(!_this.metaAddress){
+                if(!_this.metaAddress || _this.metaAddress == 'undefined'){
                     _this.modelClose = false
                     return false
                 }
@@ -710,7 +712,7 @@
                         _this.centerDialogVisible = true
                         return;
                     case 80001:
-                        _this.network.name = 'polygon';
+                        _this.network.name = 'mumbai';
                         _this.network.unit = 'MATIC';
                         _this.center_fail = false
                         _this.centerDialogVisible = false
@@ -776,7 +778,7 @@
         mounted() {
             let _this = this
             that = _this
-            if(!_this.metaAddress || _this.center_fail){
+            if(!_this.metaAddress || _this.metaAddress == 'undefined' || _this.center_fail){
                 _this.centerDialogVisible = true
                 _this.modelClose = false
             }

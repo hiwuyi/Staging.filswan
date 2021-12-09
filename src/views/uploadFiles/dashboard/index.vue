@@ -403,7 +403,7 @@
           <el-table-column prop="active" width="120" label="PAYMENT">
             <template slot-scope="scope">
               <div class="hot-cold-box">
-                <el-button class="uploadBtn blue"
+                <el-button class="uploadBtn blue" type="primary"
                   v-if="tableData[scope.$index].status.toLowerCase()=='pending'"
                   @click.stop="payClick(scope.row)">
                   PAY
@@ -438,13 +438,13 @@
             />
           </div>
         </div>
+      </div>
 
-        <div class="loadMetamaskPay" v-if="loadMetamaskPay">
-            <div>
-                <div class="el-loading-spinner"><svg viewBox="25 25 50 50" class="circular"><circle cx="50" cy="50" r="20" fill="none" class="path"></circle></svg><!----></div>
-                <p>Please wait until the process of locking funds completed.</p>
-            </div>
-        </div>
+      <div class="loadMetamaskPay" v-if="loadMetamaskPay">
+          <div>
+              <div class="el-loading-spinner"><svg viewBox="25 25 50 50" class="circular"><circle cx="50" cy="50" r="20" fill="none" class="path"></circle></svg><!----></div>
+              <p>Please wait until the process of locking funds completed.</p>
+          </div>
       </div>
     </div>
  <!-- @getPay="getPay" -->
@@ -634,7 +634,7 @@ export default {
     },
     payClick(row){
       let _this = this
-      console.log(row)
+      // console.log(row)
       _this.payRow = row
       _this.payRow.storage_cost = row.file_size_byte * row.duration * _this.storage / 365
       _this.payRow.amount_minprice = Number(_this.payRow.storage_cost * _this.biling_price).toFixed(9)
@@ -656,17 +656,6 @@ export default {
             },
         })
         .then((res) => {
-          // let res = {
-          //   data: {
-          //       "status": "success",
-          //       "code": "200",
-          //       "data": {
-          //           "locked_fee": "62147079000000000",
-          //           "payload_cid": "bafykbzacednzoz5mo6h622uhf3nfht6ednrfv5qbzk6h4cnwjhf7ns53oeyhm",
-          //           "tx_hash": ""
-          //       }
-          //   }
-          // }
             if (res.data.status == "success") {
                 if(res.data.data.tx_hash){
                     _this.$message.error('This file has been paid.')
@@ -825,7 +814,7 @@ export default {
     },
     walletInfo() {
         let _this = this
-        if(!_this.metaAddress){
+        if(!_this.metaAddress || _this.metaAddress == 'undefined'){
             _this.modelClose = false
             return false
         }
@@ -882,7 +871,7 @@ export default {
                   _this.centerDialogVisible = true
                   return;
               case 80001:
-                  _this.network.name = 'polygon';
+                  _this.network.name = 'mumbai';
                   _this.network.unit = 'MATIC';
                   _this.center_fail = false
                   _this.centerDialogVisible = false
@@ -1267,7 +1256,7 @@ export default {
     document.getElementById("content-box").scrollTop = 0;
     _this.$store.dispatch("setRouterMenu", 1);
     _this.$store.dispatch("setHeadertitle", _this.$t('navbar.deal'));
-    if(!_this.metaAddress || _this.center_fail){
+    if(!_this.metaAddress || _this.metaAddress == 'undefined' || _this.center_fail){
         _this.centerDialogVisible = true
         _this.modelClose = false
     }
@@ -2077,6 +2066,11 @@ export default {
                         width: 0.17rem;
                         margin-top: 0.03rem;
                     }
+                }
+                .el-button--primary {
+                    color: #FFF !important;
+                    background-color: #409EFF !important;
+                    border-color: #409EFF !important;
                 }
                 .el-button:hover{
                     img{

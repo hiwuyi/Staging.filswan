@@ -66,8 +66,15 @@
                 <el-col :span="8">Signature:</el-col>
                 <el-col :span="16">{{dealCont.deal.signature | NumFormat}}</el-col>
                 <el-col :span="24">
-                    <div class="lotupTitle">Retrieval From Filecoin Network： <img src="@/assets/images/copy.png" @click="copyTextToClipboard(copy_filename)" alt=""></div>
-                    <div class="lotupContent" @click="copyTextToClipboard(copy_filename)">{{copy_filename}}</div>
+                    <div class="lotupTitle">
+                        Retrieval From Filecoin Network
+                        <el-tooltip effect="dark" content="The deal will not be available for retrieval until it is Published on the blockchain. The ‘output-file’ in the end of this command is the name of the file that you'd like to save, you can also add a path to this variable." placement="top">
+                            <img src="@/assets/images/info.png"/>
+                        </el-tooltip>：
+                         
+                        <img class="img" src="@/assets/images/copy.png" @click="copyTextToClipboard(copy_filename)" alt="">
+                    </div>
+                    <div class="lotupContent" :class="{'color': !dealCont.deal.provider && !dealCont.found.payload_cid}" @click="copyTextToClipboard(copy_filename)">{{copy_filename}}</div>
                 </el-col>
             </el-row>
                    
@@ -235,9 +242,9 @@ export default {
                     _this.dealCont = json.data
 
                     if(json.data.deal.provider && json.data.found.payload_cid){
-                        _this.copy_filename = 'lotus client retrieve --miner '+json.data.deal.provider+' '+json.data.found.payload_cid+' [absolute_output_path]';
+                        _this.copy_filename = 'lotus client retrieve --miner '+json.data.deal.provider+' '+json.data.found.payload_cid+' output-file';
                     }else{
-                        _this.copy_filename = 'lotus client retrieve [absolute_output_path/'+_this.dealCont.deal.file_name+']';
+                        _this.copy_filename = "It's not available yet.";
                     }
 
                     if(!json.data.found){
@@ -394,13 +401,20 @@ export default {
                 }
                         .lotupTitle{
                             display: flex;
+                            align-items: center;
                             margin: 0 0 0.1rem;
                             font-size: inherit;
                             color: inherit;
-                            img {
+                            
+                            img { 
                                 width: 0.16rem;
-                                margin: 0 0.08rem;
+                                height: 0.16rem;
+                                margin: 0 0 0 3px;
                                 cursor: pointer;
+                                @media screen and (max-width:600px){
+                                    width: 14px;
+                                    height: 14px;
+                                }
                             }
                             span{
                                 display: block;
@@ -420,6 +434,13 @@ export default {
                             cursor: pointer;
                             &:hover{
                                 color: #333;
+                            }
+                        }
+                        .color{
+                            color: red;
+                            cursor: text;
+                            &:hover{
+                                color: red;
                             }
                         }
             }

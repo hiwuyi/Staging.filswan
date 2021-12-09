@@ -40,45 +40,6 @@ export default new Router({
             // meta: { title: '自述文件' },
             children: [
                 {
-                  path: '/my_files',
-                  component: my_files,
-                  children: [
-                    {
-                      path: '/',
-                      redirect: '/my_files/dashboard'
-                    },
-                    {
-                      path: '/my_files/dashboard',
-                      name: 'my_files',
-                      component: my_files_index
-                    },
-                    {
-                      path: '/my_files/detail/:id/:cid',
-                      name: 'my_files_detail',
-                      component: my_files_detail
-                    },
-                  ],
-                  beforeEnter: (to, from, next) => {
-                      
-                      //这里判断用户是否登录，验证本地存储是否有token
-                      if (!localStorage.getItem('mcpLoginAccessToken')) { // 判断当前的token是否存在
-                          next({
-                              path: '/login',
-                              query: { redirect: to.fullPath }
-                          })
-                      } else {
-                          next()
-                      }
-
-                  },
-                  meta: {
-                      metaInfo: {
-                          title: 'My Files',
-                          description: "Swan is a marketplace for Filecoin miners, clients post/bidding deals the online."
-                      }
-                  }
-                },
-                {
                     path: '/upload_file',
                     name: 'upload_file',
                     component: upload_file,
@@ -103,6 +64,54 @@ export default new Router({
                     }
                 },
                 {
+                    path: '/my_files',
+                    name: 'my_files',
+                    component: my_files_index,
+                    beforeEnter: (to, from, next) => {
+                        
+                        //这里判断用户是否登录，验证本地存储是否有token
+                        if (!localStorage.getItem('mcpLoginAccessToken')) { // 判断当前的token是否存在
+                            next({
+                                path: '/login',
+                                query: { redirect: to.fullPath }
+                            })
+                        } else {
+                            next()
+                        }
+
+                    },
+                    meta: {
+                        metaInfo: {
+                            title: 'My Files',
+                            description: "Swan is a marketplace for Filecoin miners, clients post/bidding deals the online."
+                        }
+                    }
+                },
+                {
+                    path: '/my_files/detail/:id/:cid',
+                    name: 'my_files_detail',
+                    component: my_files_detail,
+                    beforeEnter: (to, from, next) => {
+                        
+                        //这里判断用户是否登录，验证本地存储是否有token
+                        if (!localStorage.getItem('mcpLoginAccessToken')) { // 判断当前的token是否存在
+                            next({
+                                path: '/login',
+                                query: { redirect: to.fullPath }
+                            })
+                        } else {
+                            next()
+                        }
+
+                    },
+                    meta: {
+                        metaInfo: {
+                            title: 'My Files',
+                            description: "Swan is a marketplace for Filecoin miners, clients post/bidding deals the online."
+                        }
+                    }
+                },
+                {
                     path: '/Search_file',
                     name: 'Search_file',
                     component: Search_file,
@@ -121,7 +130,7 @@ export default new Router({
                     },
                     meta: {
                         metaInfo: {
-                            title: 'Upload File',
+                            title: 'Search File',
                             description: "Swan is a marketplace for Filecoin miners, clients post/bidding deals the online."
                         }
                     }
@@ -169,7 +178,7 @@ export default new Router({
                     },
                     meta: {
                         metaInfo: {
-                            title: 'My Account',
+                            title: 'Settings',
                             description: "Swan is a marketplace for Filecoin miners, clients post/bidding deals the online."
                         }
                     }
