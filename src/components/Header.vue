@@ -291,68 +291,89 @@ export default {
         },
         walletInfo() {
             let _this = this
-            if(!_this.addrChild){
+            if(!_this.addrChild || _this.addrChild == 'undefined'){
                 return false
             }
-            web3.eth.getBalance(_this.addrChild).then(balance => {
+
+            ethereum
+            .request(
+                {
+                    "jsonrpc":"2.0",
+                    "method":"eth_getBalance",
+                    "params":[_this.addrChild, "latest"],
+                    "id":19999
+                }
+            )
+            .then((balance) => {
                 let balanceAll = web3.utils.fromWei(balance, 'ether')
                 _this.priceAccound = Number(balanceAll).toFixed(4)
+            })
+            .catch((error) => {
+                console.error(`Error fetching getBalance: ${error.code}: ${error.message}`);
             });
-            web3.eth.net.getId().then(netId => {
+
+            ethereum
+            .request({ method: 'eth_chainId' })
+            .then((chainId) => {
+                let netId = parseInt(chainId, 16)
                 // console.log('network ID:', netId)
+                // console.log(`decimal number: ${parseInt(chainId, 16)}`);
                 _this.$store.dispatch('setMetaNetworkId', netId)
                 switch (netId) {
-                case 1:
-                    _this.network.name = 'mainnet';
-                    _this.network.unit = 'ETH';
-                    _this.network.text = false
-                    return;
-                case 3:
-                    _this.network.name = 'ropsten';
-                    _this.network.unit = 'ETH';
-                    _this.network.text = false
-                    break;
-                case 4:
-                    _this.network.name = 'rinkeby';
-                    _this.network.unit = 'ETH';
-                    _this.network.text = false
-                    return;
-                case 5:
-                    _this.network.name = 'goerli';
-                    _this.network.unit = 'ETH';
-                    _this.network.text = false
-                    return;
-                case 42:
-                    _this.network.name = 'kovan';
-                    _this.network.unit = 'ETH';
-                    _this.network.text = false
-                    return;
-                case 56:
-                    _this.network.name = 'BSC';
-                    _this.network.unit = 'BNB';
-                    _this.network.text = false
-                    return;
-                case 97:
-                    _this.network.name = 'BSC';
-                    _this.network.unit = 'BNB';
-                    _this.network.text = false
-                    return;
-                case 999:
-                    _this.network.name = 'NBAI';
-                    _this.network.unit = 'NBAI';
-                    _this.network.text = false
-                    return;
-                case 80001:
-                    _this.network.name = 'mumbai';
-                    _this.network.unit = 'MATIC';
-                    _this.network.text = true
-                    return;
-                default:
-                    _this.network.name = '';
-                    _this.network.unit = '';
-                    _this.network.text = false
-                    return;
+                    case 1:
+                        _this.network.name = 'mainnet';
+                        _this.network.unit = 'ETH';
+                        _this.network.text = false
+                        return;
+                    case 3:
+                        _this.network.name = 'ropsten';
+                        _this.network.unit = 'ETH';
+                        _this.network.text = false
+                        break;
+                    case 4:
+                        _this.network.name = 'rinkeby';
+                        _this.network.unit = 'ETH';
+                        _this.network.text = false
+                        return;
+                    case 5:
+                        _this.network.name = 'goerli';
+                        _this.network.unit = 'ETH';
+                        _this.network.text = false
+                        return;
+                    case 42:
+                        _this.network.name = 'kovan';
+                        _this.network.unit = 'ETH';
+                        _this.network.text = false
+                        return;
+                    case 56:
+                        _this.network.name = 'BSC';
+                        _this.network.unit = 'BNB';
+                        _this.network.text = false
+                        return;
+                    case 97:
+                        _this.network.name = 'BSC';
+                        _this.network.unit = 'BNB';
+                        _this.network.text = false
+                        return;
+                    case 999:
+                        _this.network.name = 'NBAI';
+                        _this.network.unit = 'NBAI';
+                        _this.network.text = false
+                        return;
+                    case 80001:
+                        _this.network.name = 'mumbai';
+                        _this.network.unit = 'MATIC';
+                        _this.network.text = true
+                        return;
+                    default:
+                        _this.network.name = '';
+                        _this.network.unit = '';
+                        _this.network.text = false
+                        return;
                 }
+            })
+            .catch((error) => {
+                console.error(`Error fetching chainId: ${error.code}: ${error.message}`);
             });
         },
         fn() {
@@ -368,6 +389,10 @@ export default {
             // networkChanged
             ethereum.on("chainChanged", function(accounts) {
                 _this.walletInfo()
+            });
+            // 监听metamask网络断开
+            ethereum.on('disconnect', (code, reason) => {
+                // console.log(`Ethereum Provider connection closed: ${reason}. Code: ${code}`);
             });
         },
         signOutFun() {

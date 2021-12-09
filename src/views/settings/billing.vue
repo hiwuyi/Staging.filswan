@@ -371,8 +371,12 @@
                     _this.modelClose = false
                     return false
                 }
-                web3.eth.net.getId().then(netId => {
+                ethereum
+                .request({ method: 'eth_chainId' })
+                .then((chainId) => {
+                    let netId = parseInt(chainId, 16)
                     // console.log('network ID:', netId)
+                    // console.log(`decimal number: ${parseInt(chainId, 16)}`);
                     _this.$store.dispatch('setMetaNetworkId', netId)
                     switch (netId) {
                         case 1:
@@ -437,6 +441,9 @@
                             _this.centerDialogVisible = true
                             return;
                     }
+                })
+                .catch((error) => {
+                    console.error(`Error fetching chainId: ${error.code}: ${error.message}`);
                 });
             }
         },
