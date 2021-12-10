@@ -1,28 +1,48 @@
-# Staging
-
-> A Vue.js project
+# Multi-Chain Payment
 
 **Technology stack：** vue2 + vuex + vue-router + webpack + sass + element-ui + web3
 
-## Build Setup
+## Installation dependency
 
-``` bash
-# install dependencies
-npm install
+Run `npm install` to generate component.
 
-# serve with hot reload at localhost:8080
-npm run dev
+## Development server
 
-# build for production with minification
-npm run build
+Run `npm run dev` for a dev server. Navigate to `http://localhost:8080/`. The app will automatically reload if you change any of the source files.
 
-# build for production and view the bundle analyzer report
-npm run build --report
-```
+## Build
 
-## Node version
+Run `npm run build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
-v10.18.0
+## Reference documents
+
+- [vue](https://vuejs.bootcss.com/v2/guide/)：Vue is a progressive framework for building user interfaces.
+
+- [vuex](https://vuex.vuejs.org/zh/)：Vuex is a state management pattern developed specifically for vue.js applications.
+ 
+- [vue-router](https://router.vuejs.org/zh/)：Vue router is the official routing manager of vue.js.
+ 
+- [webpack](https://webpack.js.org/concepts/)：Front end module packer.
+ 
+- [element-ui](https://element.eleme.io/)：Element, a desktop component library based on Vue 2.0 for developers, designers and product managers.
+
+- [web3.js](http://cw.hubwiz.com/card/c/web3.js-1.0/)：Web3.js is a set of JS libraries used to interact with local or remote Ethereum nodes.
+
+## Pre order preparation
+
+**Preparation before operation:**
+
+   Since this project is based on nodejs, you need to make preparations for nodejs. Before running the project, please ensure that the following applications have been installed in the system:
+
+**Node version**
+   
+   Node (version 10.18.0 and above). Please refer to:[Download and install node.](https://nodejs.org/en/download/)
+
+## Build project
+
+Go to the config folder and modify the URL in the prod.env file
+
+Note: you need to package the program first (npm run build)
 
 ## Further help
 

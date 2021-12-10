@@ -33,7 +33,7 @@
                                 <img src="@/assets/images/info.png"/>
                             </el-tooltip>
                         </template>
-                        <el-input v-model="ruleForm.duration" type="number" style="max-width:130px"></el-input> &nbsp; days
+                        <el-input v-model="ruleForm.duration" type="number" style="max-width:130px"></el-input> &nbsp; days <small> (min: 180 - max: 540)</small>
                     </el-form-item>
                     <el-form-item prop="storage_cost">
                         <template slot="label">
@@ -189,8 +189,11 @@
                 }
                 setTimeout(() => {
                     if (value < 180) {
-                        callback(new Error('Minimum not less than 180'));
+                        callback(new Error(' '));
                         callback(that.calculation(1));
+                    }else if (value > 540) {
+                        callback(new Error(' '));
+                        callback(that.calculation(2));
                     } else {
                         callback(that.calculation());
                     }
@@ -203,7 +206,7 @@
                     payload_cid: ''
                 },
                 ruleForm: {
-                    duration: '180',
+                    duration: '365',
                     fileList: [],
                     file_size: '',
                     file_size_byte: '',
@@ -272,7 +275,12 @@
         },
         methods: {
             calculation(type){
-                this.ruleForm.storage_cost = type ? '' : this.ruleForm.file_size_byte * this.ruleForm.duration * this.storage / 365
+                if(type && type == 2){
+                    this.ruleForm.duration = '540'
+                }else if(type && type == 1){
+                    this.ruleForm.duration = '180'
+                }
+                this.ruleForm.storage_cost = this.ruleForm.file_size_byte * this.ruleForm.duration * this.storage / 365
                 this.ruleForm.amount_minprice = Number(this.ruleForm.storage_cost * this.biling_price).toFixed(9)
                 this.storage_cost_low = Number(this.ruleForm.storage_cost * this.biling_price * 2).toFixed(9)
                 this.storage_cost_average = Number(this.ruleForm.storage_cost * this.biling_price * 3).toFixed(9)
@@ -1056,14 +1064,21 @@
                         .el-form-item__content{
                             display: flex;
                             align-items: center;
-                            font-size: 0.1372rem;
+                            font-size: 0.14rem;
                             white-space: normal;
                             word-break: break-word;
                             line-height: 1.5;
                             color: #666;
+                            @media screen and (max-width:600px){
+                                font-size: 14px;
+                            }
+                            small{
+                                margin: 2px 5px 0;
+                                font-size: 12px;
+                            }
                             h4{
                                 width: 100%;
-                                font-size: 0.1372rem;
+                                font-size: inherit;
                                 font-weight: 500;
                                 line-height: 1.7;
                             }
@@ -1074,6 +1089,9 @@
                                 font-weight: 500;
                                 line-height: 1.2;
                                 color: #737373;
+                                @media screen and (max-width:600px){
+                                    font-size: 12px;
+                                }
                             }
                             .el-tag, .el-button--small{
                                 margin: 0 5px 5px 0;
@@ -1082,7 +1100,7 @@
                                 width: auto;
                                 .el-input__inner{
                                     height: 0.32rem;
-                                    font-size: 0.1372rem;
+                                    font-size: inherit;
                                     line-height: 0.32rem;
                                 }
                                 .el-input__suffix{
@@ -1138,6 +1156,9 @@
                                 color: #737373;
                                 line-height: 1;
                                 font-size: 0.12rem;
+                                @media screen and (max-width:600px){
+                                    font-size: 14px;
+                                }
                             }
                             .el-radio{
                                 .el-radio__inner{

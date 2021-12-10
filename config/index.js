@@ -12,7 +12,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/api': {
-        target: 'https://staging.filswan.com',
+        target: 'https://calibration-api.filswan.com',
         changeOrigin: true,
         secure: true,
         pathRewrite: {
