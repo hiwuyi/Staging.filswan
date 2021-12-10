@@ -10,7 +10,9 @@ Run `npm install` to generate component.
 
 Run `npm run dev` for a dev server. Navigate to `http://localhost:8080/`. The app will automatically reload if you change any of the source files.
 
-## Build
+## Build project
+
+Go to the `config/` directory and modify the URL in the `prod.env.js` file.
 
 Run `npm run build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
@@ -35,12 +37,6 @@ Run `npm run build` to build the project. The build artifacts will be stored in 
    Since this project is based on nodejs, you need to make preparations for nodejs. Before running the project, please ensure that the following applications have been installed in the system:
 
    (1)、Node (version 10.18.0 and above). Please refer to:[Download and install node.](https://nodejs.org/en/download/)
-
-## Build project
-
-Go to the config folder and modify the URL in the prod.env file
-
-Note: you need to package the program first (npm run build)
 
 ## Further help
 
