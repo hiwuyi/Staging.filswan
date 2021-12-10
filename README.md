@@ -34,8 +34,6 @@ Run `npm run build` to build the project. The build artifacts will be stored in 
 
    Since this project is based on nodejs, you need to make preparations for nodejs. Before running the project, please ensure that the following applications have been installed in the system:
 
-**Node version**
-   
    Node (version 10.18.0 and above). Please refer to:[Download and install node.](https://nodejs.org/en/download/)
 
 ## Build project
