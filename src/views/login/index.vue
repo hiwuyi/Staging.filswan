@@ -213,13 +213,12 @@ import bus from '@/components/bus';
               _this.$store.state.user.accessToken = response.auth_token
               _this.$store.state.user.email = _this.formData.mail.email
 
-
-              if(_this.fromEnter){
+              if(_this.fromEnter && _this.fromEnter != '/supplierAllBack'){
                 // 防止登录后需要跳转到指定页面
-                this.$router.push(_this.fromEnter)
+                _this.$router.push({ path: _this.fromEnter })
               }else{
                 // this.$router.go(-1)
-                this.$router.push({ path: '/dashboard' })
+                _this.$router.push({ path: '/upload_file' })
               }
               _this.loginLoad = false
             } else {
@@ -236,7 +235,7 @@ import bus from '@/components/bus';
       isLogin() {
         var _this = this
         if (localStorage.getItem("mcpLoginAccessToken")) {
-          _this.$router.push({ path: '/dashboard' })
+          _this.$router.push({ path: '/upload_file' })
         }
       },
       menuIndexFun(to,index) {
@@ -251,7 +250,7 @@ import bus from '@/components/bus';
       },
     },
     mounted() {
-      console.log(this.$route.query.redirect)
+      // console.log(this.$route.query.redirect)
       this.isLogin()
       var _this = this
       _this.fromEnter = this.$route.query.redirect

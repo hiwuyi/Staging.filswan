@@ -93,6 +93,13 @@ export default {
                     name: 'Stats',
                     type: ''
                 },
+                {
+                    icon: 'el-icon-s-documentation',
+                    index: '',
+                    title: 'Documentation',
+                    name: '',
+                    type: ''
+                },
             ]
         };
     },
@@ -144,10 +151,11 @@ export default {
                 default:
             }
             if(!nameNow && !indexNow){
-                window.open('https://docs.filswan.com/', "_blank")
+                window.open('https://docs.filswan.com/multi-chain-payment/overview', "_blank")
                 window.location.reload();
                 return false
             }
+            _this.$store.dispatch("setRouterMenu", Number(index));
             if(typeNow){
                 _this.$router.push({ name: nameNow, params:{type:typeNow} })
                 return false
