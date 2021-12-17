@@ -313,7 +313,7 @@ export default {
 
 <style scoped lang="scss">
 #dealManagement{
-    padding: 0.25rem 0.2rem 0.5rem;
+    padding: 0.25rem 0.2rem 0.2rem;
     .backTo{
         display: flex;
         align-items: center;
@@ -375,7 +375,6 @@ export default {
     }
     .upload{
         padding: 0.1rem 0.3rem 0.2rem;
-        margin-bottom: 0.2rem;
         background-color: #fff;
         border-radius: 5px;
         overflow: hidden;
@@ -550,7 +549,7 @@ export default {
 
 @media screen and (max-width:999px){
     #dealManagement{
-        padding: 0.15rem 0.1rem 0.3rem;
+        padding: 0.15rem 0.1rem 0.2rem;
         .backTo{
             margin: 0.2rem 0;
         }

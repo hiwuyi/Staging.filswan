@@ -1,12 +1,14 @@
 <template>
-    <div class="stats" v-loading="loading">
-        <div class="title">{{generateState('network_overview')}}</div>
-        <div class="main">
-            <div v-for="(item,key,index) in list" :key="index" class="info">
-                <div class="info-up">
-                    {{ item.title }}
+    <div class="statsCont">
+        <div class="stats" v-loading="loading">
+            <div class="title">{{generateState('network_overview')}}</div>
+            <div class="main">
+                <div v-for="(item,key,index) in list" :key="index" class="info">
+                    <div class="info-up">
+                        {{ item.title }}
+                    </div>
+                    <div class="info-num">{{ item.num }}</div>
                 </div>
-                <div class="info-num">{{ item.num }}</div>
             </div>
         </div>
     </div>
@@ -115,12 +117,13 @@
 </script>
 
 <style lang="scss" scoped>
+.statsCont{
+    padding: 0.25rem 0.2rem 0.5rem;
     .stats {
         /*width: 100%;*/
         padding: 10px;
         background: white;
         border-radius: 10px;
-        margin: 0.25rem 0.2rem 0.5rem;
         .title {
             font-size: 20px;
             border-bottom: 1px solid #ededed;
@@ -172,13 +175,15 @@
             visibility: hidden;
         }
     }
-    @media screen and (max-width: 800px) {
+}
+@media screen and (max-width: 800px) {
+    .statsCont{
+        padding: 0.3rem 4%;
         .stats {
             /*width: 100%;*/
             padding: 10px;
             background: white;
             border-radius: 10px;
-            margin: 0.3rem 4%;
             .title {
                 font-size: 20px;
                 border-bottom: 1px solid #ededed;
@@ -230,4 +235,5 @@
             }
         }
     }
+}
 </style>

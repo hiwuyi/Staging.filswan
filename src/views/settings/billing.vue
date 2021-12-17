@@ -572,7 +572,7 @@
     }
 }
 #dealManagement{
-    padding: 0.25rem 0.2rem 0.5rem;
+    padding: 0.25rem 0.2rem 0.2rem;
     .metatips /deep/{
         position: absolute;
         left: 0;
@@ -584,7 +584,6 @@
     }
     .upload{
         padding: 0.1rem 0.35rem 0.2rem 0.2rem;
-        margin-bottom: 0.2rem;
         background-color: #fff;
         border-radius: 0.1rem;
         overflow: hidden;
@@ -958,7 +957,7 @@
     }
     @media screen and (max-width:999px){
         #dealManagement{
-            padding: 0.15rem 0.1rem 0.3rem;
+            padding: 0.15rem 0.1rem 0.2rem;
             .upload{
                 padding: 0.1rem;
                 #billing{

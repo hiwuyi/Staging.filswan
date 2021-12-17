@@ -1300,7 +1300,7 @@ export default {
 <style scoped lang="scss">
 #dealManagement {
   position: relative;
-  padding: 0.25rem 0.2rem 0.5rem;
+  padding: 0.25rem 0.2rem 0.2rem;
   .el-alert /deep/{
       position: absolute;
       left: 0;
@@ -2684,7 +2684,7 @@ export default {
 }
 @media screen and (max-width: 999px) {
   #dealManagement {
-    padding: 0.15rem 0.1rem 0.3rem;
+    padding: 0.15rem 0.1rem 0.2rem;
 
     .tabTaskStyle {
       .createTask {

@@ -9,11 +9,31 @@
                 </div>
             </div>
             <div class="content">
-                <transition name="move" mode="out-in">
-                    <keep-alive :include="tagsList">
-                        <router-view></router-view>
-                    </keep-alive>
-                </transition>
+                <div class="content_body">
+                    <transition name="move" mode="out-in">
+                        <keep-alive :include="tagsList">
+                            <router-view></router-view>
+                        </keep-alive>
+                    </transition>
+                </div>
+                <div class="fes-icon">
+                    <div class="fes-icon-logo">
+                        <a href="https://filswan.medium.com/" target="_block"><img :src="share_img1" alt=""></a>
+                        <a href="https://twitter.com/filswan1" target="_block"><img :src="share_img2" alt=""></a>
+                        <a href="https://github.com/filswan" target="_block"><img :src="share_img3" alt=""></a>
+                        <a href="https://www.facebook.com/fil.swan" target="_block"><img :src="share_img5" alt=""></a>
+                        <a href="https://filswan.slack.com" target="_block"><img :src="share_img7" alt=""></a>
+                        <a href="https://youtube.com/channel/UCcvrZdNqFWYl3FwfcHS9xIg" target="_block"><img :src="share_img8" alt=""></a>
+                        <a href="https://t.me/filswan" target="_block"><img :src="share_img9" alt=""></a>
+                        <a href="https://discord.gg/MSXGzVsSYf" target="_block"><img :src="share_img10" alt=""></a>
+                    </div>
+                    <div class="fes-icon-copy">
+                        <span>© 2021 FilSwan Canada</span>
+                        <el-divider direction="vertical"></el-divider>
+                        <a href="https://www.filswan.com/" target="_block">filswan.com</a>
+
+                    </div>
+                </div>
                 <el-backtop target=".content"></el-backtop>
             </div>
         </div>
@@ -31,7 +51,16 @@ export default {
             collapse: false,
             collapseP: this.$store.getters.collapseL == 'true'||this.$store.getters.collapseL==true?true: false,
             bodyWidth: document.body.clientWidth<1024?true:false,
-            tabshow: localStorage.getItem('tabTask_name') == 'User_Profile'?true:false
+            tabshow: localStorage.getItem('tabTask_name') == 'User_Profile'?true:false,
+            share_img1: require('@/assets/images/landing/medium.png'),
+            share_img2: require('@/assets/images/landing/twitter.png'),
+            share_img3: require('@/assets/images/landing/github-fill.png'),
+            share_img5: require('@/assets/images/landing/facebook-fill.png'),
+            share_img7: require('@/assets/images/landing/slack.png'),
+            share_img8: require('@/assets/images/landing/youtube.png'),
+            share_img9: require('@/assets/images/landing/telegram.png'),
+            share_img10: require('@/assets/images/landing/discord.png'),
+            share_logo: require('@/assets/images/landing/logo_small.png'),
         };
     },
     components: {
@@ -68,3 +97,76 @@ export default {
 };
 </script>
 
+
+<style lang="scss" scoped>
+.wrapper{
+    display: flex;
+    flex-wrap: wrap;
+    .content{
+        position: relative;
+        height: 100%;
+        // overflow-y: scroll;
+        // transition: all;
+        // transition-duration: .3s;
+        // &::-webkit-scrollbar{
+        //     width: 1px;
+        //     height: 1px;
+        //     background-color: #eee;
+        // }
+
+        // &::-webkit-scrollbar-track {
+        //     box-shadow: none;
+        //     -webkit-box-shadow: none;
+        //     border-radius: 10px;
+        //     background-color: #eee;
+        // }
+
+        // &::-webkit-scrollbar-thumb{
+        //     border-radius: 10px;
+        //     box-shadow: none;
+        //     -webkit-box-shadow: none;
+        //     background-color: #eee;
+        // }
+        .content_body{
+            min-height: calc(100% - 65px);
+        }
+        .fes-icon{
+            background-color: #f0f0f0;
+            z-index: 8;
+            .fes-icon-logo{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 10px 0;
+                img{
+                    display: block;
+                    height: 20px;
+                    margin: 0 0.05rem;
+                    @media screen and (max-width: 999px) {
+                        height: 20px;
+                    }
+                }
+            }
+            .fes-icon-copy{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 0 0 10px;
+                span, a{
+                    font-size: 12px;
+                    color: #333;
+                    line-height: 15px;
+                }
+                a{
+                    &:hover{
+                        color: #409eff;
+                    }
+                }
+                .el-divider--vertical /deep/{
+                    height: 15px;
+                }
+            }
+        }
+    }
+}
+</style>

@@ -36,7 +36,8 @@
                 </template>
             </template>
         </el-menu>
-        <div class="copyStyle" v-if="!collapseLocal">{{ $t('navbar.copy') }} {{git_version}}</div>
+
+        <!-- <div class="copyStyle" v-if="!collapseLocal">{{ $t('navbar.copy') }} {{git_version}}</div> -->
     </div>
 </template>
 
@@ -79,13 +80,13 @@ export default {
                     name: 'billing',
                     type: ''
                 },
-                {
-                    icon: 'el-icon-s-myAccount',
-                    index: '3',
-                    title: this.$t('route.myAccount'),
-                    name: 'settings',
-                    type: ''
-                },
+                // {
+                //     icon: 'el-icon-s-myAccount',
+                //     index: '3',
+                //     title: this.$t('route.myAccount'),
+                //     name: 'settings',
+                //     type: ''
+                // },
                 {
                     icon: 'el-icon-s-Stats',
                     index: '4',
@@ -100,7 +101,7 @@ export default {
                     name: '',
                     type: ''
                 },
-            ]
+            ],
         };
     },
     computed: {
@@ -246,12 +247,13 @@ export default {
 }
 .sidebar-el-menu{
     width: 0.65rem;
-    height: calc(100% - 0.31rem);
+    // height: calc(100% - 0.31rem);
+    height: 100%;
     padding: 0;
     border-right: 0;
     // transition: width .3s;
     .menu_list{
-        height: calc(100% - 0.86rem);
+        height: calc(100% - 1.2rem);
         padding: 0;
         overflow-y: scroll;
         // 火狐浏览器滚动条样式设置
@@ -574,8 +576,8 @@ export default {
   background: #0b318f;
   font-size: 0.12rem;
   line-height: 0.3rem;
-  border-top: 0.01rem solid rgba(255, 255, 255, 0.2);
   color: #9c9c9c;
+  border-top: 0.01rem solid rgba(255, 255, 255, 0.2);
   z-index: 999;
 }
 
