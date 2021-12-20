@@ -140,11 +140,12 @@ export default {
                 currentPassword: _this.formData.mail.password,
                 password: _this.formData.mail.passwordNew,
                 repeatPassword: _this.formData.mail.passwordComfirm,
+                wallet_address: _this.metaAddress
             }
             _this.loading = true
             axios.post(process.env.BASE_API+'user/update_login_password', reqData,{
                 headers: {
-                  'Authorization': "Bearer "+_this.$store.getters.accessToken
+                //   'Authorization': "Bearer "+_this.$store.getters.accessToken
                 },
             }).then((response) => {
                 _this.loading = false

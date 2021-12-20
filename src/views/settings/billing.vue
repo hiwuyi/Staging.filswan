@@ -1,8 +1,5 @@
 <template>
     <div id="dealManagement">
-        <el-alert type="warning" effect="dark" class="metatips" center show-icon v-if="metaAddress&&networkID!=80001">
-            <div slot="title">Your wallet is wrongly connected to {{network.name}} Network. To use our site, please switch to <span style="text-decoration: underline;">Mumbai Testnet</span>.</div>
-        </el-alert>
         <div class="upload">
             <div v-if="metaAddress" style="font-size:12px">
                 <div id="billing">
@@ -132,22 +129,6 @@
             </div>
         </div>
 
-        <el-dialog
-        :title="$t('transfer.connect_wallet')"
-        :visible.sync="centerDialogVisible" :close-on-click-modal="modelClose" :show-close="modelClose" :close-on-press-escape="modelClose"
-        :width="width"
-        custom-class="metaM"
-        center>
-            <el-row>
-                <el-col :span="12">MetaMask</el-col>
-                <el-col :span="12"><img src="@/assets/images/metamask.png" alt=""></el-col>
-            </el-row>
-            <span slot="footer" class="dialog-footer">
-                <el-button type="primary"  @click="signFun">{{$t('transfer.connect_wallet')}}</el-button>
-                <p v-if="center_fail">Please connect your wallet to Mumbai Testnet.</p>
-            </span>
-        </el-dialog>
-
         <!-- 回到顶部 -->
         <el-backtop target=".content-box" :bottom="40" :right="20"></el-backtop>
     </div>
@@ -204,9 +185,6 @@
                     return false
                 }
                 this.getData()
-            },
-            networkID: function(){
-                this.walletInfo()
             }
         },
         components: {},
@@ -350,110 +328,10 @@
             clearAll() {
                 this.searchValue = ""
                 this.search();
-            },
-            signFun(){
-                let _this = this
-                if(!_this.metaAddress || _this.metaAddress == 'undefined'){
-                    NCWeb3.Init(addr=>{
-                        _this.$nextTick(() => {
-                            _this.$store.dispatch('setMetaAddress', addr)
-                            _this.walletInfo()
-                        })
-                    })
-                    return false
-                }else{
-                    _this.walletInfo()
-                }
-            },
-            walletInfo() {
-                let _this = this
-                if(!_this.metaAddress || _this.metaAddress == 'undefined'){
-                    _this.modelClose = false
-                    return false
-                }
-                ethereum
-                .request({ method: 'eth_chainId' })
-                .then((chainId) => {
-                    let netId = parseInt(chainId, 16)
-                    // console.log('network ID:', netId)
-                    // console.log(`decimal number: ${parseInt(chainId, 16)}`);
-                    _this.$store.dispatch('setMetaNetworkId', netId)
-                    switch (netId) {
-                        case 1:
-                            _this.network.name = 'mainnet';
-                            _this.network.unit = 'ETH';
-                            _this.center_fail = true
-                            _this.centerDialogVisible = true
-                            return;
-                        case 3:
-                            _this.network.name = 'ropsten';
-                            _this.network.unit = 'ETH';
-                            _this.center_fail = true
-                            _this.centerDialogVisible = true
-                            break;
-                        case 4:
-                            _this.network.name = 'rinkeby';
-                            _this.network.unit = 'ETH';
-                            _this.center_fail = true
-                            _this.centerDialogVisible = true
-                            return;
-                        case 5:
-                            _this.network.name = 'goerli';
-                            _this.network.unit = 'ETH';
-                            _this.center_fail = true
-                            _this.centerDialogVisible = true
-                            return;
-                        case 42:
-                            _this.network.name = 'kovan';
-                            _this.network.unit = 'ETH';
-                            _this.center_fail = true
-                            _this.centerDialogVisible = true
-                            return;
-                        case 56:
-                            _this.network.name = 'BSC';
-                            _this.network.unit = 'BNB';
-                            _this.center_fail = true
-                            _this.centerDialogVisible = true
-                            return;
-                        case 97:
-                            _this.network.name = 'BSC';
-                            _this.network.unit = 'BNB';
-                            _this.center_fail = true
-                            _this.centerDialogVisible = true
-                            return;
-                        case 999:
-                            _this.network.name = 'NBAI';
-                            _this.network.unit = 'NBAI';
-                            _this.center_fail = true
-                            _this.centerDialogVisible = true
-                            return;
-                        case 80001:
-                            _this.network.name = 'mumbai';
-                            _this.network.unit = 'MATIC';
-                            _this.center_fail = false
-                            _this.centerDialogVisible = false
-                            _this.modelClose = true
-                            return;
-                        default:
-                            _this.network.name = 'Custom';
-                            _this.network.unit = '';
-                            _this.center_fail = true
-                            _this.centerDialogVisible = true
-                            return;
-                    }
-                })
-                .catch((error) => {
-                    console.error(`Error fetching chainId: ${error.code}: ${error.message}`);
-                });
             }
         },
         mounted() {
             let _this = this
-            if(!_this.metaAddress || _this.metaAddress == 'undefined' || _this.center_fail){
-                _this.centerDialogVisible = true
-                _this.modelClose = false
-            }
-            setTimeout(function(){_this.walletInfo()}, 500)
             _this.getData()
             this.$store.dispatch('setRouterMenu', 5)
             this.$store.dispatch('setHeadertitle', this.$t('navbar.BillingHistory'))

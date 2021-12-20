@@ -15,7 +15,8 @@ const app = {
         htmlGo:{},
         collapseL:  localStorage.getItem('collapseL') || false,
         metaAddress: sessionStorage.getItem('metaAddress') || '',
-        networkID: sessionStorage.getItem('networkID') || 0
+        networkID: sessionStorage.getItem('networkID') || 0,
+        metaNetworkInfo: sessionStorage.getItem('metaNetworkInfo') || {}
     },
     mutations: {
         TOGGLE_SIDEBAR: state => {
@@ -66,7 +67,10 @@ const app = {
             state.networkID = networkID
             sessionStorage.setItem('networkID', networkID)
         },
-
+        SET_METANETWORKINFO: (state, metaNetworkInfo) => {
+            state.metaNetworkInfo = metaNetworkInfo
+            sessionStorage.setItem('metaNetworkInfo', metaNetworkInfo)
+        },
     },
     actions: {
         toggleSideBar({commit}) {
@@ -101,6 +105,9 @@ const app = {
         },
         setMetaNetworkId({commit}, networkID) {
             commit('SET_METANETWORKID', networkID)
+        },
+        setMetaNetworkInfo({commit}, metaNetworkInfo) {
+            commit('SET_METANETWORKINFO', metaNetworkInfo)
         }
     }
 }

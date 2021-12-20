@@ -8,7 +8,7 @@
             <div class="header-right">
                 <div :class="{'online': addrChild, 'feh-metamask': 1==1}">
                     <el-tooltip class="item" effect="dark" content="Connect to your MetaMask Wallet" placement="bottom" v-if="!addrChild">
-                        <img src="@/assets/images/metamask.png" @click="signFun" />
+                        <img src="@/assets/images/metamask.png" @click="metamaskLogin" />
                     </el-tooltip>
 
 
@@ -19,11 +19,11 @@
                         popper-class="addressInfo"
                         @show="walletInfo">
                         <h6>connected to:</h6>
-                        <h5 v-if="network.name">{{ network.name }}</h5>
+                        <h5 v-if="metaNetworkInfo.name">{{ metaNetworkInfo.name }}</h5>
                         <h4>{{addrChild | hiddAddress}}</h4>
                             <el-divider></el-divider>
                         <h4>{{addrChild | hiddAddress}}</h4>
-                        <h5>{{priceAccound}} {{ network.unit}}</h5>
+                        <h5>{{priceAccound}} {{ metaNetworkInfo.unit}}</h5>
                             <el-divider></el-divider>
                         <h3 @click="signOutFun">Disconnect</h3>
 
@@ -31,15 +31,15 @@
                     </el-popover>
 
                     <!-- <span class="text" v-if="addrChild && !network.text" @click="wrongVisible=true">Wrong Network</span> -->
-                    <span class="text" v-if="!addrChild" @click="signFun">Connect Wallet</span>
-                    <span class="text textTrue" v-else>{{network.name}}</span>
+                    <span class="text" v-if="!addrChild" @click="metamaskLogin">Connect Wallet</span>
+                    <span class="text textTrue" v-else>{{metaNetworkInfo.name}}</span>
                 </div>
-                {{$t('navbar.hi')}}
+                <!-- {{$t('navbar.hi')}}
                 <router-link :to="{name: 'upload_file'}">
                     <b>&nbsp;{{email}}</b>
-                </router-link>
+                </router-link> -->
 
-                <div class="sighChild" v-if="!email">
+                <!-- <div class="sighChild" v-if="!email">
                     <span @click="pageJump(1)">
                         {{$t('navbar.log_in')}}
                     </span>
@@ -47,9 +47,8 @@
                     <span @click="pageJump(2)">
                         {{$t('navbar.sign_up')}}
                     </span>
-                </div>
-                 <!-- v-if="!loginShow" -->
-                <a href="javascript:;" @click="logout" class="sighChild" v-if="email && !bodyWidth">{{$t('navbar.logout')}}</a>
+                </div> -->
+                <!-- <a href="javascript:;" @click="logout" class="sighChild" v-if="email && !bodyWidth">{{$t('navbar.logout')}}</a> -->
                 <!-- mobile显示 -->
                 <div class="mobileShow">
                     <div class="collapse-btn-cont" @click="collapseChage">
@@ -100,7 +99,7 @@ export default {
             network: {
                 name: '',
                 unit: '',
-                text: false
+                center_fail: false
             },
             addrChild: '',
             wrongVisible: false,
@@ -128,6 +127,9 @@ export default {
         },
         metaAddress() {
             return this.$store.getters.metaAddress
+        },
+        metaNetworkInfo() {
+            return this.$store.getters.metaNetworkInfo?JSON.parse(JSON.stringify(this.$store.getters.metaNetworkInfo)):{}
         }
     },
     watch: {
@@ -142,21 +144,21 @@ export default {
                 this.collapseChage();
             }
         },
-        'tabOaxLogin': function() {
-            let _this = this;
-            let name = _this.$route.name;
-            if(!localStorage.getItem("mcpLoginAccessToken")){
-                if(name == 'my_files' || name == 'my_files_detail' || name == 'upload_file' || name == 'Search_file' ||
-                   name == 'billing' || name == 'settings'){
-                    _this.$store.dispatch("FedLogOut").then(() => {
-                        _this.$router.push("/login");
-                    });
-                }
-            }
-            if(!_this.email && localStorage.getItem("mcpLoginAccessToken")){
-                location. reload()
-            }
-        },
+        // 'tabOaxLogin': function() {
+        //     let _this = this;
+        //     let name = _this.$route.name;
+        //     if(!localStorage.getItem("mcpLoginAccessToken")){
+        //         if(name == 'my_files' || name == 'my_files_detail' || name == 'upload_file' || name == 'Search_file' ||
+        //            name == 'billing' || name == 'settings'){
+        //             _this.$store.dispatch("FedLogOut").then(() => {
+        //                 _this.$router.push("/login");
+        //             });
+        //         }
+        //     }
+        //     if(!_this.email && localStorage.getItem("mcpLoginAccessToken")){
+        //         location. reload()
+        //     }
+        // },
         'collapseL': function(){
             this.collapseLocal = this.$store.getters.collapseL == 'true'||this.$store.getters.collapseL==true?true: false
         },
@@ -274,8 +276,11 @@ export default {
             // otherwise it's not supported
             return null;
         },
+        metamaskLogin() {
+            this.$router.push({ path: '/metamask_login' })
+        },
         // Wallet address
-        signFun(){
+        signFun(redirect){
             let _this = this
             if(!_this.addrChild){
                 NCWeb3.Init(addr=>{
@@ -283,6 +288,14 @@ export default {
                     // console.log('Wallet address:', addr)
                     _this.$nextTick(() => {
                         _this.addrChild = addr
+                        if(redirect) {
+                            if(_this.$route.query.redirect && _this.$route.query.redirect != '/supplierAllBack'){
+                                // 防止登录后需要跳转到指定页面
+                                _this.$router.push({ path: _this.$route.query.redirect })
+                            }else{
+                                _this.$router.push({ path: '/upload_file' })
+                            }
+                        }
                         _this.walletInfo()
                     })
                 })
@@ -311,70 +324,86 @@ export default {
             .catch((error) => {
                 console.error(`Error fetching getBalance: ${error.code}: ${error.message}`);
             });
-
-            ethereum
-            .request({ method: 'eth_chainId' })
-            .then((chainId) => {
-                let netId = parseInt(chainId, 16)
-                // console.log('network ID:', netId)
-                // console.log(`decimal number: ${parseInt(chainId, 16)}`);
-                _this.$store.dispatch('setMetaNetworkId', netId)
-                switch (netId) {
-                    case 1:
-                        _this.network.name = 'mainnet';
-                        _this.network.unit = 'ETH';
-                        _this.network.text = false
-                        return;
-                    case 3:
-                        _this.network.name = 'ropsten';
-                        _this.network.unit = 'ETH';
-                        _this.network.text = false
-                        break;
-                    case 4:
-                        _this.network.name = 'rinkeby';
-                        _this.network.unit = 'ETH';
-                        _this.network.text = false
-                        return;
-                    case 5:
-                        _this.network.name = 'goerli';
-                        _this.network.unit = 'ETH';
-                        _this.network.text = false
-                        return;
-                    case 42:
-                        _this.network.name = 'kovan';
-                        _this.network.unit = 'ETH';
-                        _this.network.text = false
-                        return;
-                    case 56:
-                        _this.network.name = 'BSC';
-                        _this.network.unit = 'BNB';
-                        _this.network.text = false
-                        return;
-                    case 97:
-                        _this.network.name = 'BSC';
-                        _this.network.unit = 'BNB';
-                        _this.network.text = false
-                        return;
-                    case 999:
-                        _this.network.name = 'NBAI';
-                        _this.network.unit = 'NBAI';
-                        _this.network.text = false
-                        return;
-                    case 80001:
-                        _this.network.name = 'mumbai';
-                        _this.network.unit = 'MATIC';
-                        _this.network.text = true
-                        return;
-                    default:
-                        _this.network.name = '';
-                        _this.network.unit = '';
-                        _this.network.text = false
-                        return;
-                }
-            })
-            .catch((error) => {
-                console.error(`Error fetching chainId: ${error.code}: ${error.message}`);
-            });
+          ethereum
+          .request({ method: 'eth_chainId' })
+          .then((chainId) => {
+              let netId = parseInt(chainId, 16)
+              // console.log('network ID:', netId)
+              // console.log(`decimal number: ${parseInt(chainId, 16)}`);
+              _this.$store.dispatch('setMetaNetworkId', netId)
+              switch (netId) {
+              case 1:
+                  _this.network.name = 'mainnet';
+                  _this.network.unit = 'ETH';
+                  _this.network.center_fail = true
+                  _this.$store.dispatch('setMetaNetworkInfo', _this.network)
+                  return;
+              case 3:
+                  _this.network.name = 'ropsten';
+                  _this.network.unit = 'ETH';
+                  _this.network.center_fail = true
+                  _this.$store.dispatch('setMetaNetworkInfo', _this.network)
+                  break;
+              case 4:
+                  _this.network.name = 'rinkeby';
+                  _this.network.unit = 'ETH';
+                  _this.network.center_fail = true
+                  _this.$store.dispatch('setMetaNetworkInfo', _this.network)
+                  return;
+              case 5:
+                  _this.network.name = 'goerli';
+                  _this.network.unit = 'ETH';
+                  _this.network.center_fail = true
+                  _this.$store.dispatch('setMetaNetworkInfo', _this.network)
+                  return;
+              case 42:
+                  _this.network.name = 'kovan';
+                  _this.network.unit = 'ETH';
+                  _this.network.center_fail = true
+                  _this.$store.dispatch('setMetaNetworkInfo', _this.network)
+                  return;
+              case 56:
+                  _this.network.name = 'BSC';
+                  _this.network.unit = 'BNB';
+                  _this.network.center_fail = true
+                  _this.$store.dispatch('setMetaNetworkInfo', _this.network)
+                  return;
+              case 97:
+                  _this.network.name = 'BSC';
+                  _this.network.unit = 'BNB';
+                  _this.network.center_fail = true
+                  _this.$store.dispatch('setMetaNetworkInfo', _this.network)
+                  return;
+              case 999:
+                  _this.network.name = 'NBAI';
+                  _this.network.unit = 'NBAI';
+                  _this.network.center_fail = true
+                  _this.$store.dispatch('setMetaNetworkInfo', _this.network)
+                  return;
+              case 80001:
+                  _this.network.name = 'mumbai';
+                  _this.network.unit = 'MATIC';
+                  _this.network.center_fail = false
+                  _this.$store.dispatch('setMetaNetworkInfo', _this.network)
+                  if(_this.fromEnter && _this.fromEnter != '/supplierAllBack'){
+                    // 防止登录后需要跳转到指定页面
+                    _this.$router.push({ path: _this.fromEnter })
+                  }else{
+                    // this.$router.go(-1)
+                    _this.$router.push({ path: '/upload_file' })
+                  }
+                  return;
+              default:
+                  _this.network.name = 'Custom';
+                  _this.network.unit = '';
+                  _this.network.center_fail = true
+                  _this.$store.dispatch('setMetaNetworkInfo', _this.network)
+                  return;
+              }
+          })
+          .catch((error) => {
+              console.error(`Error fetching chainId: ${error.code}: ${error.message}`);
+          });
         },
         fn() {
             let _this = this
@@ -383,6 +412,7 @@ export default {
                     _this.addrChild = accounts[0]
                     _this.walletInfo()
                     _this.$store.dispatch('setMetaAddress', accounts[0])
+                    _this.$router.go(0)
                     // console.log('account header:', accounts[0]);  //Once the account is switched, it will be executed here
                 }
             });
@@ -399,10 +429,15 @@ export default {
             this.addrChild = ''
             this.$store.dispatch('setMetaAddress', '')
             this.$store.dispatch('setMetaNetworkId', 0)
+            this.network.name = '';
+            this.network.unit = '';
+            this.network.center_fail = false
+            this.$store.dispatch('setMetaNetworkInfo', JSON.stringify(this.network))
+            this.$router.push("/supplierAllBack");
         },
         commonParam(){
             let _this = this
-            let common_api = `${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/common/system/params?limit=20`
+            let common_api = `${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/common/system/params?limit=20&wallet_address=${_this.metaAddress}`
 
             axios.get(common_api, {
                 headers: {

@@ -10,6 +10,9 @@
             </div>
             <div class="content">
                 <div class="content_body">
+                    <el-alert type="warning" effect="dark" center show-icon v-if="metaAddress&&networkID!=80001">
+                        <div slot="title">Your wallet is wrongly connected to {{metaNetworkInfo.name}} Network. To use our site, please switch to <span style="text-decoration: underline;">Mumbai Testnet</span>.</div>
+                    </el-alert>
                     <transition name="move" mode="out-in">
                         <keep-alive :include="tagsList">
                             <router-view></router-view>
@@ -60,7 +63,7 @@ export default {
             share_img8: require('@/assets/images/landing/youtube.png'),
             share_img9: require('@/assets/images/landing/telegram.png'),
             share_img10: require('@/assets/images/landing/discord.png'),
-            share_logo: require('@/assets/images/landing/logo_small.png'),
+            share_logo: require('@/assets/images/landing/logo_small.png')
         };
     },
     components: {
@@ -79,12 +82,23 @@ export default {
         },
         collapseL() {
             return this.$store.getters.collapseL
+        },
+        metaAddress() {
+            return this.$store.getters.metaAddress
+        },
+        networkID() {
+            return this.$store.getters.networkID
+        },
+        metaNetworkInfo() {
+            return this.$store.getters.metaNetworkInfo?JSON.parse(JSON.stringify(this.$store.getters.metaNetworkInfo)):{}
         }
     },
     watch: {
         'collapseL': function(){
             this.collapseP = this.$store.getters.collapseL == 'true'||this.$store.getters.collapseL==true?true: false
         }
+    },
+    methods: {
     },
     mounted() {
         let bo = this.bodyWidth
@@ -128,7 +142,18 @@ export default {
         //     background-color: #eee;
         // }
         .content_body{
+            // position: relative;
             min-height: calc(100% - 65px);
+            .el-alert{
+                position: absolute;
+                left: 0;
+                top: 0;
+                z-index: 9;
+                .el-alert__content{
+                    display: flex;
+                    align-items: center;
+                }
+            }
         }
         .fes-icon{
             background-color: #f0f0f0;

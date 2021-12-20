@@ -27,11 +27,11 @@
             }
         },
         created() {
-            let stats_api = `${process.env.BASE_API}stats/storage`
+            let stats_api = `${process.env.BASE_API}stats/storage?wallet_address=${this.$store.getters.metaAddress}`
 
             axios.get(stats_api, {
                 headers: {
-                  'Authorization': "Bearer "+ this.$store.getters.accessToken
+                //   'Authorization': "Bearer "+ this.$store.getters.accessToken
                 },
             }).then(res => {
                 this.list = this.deepClone(res.data.data)

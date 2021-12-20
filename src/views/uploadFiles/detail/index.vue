@@ -215,11 +215,12 @@ export default {
             _this.loading = true
 
             let dataCid = {
-                payload_cid: _this.$route.params.cid
+                payload_cid: _this.$route.params.cid,
+                wallet_address: _this.$store.getters.metaAddress
             }
             axios.get(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/storage/deal/detail/${_this.dealId}?${QS.stringify(dataCid)}`, {headers: {
             // axios.get(`./static/detail_page_response.json`, {headers: {
-                    'Authorization':"Bearer "+ _this.$store.getters.accessToken
+                    // 'Authorization':"Bearer "+ _this.$store.getters.accessToken
             }}).then((response) => {
                 let json = response.data
                 _this.loading = false

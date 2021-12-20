@@ -14,6 +14,7 @@ const stats = () => import("@/views/stats/index");
 
 
 const login = () => import("@/views/login/index");
+const metamask_login = () => import("@/views/login/metamaskLogin");
 const register = () => import("@/views/register/index");
 const activation_success = () => import("@/views/activationSuccess/index.vue");    
 const forget = () => import("@/views/forgetPassword/index.vue");
@@ -44,17 +45,14 @@ export default new Router({
                     name: 'upload_file',
                     component: upload_file,
                     beforeEnter: (to, from, next) => {
-                        
-                        //这里判断用户是否登录，验证本地存储是否有token
-                        if (!localStorage.getItem('mcpLoginAccessToken')) { // 判断当前的token是否存在
+                        if (!sessionStorage.getItem('metaAddress')) {
                             next({
-                                path: '/login',
+                                path: '/metamask_login',
                                 query: { redirect: to.fullPath }
                             })
                         } else {
                             next()
                         }
-
                     },
                     meta: {
                         metaInfo: {
@@ -68,17 +66,14 @@ export default new Router({
                     name: 'my_files',
                     component: my_files_index,
                     beforeEnter: (to, from, next) => {
-                        
-                        //这里判断用户是否登录，验证本地存储是否有token
-                        if (!localStorage.getItem('mcpLoginAccessToken')) { // 判断当前的token是否存在
+                        if (!sessionStorage.getItem('metaAddress')) {
                             next({
-                                path: '/login',
+                                path: '/metamask_login',
                                 query: { redirect: to.fullPath }
                             })
                         } else {
                             next()
                         }
-
                     },
                     meta: {
                         metaInfo: {
@@ -92,17 +87,14 @@ export default new Router({
                     name: 'my_files_detail',
                     component: my_files_detail,
                     beforeEnter: (to, from, next) => {
-                        
-                        //这里判断用户是否登录，验证本地存储是否有token
-                        if (!localStorage.getItem('mcpLoginAccessToken')) { // 判断当前的token是否存在
+                        if (!sessionStorage.getItem('metaAddress')) {
                             next({
-                                path: '/login',
+                                path: '/metamask_login',
                                 query: { redirect: to.fullPath }
                             })
                         } else {
                             next()
                         }
-
                     },
                     meta: {
                         metaInfo: {
@@ -116,17 +108,14 @@ export default new Router({
                     name: 'Search_file',
                     component: Search_file,
                     beforeEnter: (to, from, next) => {
-                        
-                        //这里判断用户是否登录，验证本地存储是否有token
-                        if (!localStorage.getItem('mcpLoginAccessToken')) { // 判断当前的token是否存在
+                        if (!sessionStorage.getItem('metaAddress')) {
                             next({
-                                path: '/login',
+                                path: '/metamask_login',
                                 query: { redirect: to.fullPath }
                             })
                         } else {
                             next()
                         }
-
                     },
                     meta: {
                         metaInfo: {
@@ -140,17 +129,14 @@ export default new Router({
                     name: 'billing',
                     component: billing,
                     beforeEnter: (to, from, next) => {
-                        
-                        //这里判断用户是否登录，验证本地存储是否有token
-                        if (!localStorage.getItem('mcpLoginAccessToken')) { // 判断当前的token是否存在
+                        if (!sessionStorage.getItem('metaAddress')) {
                             next({
-                                path: '/login',
+                                path: '/metamask_login',
                                 query: { redirect: to.fullPath }
                             })
                         } else {
                             next()
                         }
-
                     },
                     meta: {
                         metaInfo: {
@@ -164,17 +150,14 @@ export default new Router({
                     name: 'settings',
                     component: settings,
                     beforeEnter: (to, from, next) => {
-                        
-                        //这里判断用户是否登录，验证本地存储是否有token
-                        if (!localStorage.getItem('mcpLoginAccessToken')) { // 判断当前的token是否存在
+                        if (!sessionStorage.getItem('metaAddress')) {
                             next({
-                                path: '/login',
+                                path: '/metamask_login',
                                 query: { redirect: to.fullPath }
                             })
                         } else {
                             next()
                         }
-
                     },
                     meta: {
                         metaInfo: {
@@ -199,17 +182,14 @@ export default new Router({
                     name: 'supplierAllBack',
                     component: supplierAllBack,
                     beforeEnter: (to, from, next) => {
-
-                        //这里判断用户是否登录，验证本地存储是否有token
-                        if (!localStorage.getItem('mcpLoginAccessToken')) { // 判断当前的token是否存在
+                        if (!sessionStorage.getItem('metaAddress')) {
                             next({
-                                path: '/login',
+                                path: '/metamask_login',
                                 query: { redirect: to.fullPath }
                             })
                         } else {
                             next()
                         }
-
                     },
                     meta: {
                         metaInfo: {
@@ -223,6 +203,17 @@ export default new Router({
                     name: 'login',
                     component: login,
                     // meta: { title: 'login' },
+                    meta: {
+                        metaInfo: {
+                            title: 'Login',
+                            description: "Swan is a marketplace for Filecoin miners, clients post/bidding deals the online."
+                        }
+                    }
+                },
+                {
+                    path: '/metamask_login',
+                    name: 'metamask_login',
+                    component: metamask_login,
                     meta: {
                         metaInfo: {
                             title: 'Login',

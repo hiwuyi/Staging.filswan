@@ -1,8 +1,5 @@
 <template>
     <div id="Create">
-        <el-alert type="warning" effect="dark" center show-icon v-if="metaAddress&&networkID!=80001">
-            <div slot="title">Your wallet is wrongly connected to {{network.name}} Network. To use our site, please switch to <span style="text-decoration: underline;">Mumbai Testnet</span>.</div>
-        </el-alert>
         <div class="upload" v-loading="loading">
             <div class="upload_title">Please upload a file and set a duration. An estimated storage cost will be calculated for you.</div>
             <div class="upload_form">
@@ -78,8 +75,7 @@
                     </div>
                 </div>
                 <div class="upload_bot">
-                    <el-button type="primary" v-if="!metaAddress||center_fail||networkID!=80001" @click="centerDialogVisible=true">Connect Wallet</el-button>
-                    <el-button type="primary" v-else @click="submitForm('ruleForm')">{{$t('deal.Submit')}}</el-button>
+                    <el-button type="primary" @click="submitForm('ruleForm')">{{$t('deal.Submit')}}</el-button>
                 </div>
             </div>
             
@@ -108,22 +104,6 @@
                 </div>
             </div>
         </div>
-
-        <el-dialog
-        :title="$t('transfer.connect_wallet')"
-        :visible.sync="centerDialogVisible" :close-on-click-modal="modelClose" :show-close="modelClose" :close-on-press-escape="modelClose"
-        :width="width"
-        custom-class="metaM"
-        center>
-        <el-row>
-            <el-col :span="12">MetaMask</el-col>
-            <el-col :span="12"><img src="@/assets/images/metamask.png" alt=""></el-col>
-        </el-row>
-        <span slot="footer" class="dialog-footer">
-            <el-button type="primary"  @click="signFun">{{$t('transfer.connect_wallet')}}</el-button>
-            <p v-if="center_fail">Please connect your wallet to Mumbai Testnet.</p>
-        </span>
-        </el-dialog>
 
         <el-dialog title="" :visible.sync="finishTransaction" :width="width"
             custom-class="completeDia">
@@ -167,6 +147,13 @@
             <h4>You don’t need to pay this file, it will add to your files. Because we currently only support uploading a file once.</h4>
             <h4>Thank you for your comprehension.</h4>
             <a class="a-close" @click="paymentPopup01=false">OK</a>
+        </el-dialog>
+
+        <el-dialog title="" :visible.sync="metamaskLoginTip" :width="width"
+            custom-class="completeDia">
+            <img src="@/assets/images/box-important.png" />
+            <h4>Your wallet is wrongly connected to {{network.name}} Network. To use our site, please switch to <b>Mumbai Testnet</b>.</h4>
+            <a class="a-close" @click="metamaskLoginTip=false">OK</a>
         </el-dialog>
     </div>
 </template>
@@ -257,7 +244,8 @@
                 paymentPopup: false,
                 paymentPopup01: false,
                 percentIn: '',
-                loadMetamaskPay: false
+                loadMetamaskPay: false,
+                metamaskLoginTip: false
             };
         },
         components: {},
@@ -268,9 +256,6 @@
                 if(this.ruleForm.file_size_byte > 0){
                     this.calculation()
                 }
-            },
-            networkID: function(){
-                this.walletInfo()
             }
         },
         methods: {
@@ -307,6 +292,10 @@
                 let _this = this;
                 _this.$refs[formName].validate((valid) => {
                     if (valid) {
+                        if(_this.metaAddress&&_this.networkID!=80001) {
+                            _this.metamaskLoginTip = true
+                            return false
+                        }
                         if(!_this.ruleForm.lock_plan || _this.ruleForm.amount<=0){
                             _this.ruleForm.lock_plan_tip = true
                             return false
@@ -334,6 +323,7 @@
                                 var formData = new FormData()
                                 formData.append('file', _this._file)
                                 formData.append('duration', _this.ruleForm.duration)
+                                formData.append('wallet_address', _this.metaAddress)
                                 // formData.append('task_name', _this.ruleForm.task_name)
                                 _this.loading = true
                                 _this.fileUploadVisible = true
@@ -543,10 +533,11 @@
                 lockParam.append('lock_payment_tx', _this.txHash)
                 lockParam.append('lock_payment_status', success)
                 lockParam.append('network_name', 'polygon')
+                lockParam.append('address', _this.metaAddress)
 
                 axios.post(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/billing/deal/lockpayment/status`, lockParam,{
                     headers: {
-                    'Authorization': "Bearer "+_this.$store.getters.accessToken
+                    // 'Authorization': "Bearer "+_this.$store.getters.accessToken
                     },
                 })
                 .then((res) => {
@@ -610,10 +601,10 @@
                     _this.gatewayContractAddress = _this.$root.SWAN_PAYMENT_CONTRACT_ADDRESS
                     _this.usdcAddress = _this.$root.USDC_ADDRESS
                     _this.recipientAddress = _this.$root.RECIPIENT
-                    let stats_api = `${process.env.BASE_API}stats/storage`
+                    let stats_api = `${process.env.BASE_API}stats/storage?wallet_address=${_this.metaAddress}`
                     axios.get(stats_api, {
                         headers: {
-                            'Authorization': "Bearer "+ _this.$store.getters.accessToken
+                            // 'Authorization': "Bearer "+ _this.$store.getters.accessToken
                         },
                     }).then(res => {
                         if(res.data.data){
@@ -628,10 +619,10 @@
                         _this.loading = false
                     })
                     
-                    let billing_api = `${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/billing/price/filecoin`
+                    let billing_api = `${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/billing/price/filecoin?wallet_address=${_this.metaAddress}`
                     axios.get(billing_api, {
                         headers: {
-                            'Authorization': "Bearer "+ _this.$store.getters.accessToken
+                            // 'Authorization': "Bearer "+ _this.$store.getters.accessToken
                         },
                     }).then(res => {
                         if(res.data.data){
@@ -645,159 +636,11 @@
                         _this.stats()
                     }, 1000)
                 }
-            },
-            signFun(){
-                let _this = this
-                if(!_this.metaAddress || _this.metaAddress == 'undefined'){
-                    NCWeb3.Init(addr=>{
-                        _this.$nextTick(() => {
-                            _this.$store.dispatch('setMetaAddress', addr)
-                            _this.walletInfo()
-                        })
-                    })
-                    return false
-                }else{
-                    _this.walletInfo()
-                }
-            },
-            walletInfo() {
-                let _this = this
-                if(!_this.metaAddress || _this.metaAddress == 'undefined'){
-                    _this.modelClose = false
-                    return false
-                }
-                ethereum
-                .request({ method: 'eth_chainId' })
-                .then((chainId) => {
-                    let netId = parseInt(chainId, 16)
-                    // console.log('network ID:', netId)
-                    // console.log(`decimal number: ${parseInt(chainId, 16)}`);
-                    _this.$store.dispatch('setMetaNetworkId', netId)
-                    _this.modelClose = true
-                    switch (netId) {
-                    case 1:
-                        _this.network.name = 'mainnet';
-                        _this.network.unit = 'ETH';
-                        _this.center_fail = true
-                        _this.centerDialogVisible = true
-                        return;
-                    case 3:
-                        _this.network.name = 'ropsten';
-                        _this.network.unit = 'ETH';
-                        _this.center_fail = true
-                        _this.centerDialogVisible = true
-                        break;
-                    case 4:
-                        _this.network.name = 'rinkeby';
-                        _this.network.unit = 'ETH';
-                        _this.center_fail = true
-                        _this.centerDialogVisible = true
-                        return;
-                    case 5:
-                        _this.network.name = 'goerli';
-                        _this.network.unit = 'ETH';
-                        _this.center_fail = true
-                        _this.centerDialogVisible = true
-                        return;
-                    case 42:
-                        _this.network.name = 'kovan';
-                        _this.network.unit = 'ETH';
-                        _this.center_fail = true
-                        _this.centerDialogVisible = true
-                        return;
-                    case 56:
-                        _this.network.name = 'BSC';
-                        _this.network.unit = 'BNB';
-                        _this.center_fail = true
-                        _this.centerDialogVisible = true
-                        return;
-                    case 97:
-                        _this.network.name = 'BSC';
-                        _this.network.unit = 'BNB';
-                        _this.center_fail = true
-                        _this.centerDialogVisible = true
-                        return;
-                    case 999:
-                        _this.network.name = 'NBAI';
-                        _this.network.unit = 'NBAI';
-                        _this.center_fail = true
-                        _this.centerDialogVisible = true
-                        return;
-                    case 80001:
-                        _this.network.name = 'mumbai';
-                        _this.network.unit = 'MATIC';
-                        _this.center_fail = false
-                        _this.centerDialogVisible = false
-                        return;
-                    default:
-                        _this.network.name = 'Custom';
-                        _this.network.unit = '';
-                        _this.center_fail = true
-                        _this.centerDialogVisible = true
-                        return;
-                    }
-                })
-                .catch((error) => {
-                    console.error(`Error fetching chainId: ${error.code}: ${error.message}`);
-                });
-            },
-            ceshiXHR(){
-                let _this = this
-                let xhr
-                xhr = new XMLHttpRequest()
-              
-                xhr.open("GET", 'https://api.filswan.com/stats/storage', true)
-                xhr.withCredentials = false
-                const token = _this.$store.getters.accessToken
-                if (token) {
-                    xhr.setRequestHeader(
-                    "Authorization",
-                    "Bearer " + _this.$store.getters.accessToken
-                    )
-                }
-                let i = 0;
-
-                xhr.onreadystatechange = function() {   // 等待ajax请求完成。
-                    if (xhr.status === 200) { 
-                        if(xhr.responseText){
-                            let res = JSON.parse(xhr.responseText)
-                            i += 1
-                            if(i <= 1){
-                                console.log(res)
-                                console.log(i)
-                            }
-                        }
-                    } else {
-                        _this.loading = false
-                        _this.fileUploadVisible = false
-                    }
-                    xhr.upload.addEventListener("error", event => {
-                        _this.$message.error('Fail')
-                    })
-                };
-                // 获取上传进度
-                xhr.upload.onprogress = function(event) { 
-                    console.log('event.loaded', event.loaded)
-                    console.log('event.total', event.total)
-                    if (event.lengthComputable) {
-                        let percentIn = Math.floor(event.loaded / event.total * 100);
-                        // 设置进度显示
-                        _this.percentIn = percentIn+'%'
-                        console.log(percentIn+'%')
-                    }
-                };
-                xhr.send();
-
-            },
+            }
         },
         mounted() {
             let _this = this
             that = _this
-            if(!_this.metaAddress || _this.metaAddress == 'undefined' || _this.center_fail){
-                _this.centerDialogVisible = true
-                _this.modelClose = false
-            }
-            setTimeout(function(){_this.walletInfo()}, 100)
             _this.stats()
             _this.$store.dispatch("setRouterMenu", 0);
             _this.$store.dispatch('setHeadertitle', _this.$t('navbar.Upload_files'))
@@ -964,7 +807,7 @@
     #Create {
         position: relative;
         height: calc(100% - 0.6rem);
-        padding: 0.4rem 0.2rem;
+        padding: 0.4rem 0.2rem 0;
         font-size: 0.24rem;
         .loadMetamaskPay{
             position: absolute;

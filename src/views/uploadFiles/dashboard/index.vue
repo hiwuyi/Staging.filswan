@@ -1,8 +1,5 @@
 <template>
   <div id="dealManagement">
-    <el-alert type="warning" effect="dark" center show-icon v-if="metaAddress&&networkID!=80001">
-        <div slot="title">Your wallet is wrongly connected to {{network.name}} Network. To use our site, please switch to <span style="text-decoration: underline;">Mumbai Testnet</span>.</div>
-    </el-alert>
     <div class="tabTaskStyle">
       <div class="createTask">
         <!-- name: 'upload_file' -->
@@ -452,23 +449,6 @@
         :payRow="payRow" :cost="cost" :bilingPrice="biling_price"
         @getDialog="getDialog"></pay-tip>
 
-
-      <el-dialog
-        :title="$t('transfer.connect_wallet')"
-        :visible.sync="centerDialogVisible" :close-on-click-modal="modelClose" :show-close="modelClose" :close-on-press-escape="modelClose"
-        :width="width"
-        custom-class="metaM"
-        center>
-        <el-row>
-            <el-col :span="12">MetaMask</el-col>
-            <el-col :span="12"><img src="@/assets/images/metamask.png" alt=""></el-col>
-        </el-row>
-        <span slot="footer" class="dialog-footer">
-            <el-button type="primary"  @click="signFun">{{$t('transfer.connect_wallet')}}</el-button>
-            <p v-if="center_fail">Please connect your wallet to Mumbai Testnet.</p>
-        </span>
-        </el-dialog>
-
         <el-dialog title="" :visible.sync="finishTransaction" :width="width"
             :before-close="finishClose"
             custom-class="completeDia">
@@ -493,6 +473,13 @@
           :visible.sync="wrongVisible" :show-close="false"
           :width="width" custom-class="wrongNet">
           <span>Please wait until the task is assigned to a storage provider.</span>
+        </el-dialog>
+
+        <el-dialog title="" :visible.sync="metamaskLoginTip" :width="width"
+            custom-class="completeDia">
+            <img src="@/assets/images/box-important.png" />
+            <h4>Your wallet is wrongly connected to {{network.name}} Network. To use our site, please switch to <b>Mumbai Testnet</b>.</h4>
+            <a class="a-close" @click="metamaskLoginTip=false">OK</a>
         </el-dialog>
 
       
@@ -577,7 +564,8 @@ export default {
         storage_cost_low: 0,
         storage_cost_average: 0,
         storage_cost_high: 0,
-      }
+      },
+      metamaskLoginTip: false
     };
   },
   computed: {
@@ -602,9 +590,6 @@ export default {
       _this.parmaChild.limit = 10
       _this.parmaChild.offset = 1
       _this.getData()
-    },
-    networkID: function(){
-        this.walletInfo()
     }
   },
   created() {
@@ -634,6 +619,10 @@ export default {
     },
     payClick(row){
       let _this = this
+      if(_this.metaAddress&&_this.networkID!=80001) {
+          _this.metamaskLoginTip = true
+          return false
+      }
       // console.log(row)
       _this.payRow = row
       _this.payRow.storage_cost = row.file_size_byte * row.duration * _this.storage / 365
@@ -650,9 +639,9 @@ export default {
       if(_this.metaAddress){
         _this.loading = true
         // 发起请求
-        axios.get(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/billing/deal/lockpayment/info?payload_cid=${_this.payRow.payload_cid}`,{
+        axios.get(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/billing/deal/lockpayment/info?payload_cid=${_this.payRow.payload_cid}&wallet_address=${_this.metaAddress}`,{
             headers: {
-            'Authorization': "Bearer "+_this.$store.getters.accessToken
+            // 'Authorization': "Bearer "+_this.$store.getters.accessToken
             },
         })
         .then((res) => {
@@ -784,9 +773,9 @@ export default {
         lockParam.append('lock_payment_status', success)
         lockParam.append('network_name', 'polygon')
 
-        axios.post(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/billing/deal/lockpayment/status`, lockParam,{
+        axios.post(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/billing/deal/lockpayment/status?wallet_address=${_this.metaAddress}`, lockParam,{
             headers: {
-            'Authorization': "Bearer "+_this.$store.getters.accessToken
+            // 'Authorization': "Bearer "+_this.$store.getters.accessToken
             },
         })
         .then((res) => {
@@ -797,101 +786,6 @@ export default {
     finishClose(){
         this.finishTransaction = false
         this.getData()
-    },
-    signFun(){
-        let _this = this
-        if(!_this.metaAddress){
-            NCWeb3.Init(addr=>{
-                _this.$nextTick(() => {
-                    _this.$store.dispatch('setMetaAddress', addr)
-                    _this.walletInfo()
-                })
-            })
-            return false
-        }else{
-          _this.walletInfo()
-        }
-    },
-    walletInfo() {
-        let _this = this
-        if(!_this.metaAddress || _this.metaAddress == 'undefined'){
-            _this.modelClose = false
-            return false
-        }
-        ethereum
-        .request({ method: 'eth_chainId' })
-        .then((chainId) => {
-            let netId = parseInt(chainId, 16)
-            // console.log('network ID:', netId)
-            // console.log(`decimal number: ${parseInt(chainId, 16)}`);
-            _this.$store.dispatch('setMetaNetworkId', netId)
-            switch (netId) {
-              case 1:
-                  _this.network.name = 'mainnet';
-                  _this.network.unit = 'ETH';
-                  _this.center_fail = true
-                  _this.centerDialogVisible = true
-                  return;
-              case 3:
-                  _this.network.name = 'ropsten';
-                  _this.network.unit = 'ETH';
-                  _this.center_fail = true
-                  _this.centerDialogVisible = true
-                  break;
-              case 4:
-                  _this.network.name = 'rinkeby';
-                  _this.network.unit = 'ETH';
-                  _this.center_fail = true
-                  _this.centerDialogVisible = true
-                  return;
-              case 5:
-                  _this.network.name = 'goerli';
-                  _this.network.unit = 'ETH';
-                  _this.center_fail = true
-                  _this.centerDialogVisible = true
-                  return;
-              case 42:
-                  _this.network.name = 'kovan';
-                  _this.network.unit = 'ETH';
-                  _this.center_fail = true
-                  _this.centerDialogVisible = true
-                  return;
-              case 56:
-                  _this.network.name = 'BSC';
-                  _this.network.unit = 'BNB';
-                  _this.center_fail = true
-                  _this.centerDialogVisible = true
-                  return;
-              case 97:
-                  _this.network.name = 'BSC';
-                  _this.network.unit = 'BNB';
-                  _this.center_fail = true
-                  _this.centerDialogVisible = true
-                  return;
-              case 999:
-                  _this.network.name = 'NBAI';
-                  _this.network.unit = 'NBAI';
-                  _this.center_fail = true
-                  _this.centerDialogVisible = true
-                  return;
-              case 80001:
-                  _this.network.name = 'mumbai';
-                  _this.network.unit = 'MATIC';
-                  _this.center_fail = false
-                  _this.centerDialogVisible = false
-                  _this.modelClose = true
-                  return;
-              default:
-                  _this.network.name = 'Custom';
-                  _this.network.unit = '';
-                  _this.center_fail = true
-                  _this.centerDialogVisible = true
-                  return;
-            }
-        })
-        .catch((error) => {
-            console.error(`Error fetching chainId: ${error.code}: ${error.message}`);
-        });
     },
     getDialog(dialog, rows){
         this.payVisible = dialog
@@ -1005,9 +899,9 @@ export default {
               instance.confirmButtonText = 'Executing...';
 
               let cancelDeal_api = `${process.env.BASE_API}tasks/${uuid}/paymentgateway/cancel`
-              axios.put(cancelDeal_api, {}, {
+              axios.put(cancelDeal_api, {'wallet_address': _this.metaAddress}, {
                   headers: {
-                      'Authorization': "Bearer "+ _this.$store.getters.accessToken
+                      // 'Authorization': "Bearer "+ _this.$store.getters.accessToken
                   },
               }).then(res => {
                   if(res.data.status == 'success'){
@@ -1040,11 +934,11 @@ export default {
     },
     payFun(cid, type){
       let _this = this
-      let pay_api = `${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/events/logs/lock/${cid}`
+      let pay_api = `${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/events/logs/lock/${cid}?wallet_address=${_this.metaAddress}`
 
       axios.get(pay_api, {
           headers: {
-            'Authorization': "Bearer "+ _this.$store.getters.accessToken
+            // 'Authorization': "Bearer "+ _this.$store.getters.accessToken
           },
       })
       .then((json) => {
@@ -1076,10 +970,10 @@ export default {
     },
     sendDeal(){
         let _this = this
-        let sendDeal_api = `${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/storage/lotus/deal/${_this.expands[0]}`
+        let sendDeal_api = `${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/storage/lotus/deal/${_this.expands[0]}?wallet_address=${_this.metaAddress}`
         axios.get(sendDeal_api, {
             headers: {
-                'Authorization': "Bearer "+ _this.$store.getters.accessToken
+                // 'Authorization': "Bearer "+ _this.$store.getters.accessToken
             },
         }).then(res => {
             if(res.data.status == 'success'){
@@ -1123,10 +1017,10 @@ export default {
             _this.usdcAddress = _this.$root.USDC_ADDRESS
             _this.recipientAddress = _this.$root.RECIPIENT
             
-            let stats_api = `${process.env.BASE_API}stats/storage`
+            let stats_api = `${process.env.BASE_API}stats/storage?wallet_address=${_this.metaAddress}`
             axios.get(stats_api, {
                 headers: {
-                    'Authorization': "Bearer "+ _this.$store.getters.accessToken
+                    // 'Authorization': "Bearer "+ _this.$store.getters.accessToken
                 },
             }).then(res => {
                 if(res.data.data){
@@ -1137,10 +1031,10 @@ export default {
                 console.log(error)
             })
             
-            let billing_api = `${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/billing/price/filecoin`
+            let billing_api = `${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/billing/price/filecoin?wallet_address=${_this.metaAddress}`
             axios.get(billing_api, {
                 headers: {
-                    'Authorization': "Bearer "+ _this.$store.getters.accessToken
+                    // 'Authorization': "Bearer "+ _this.$store.getters.accessToken
                 },
             }).then(res => {
                 if(res.data.data){
@@ -1165,7 +1059,8 @@ export default {
         page_size: _this.parma.limit,
         page_number: _this.parma.offset,
         file_name: _this.searchValue,
-        source_id: 4
+        source_id: 4,
+        wallet_address: _this.metaAddress
       };
 
       _this.tableData = []
@@ -1263,11 +1158,6 @@ export default {
     document.getElementById("content-box").scrollTop = 0;
     _this.$store.dispatch("setRouterMenu", 1);
     _this.$store.dispatch("setHeadertitle", _this.$t('navbar.deal'));
-    if(!_this.metaAddress || _this.metaAddress == 'undefined' || _this.center_fail){
-        _this.centerDialogVisible = true
-        _this.modelClose = false
-    }
-    setTimeout(function(){_this.walletInfo()}, 500)
     _this.stats()
     document.onkeydown = function (e) {
       if (e.keyCode === 13) {
