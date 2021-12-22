@@ -324,86 +324,80 @@ export default {
             .catch((error) => {
                 console.error(`Error fetching getBalance: ${error.code}: ${error.message}`);
             });
-          ethereum
-          .request({ method: 'eth_chainId' })
-          .then((chainId) => {
-              let netId = parseInt(chainId, 16)
-              // console.log('network ID:', netId)
-              // console.log(`decimal number: ${parseInt(chainId, 16)}`);
-              _this.$store.dispatch('setMetaNetworkId', netId)
-              switch (netId) {
-              case 1:
-                  _this.network.name = 'mainnet';
-                  _this.network.unit = 'ETH';
-                  _this.network.center_fail = true
-                  _this.$store.dispatch('setMetaNetworkInfo', _this.network)
-                  return;
-              case 3:
-                  _this.network.name = 'ropsten';
-                  _this.network.unit = 'ETH';
-                  _this.network.center_fail = true
-                  _this.$store.dispatch('setMetaNetworkInfo', _this.network)
-                  break;
-              case 4:
-                  _this.network.name = 'rinkeby';
-                  _this.network.unit = 'ETH';
-                  _this.network.center_fail = true
-                  _this.$store.dispatch('setMetaNetworkInfo', _this.network)
-                  return;
-              case 5:
-                  _this.network.name = 'goerli';
-                  _this.network.unit = 'ETH';
-                  _this.network.center_fail = true
-                  _this.$store.dispatch('setMetaNetworkInfo', _this.network)
-                  return;
-              case 42:
-                  _this.network.name = 'kovan';
-                  _this.network.unit = 'ETH';
-                  _this.network.center_fail = true
-                  _this.$store.dispatch('setMetaNetworkInfo', _this.network)
-                  return;
-              case 56:
-                  _this.network.name = 'BSC';
-                  _this.network.unit = 'BNB';
-                  _this.network.center_fail = true
-                  _this.$store.dispatch('setMetaNetworkInfo', _this.network)
-                  return;
-              case 97:
-                  _this.network.name = 'BSC';
-                  _this.network.unit = 'BNB';
-                  _this.network.center_fail = true
-                  _this.$store.dispatch('setMetaNetworkInfo', _this.network)
-                  return;
-              case 999:
-                  _this.network.name = 'NBAI';
-                  _this.network.unit = 'NBAI';
-                  _this.network.center_fail = true
-                  _this.$store.dispatch('setMetaNetworkInfo', _this.network)
-                  return;
-              case 80001:
-                  _this.network.name = 'mumbai';
-                  _this.network.unit = 'MATIC';
-                  _this.network.center_fail = false
-                  _this.$store.dispatch('setMetaNetworkInfo', _this.network)
-                  if(_this.fromEnter && _this.fromEnter != '/supplierAllBack'){
-                    // 防止登录后需要跳转到指定页面
-                    _this.$router.push({ path: _this.fromEnter })
-                  }else{
-                    // this.$router.go(-1)
-                    _this.$router.push({ path: '/upload_file' })
-                  }
-                  return;
-              default:
-                  _this.network.name = 'Custom';
-                  _this.network.unit = '';
-                  _this.network.center_fail = true
-                  _this.$store.dispatch('setMetaNetworkInfo', _this.network)
-                  return;
-              }
-          })
-          .catch((error) => {
-              console.error(`Error fetching chainId: ${error.code}: ${error.message}`);
-          });
+            
+            ethereum
+            .request({ method: 'eth_chainId' })
+            .then((chainId) => {
+                let netId = parseInt(chainId, 16)
+                // console.log('network ID:', netId)
+                // console.log(`decimal number: ${parseInt(chainId, 16)}`);
+                _this.$store.dispatch('setMetaNetworkId', netId)
+                switch (netId) {
+                case 1:
+                    _this.network.name = 'mainnet';
+                    _this.network.unit = 'ETH';
+                    _this.network.center_fail = true
+                    _this.$store.dispatch('setMetaNetworkInfo', _this.network)
+                    return;
+                case 3:
+                    _this.network.name = 'ropsten';
+                    _this.network.unit = 'ETH';
+                    _this.network.center_fail = true
+                    _this.$store.dispatch('setMetaNetworkInfo', _this.network)
+                    break;
+                case 4:
+                    _this.network.name = 'rinkeby';
+                    _this.network.unit = 'ETH';
+                    _this.network.center_fail = true
+                    _this.$store.dispatch('setMetaNetworkInfo', _this.network)
+                    return;
+                case 5:
+                    _this.network.name = 'goerli';
+                    _this.network.unit = 'ETH';
+                    _this.network.center_fail = true
+                    _this.$store.dispatch('setMetaNetworkInfo', _this.network)
+                    return;
+                case 42:
+                    _this.network.name = 'kovan';
+                    _this.network.unit = 'ETH';
+                    _this.network.center_fail = true
+                    _this.$store.dispatch('setMetaNetworkInfo', _this.network)
+                    return;
+                case 56:
+                    _this.network.name = 'BSC';
+                    _this.network.unit = 'BNB';
+                    _this.network.center_fail = true
+                    _this.$store.dispatch('setMetaNetworkInfo', _this.network)
+                    return;
+                case 97:
+                    _this.network.name = 'BSC';
+                    _this.network.unit = 'BNB';
+                    _this.network.center_fail = true
+                    _this.$store.dispatch('setMetaNetworkInfo', _this.network)
+                    return;
+                case 999:
+                    _this.network.name = 'NBAI';
+                    _this.network.unit = 'NBAI';
+                    _this.network.center_fail = true
+                    _this.$store.dispatch('setMetaNetworkInfo', _this.network)
+                    return;
+                case 80001:
+                    _this.network.name = 'mumbai';
+                    _this.network.unit = 'MATIC';
+                    _this.network.center_fail = false
+                    _this.$store.dispatch('setMetaNetworkInfo', _this.network)
+                    return;
+                default:
+                    _this.network.name = 'Custom';
+                    _this.network.unit = '';
+                    _this.network.center_fail = true
+                    _this.$store.dispatch('setMetaNetworkInfo', _this.network)
+                    return;
+                }
+            })
+            .catch((error) => {
+                console.error(`Error fetching chainId: ${error.code}: ${error.message}`);
+            });
         },
         fn() {
             let _this = this
