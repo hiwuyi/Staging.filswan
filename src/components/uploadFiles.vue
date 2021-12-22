@@ -315,7 +315,7 @@
                                 // 判断支付金额是否大于代币余额
                                 if(_this.ruleForm.amount > _this.usdcAvailable ){
                                     _this.$message.error('Insufficient balance')
-                                    _this.sendSuccess(cid, 'Fail')
+                                    // _this.sendSuccess(cid, 'Fail')
                                     return false
                                 }
 
@@ -360,7 +360,7 @@
                                                                 })
                                                                 .catch(error => {
                                                                     // console.log('errorerrorerror', error)
-                                                                    _this.sendSuccess(res.data.payload_cid, 'Pending')
+                                                                    // _this.sendSuccess(res.data.payload_cid, 'Pending')
                                                                 })
                                                             }
                                                             _this.contractSend(res.data.payload_cid)
@@ -503,7 +503,7 @@
                     _this.loading = false
                     _this.loadMetamaskPay = false
                     _this.failTransaction = true
-                    _this.sendSuccess(cid, 'Fail')
+                    // _this.sendSuccess(cid, 'Fail')
                 }); 
             },
             checkTransaction(txHash, cid) {
