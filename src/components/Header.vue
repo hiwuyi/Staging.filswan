@@ -106,6 +106,7 @@ export default {
             width: document.body.clientWidth>600?'400px':'95%',
         };
     },
+    props: ["meta"],
     computed: {
         email() {
             return this.$store.state.user.email
@@ -164,6 +165,9 @@ export default {
         },
         metaAddress: function() {
             this.addrChild = this.metaAddress
+            this.walletInfo()
+        },
+        meta: function() {
             this.walletInfo()
         }
     },
@@ -288,14 +292,6 @@ export default {
                     // console.log('Wallet address:', addr)
                     _this.$nextTick(() => {
                         _this.addrChild = addr
-                        if(redirect) {
-                            if(_this.$route.query.redirect && _this.$route.query.redirect != '/supplierAllBack'){
-                                // 防止登录后需要跳转到指定页面
-                                _this.$router.push({ path: _this.$route.query.redirect })
-                            }else{
-                                _this.$router.push({ path: '/upload_file' })
-                            }
-                        }
                         _this.walletInfo()
                     })
                 })
@@ -386,6 +382,15 @@ export default {
                     _this.network.unit = 'MATIC';
                     _this.network.center_fail = false
                     _this.$store.dispatch('setMetaNetworkInfo', _this.network)
+                    if(_this.meta) {
+                        if(_this.$route.query.redirect && _this.$route.query.redirect != '/supplierAllBack'){
+                            // 防止登录后需要跳转到指定页面
+                            _this.$router.push({ path: _this.$route.query.redirect })
+                        }else{
+                            _this.$router.push({ path: '/upload_file' })
+                        }
+                        _this.$emit("getMetamaskLogin", false)
+                    }
                     return;
                 default:
                     _this.network.name = 'Custom';

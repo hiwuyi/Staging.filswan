@@ -35,6 +35,7 @@
               NCWeb3.Init(addr=>{
                   _this.$nextTick(() => {
                       _this.$store.dispatch('setMetaAddress', addr)
+                      _this.$emit("getMetamaskLogin", true)
                   })
               })
               return false

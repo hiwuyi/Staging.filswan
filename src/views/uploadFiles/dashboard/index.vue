@@ -641,7 +641,7 @@ export default {
         // 发起请求
         axios.get(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/billing/deal/lockpayment/info?payload_cid=${_this.payRow.payload_cid}&wallet_address=${_this.metaAddress}`,{
             headers: {
-            // 'Authorization': "Bearer "+_this.$store.getters.accessToken
+            'Authorization': "Bearer "
             },
         })
         .then((res) => {

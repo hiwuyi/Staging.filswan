@@ -1,6 +1,6 @@
 <template>
     <div class="wrapper">
-        <v-head></v-head>
+        <v-head :meta="meta" @getMetamaskLogin="getMetamaskLogin"></v-head>
         <v-sidebar></v-sidebar>
         <div class="content-box" id="content-box" :class="{'content-collapse':collapseP}">
             <div id="headerMb" v-if="bodyWidth">
@@ -15,7 +15,7 @@
                     </el-alert>
                     <transition name="move" mode="out-in">
                         <keep-alive :include="tagsList">
-                            <router-view></router-view>
+                            <router-view @getMetamaskLogin="getMetamaskLogin"></router-view>
                         </keep-alive>
                     </transition>
                 </div>
@@ -63,7 +63,8 @@ export default {
             share_img8: require('@/assets/images/landing/youtube.png'),
             share_img9: require('@/assets/images/landing/telegram.png'),
             share_img10: require('@/assets/images/landing/discord.png'),
-            share_logo: require('@/assets/images/landing/logo_small.png')
+            share_logo: require('@/assets/images/landing/logo_small.png'),
+            meta: false
         };
     },
     components: {
@@ -99,6 +100,9 @@ export default {
         }
     },
     methods: {
+        getMetamaskLogin(meta) {
+            this.meta = meta
+        }
     },
     mounted() {
         let bo = this.bodyWidth

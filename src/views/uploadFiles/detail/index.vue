@@ -220,7 +220,7 @@ export default {
             }
             axios.get(`${process.env.BASE_PAYMENT_GATEWAY_API}api/v1/storage/deal/detail/${_this.dealId}?${QS.stringify(dataCid)}`, {headers: {
             // axios.get(`./static/detail_page_response.json`, {headers: {
-                    // 'Authorization':"Bearer "+ _this.$store.getters.accessToken
+                    'Authorization':"Bearer "
             }}).then((response) => {
                 let json = response.data
                 _this.loading = false
